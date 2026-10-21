@@ -229,14 +229,14 @@ function App() {
 
                           <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200 text-center space-y-2 hover:border-teal-300 transition-colors">
                             <Phone className="h-6 w-6 text-teal-600 mx-auto" />
-                            <h4 className="font-bold text-slate-900 text-xs">Emergency Hotline</h4>
-                            <p className="text-xs text-slate-500">+1 (800) 555-0199</p>
+                            <h4 className="font-bold text-slate-900 text-xs">Emergency Helpline</h4>
+                            <p className="text-xs text-slate-500">+91 1800 555 0199</p>
                           </div>
 
                           <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200 text-center space-y-2 hover:border-indigo-300 transition-colors">
                             <MapPin className="h-6 w-6 text-indigo-600 mx-auto" />
-                            <h4 className="font-bold text-slate-900 text-xs">Compliance HQ</h4>
-                            <p className="text-xs text-slate-500">Geneva, Switzerland</p>
+                            <h4 className="font-bold text-slate-900 text-xs">India Compliance HQ</h4>
+                            <p className="text-xs text-slate-500">Bengaluru, Karnataka, India</p>
                           </div>
                         </div>
                       </div>
@@ -264,7 +264,7 @@ function App() {
                           <strong>3. Encrypted File Storage:</strong> Verification files and uploaded beneficiary documents are encrypted before persistence in redundant cloud storage buckets.
                         </p>
                         <p>
-                          <strong>4. GDPR & Human Rights Compliance:</strong> In accordance with international privacy laws, organizations can request data export packages or cryptographically verified record purge certificates at any time.
+                          <strong>4. Digital Personal Data Protection (DPDP) Act 2023:</strong> In accordance with India's DPDP Act 2023 and global privacy standards, organizations can request data export packages or cryptographically verified record purge certificates at any time. Masked Aadhaar storage ensures zero plain Aadhaar numbers are persisted or exposed.
                         </p>
                       </div>
                     }

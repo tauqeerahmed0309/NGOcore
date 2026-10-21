@@ -162,17 +162,17 @@ function maskValue(val, fieldType = 'text', fieldKey = '') {
     return `${visibleStart}***${visibleEnd}@${domain}`;
   }
 
-  // Phone masking: e.g. +1 ***-***-1234
+  // Phone masking: e.g. +91 ***** 1234
   if (lowerType.includes('phone') || lowerKey.includes('phone') || /^[0-9+\-\s()]{7,}$/.test(str)) {
     const digits = str.replace(/[^0-9]/g, '');
     if (digits.length >= 4) {
       const last4 = digits.slice(-4);
-      return `***-***-${last4}`;
+      return `+91 ***** ${last4}`;
     }
-    return '***-***-****';
+    return '+91 ***** ****';
   }
 
-  // Identification (Aadhaar / SSN / Passport / Encrypted text): e.g. ****-****-5678
+  // Identification (Aadhaar / National ID / Encrypted text): UIDAI standard XXXX XXXX 1234
   if (
     lowerType.includes('id') ||
     lowerType.includes('national') ||
@@ -182,11 +182,11 @@ function maskValue(val, fieldType = 'text', fieldKey = '') {
     lowerKey.includes('national') ||
     lowerKey.includes('aadhaar')
   ) {
-    if (str.length > 4) {
-      const last4 = str.slice(-4);
-      return `****-****-${last4}`;
+    if (str.length >= 4) {
+      const last4 = str.replace(/[^0-9a-zA-Z]/g, '').slice(-4);
+      return `XXXX XXXX ${last4}`;
     }
-    return '****';
+    return 'XXXX XXXX ****';
   }
 
   // General text masking: keep first and last chars if long enough

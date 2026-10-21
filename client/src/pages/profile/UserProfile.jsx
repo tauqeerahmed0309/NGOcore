@@ -2,6 +2,12 @@ import React, { useState, useEffect, useRef } from 'react';
 import { pageTransition } from '../../animations';
 import userService from '../../services/userService';
 import {
+  formatIndianPhone,
+  normalizeIndianPhone,
+  isValidIndianPhone,
+  formatDateIST
+} from '../../utils/format';
+import {
   User,
   Shield,
   ShieldCheck,
@@ -175,17 +181,25 @@ export default function UserProfile() {
       setUpdatingProfile(true);
       setError(null);
 
+      if (formData.phone && !isValidIndianPhone(formData.phone)) {
+        setError('Please enter a valid 10-digit Indian mobile number');
+        setUpdatingProfile(false);
+        return;
+      }
+
+      const normalizedPhone = formData.phone ? normalizeIndianPhone(formData.phone) : '';
+
       let payload;
       if (avatarFile) {
         payload = new FormData();
         payload.append('name', formData.name);
-        payload.append('phone', formData.phone);
+        payload.append('phone', normalizedPhone);
         payload.append('designation', formData.designation);
         payload.append('avatar', avatarFile);
       } else {
         payload = {
           name: formData.name,
-          phone: formData.phone,
+          phone: normalizedPhone,
           designation: formData.designation,
           avatarUrl: formData.avatarUrl
         };
@@ -364,7 +378,7 @@ export default function UserProfile() {
                 {profile?.phone && (
                   <div className="flex items-center space-x-1.5 bg-slate-800/80 px-2.5 py-1 rounded-lg border border-slate-700/60">
                     <Phone className="h-3.5 w-3.5 text-indigo-400" />
-                    <span>{profile.phone}</span>
+                    <span>{formatIndianPhone(profile.phone)}</span>
                   </div>
                 )}
               </div>
@@ -499,7 +513,7 @@ export default function UserProfile() {
 
                   <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100">
                     <span className="text-xs text-slate-500 font-medium block mb-1">Contact Phone</span>
-                    <span className="font-bold text-slate-800">{profile?.phone || 'No phone added'}</span>
+                    <span className="font-bold text-slate-800">{profile?.phone ? formatIndianPhone(profile.phone) : 'No phone added'}</span>
                   </div>
                 </div>
 
@@ -507,7 +521,7 @@ export default function UserProfile() {
                   <div className="flex items-center space-x-2">
                     <Calendar className="h-4 w-4 text-indigo-600" />
                     <span className="text-slate-600">
-                      Member Account Created: <strong>{new Date(profile?.createdAt).toLocaleDateString()}</strong>
+                      Member Account Created: <strong>{profile?.createdAt ? formatDateIST(profile.createdAt) : 'N/A'}</strong>
                     </span>
                   </div>
                   <span className="text-indigo-700 font-semibold">Strict Multi-Tenant Scoped</span>

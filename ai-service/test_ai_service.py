@@ -49,9 +49,9 @@ class TestAIService(unittest.TestCase):
                 "_id": "rec_003",
                 "recordNumber": "BEN-2026-00003",
                 "data": {
-                    "full_name": "David Miller",
-                    "phone": "+1 555-0199",
-                    "national_id": "ID-11223-USA"
+                    "full_name": "Devendra Mishra",
+                    "phone": "+91 98765 43210",
+                    "national_id": "XXXX XXXX 1122"
                 }
             }
         ]

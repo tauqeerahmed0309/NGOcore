@@ -6,6 +6,15 @@ import privacyService from '../../services/privacyService';
 import { useToast } from '../../context/ToastContext';
 import { useAuth } from '../../context/AuthContext';
 import {
+  formatCurrency,
+  formatIndianCompact,
+  formatIndianNumber,
+  formatDateIST,
+  formatDateTimeIST,
+  formatIndianPhone,
+  maskAadhaar
+} from '../../utils/format';
+import {
   FolderLock,
   PlusCircle,
   Search,
@@ -698,14 +707,27 @@ const RecordsPage = () => {
 
                       <td className="py-3.5 px-4 max-w-xs truncate">
                         <div className="flex flex-wrap items-center gap-1.5">
-                          {dataEntries.map(([k, v]) => (
-                            <span
-                              key={k}
-                              className="px-2 py-0.5 rounded bg-slate-50 border border-slate-200/60 text-[11px] text-slate-600 truncate max-w-[140px]"
-                            >
-                              <strong>{k.replace(/_/g, ' ')}:</strong> {String(v)}
-                            </span>
-                          ))}
+                          {dataEntries.map(([k, v]) => {
+                            const lk = k.toLowerCase();
+                            let formattedVal = String(v);
+                            if (lk.includes('amount') || lk.includes('funding') || lk.includes('income')) {
+                              const num = Number(v);
+                              if (!isNaN(num) && num > 0) formattedVal = formatCurrency(num);
+                            } else if (lk.includes('aadhaar') || k === 'national_id') {
+                              formattedVal = maskAadhaar(v);
+                            } else if (lk.includes('phone')) {
+                              formattedVal = formatIndianPhone(v);
+                            }
+
+                            return (
+                              <span
+                                key={k}
+                                className="px-2 py-0.5 rounded bg-slate-50 border border-slate-200/60 text-[11px] text-slate-600 truncate max-w-[140px]"
+                              >
+                                <strong>{k.replace(/_/g, ' ')}:</strong> {formattedVal}
+                              </span>
+                            );
+                          })}
                           {rec.encryptedFields && rec.encryptedFields.length > 0 && (
                             <span
                               className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center space-x-1"
@@ -728,8 +750,8 @@ const RecordsPage = () => {
                         </span>
                       </td>
 
-                      <td className="py-3.5 px-4 text-slate-400 whitespace-nowrap">
-                        {rec.createdAt ? new Date(rec.createdAt).toLocaleDateString() : 'N/A'}
+                      <td className="py-3.5 px-4 text-slate-400 whitespace-nowrap font-mono text-[11px]">
+                        {rec.createdAt ? formatDateIST(rec.createdAt) : 'N/A'}
                       </td>
 
                       <td className="py-3.5 px-4 text-right whitespace-nowrap">
@@ -919,6 +941,38 @@ const RecordsPage = () => {
                               placeholder={field.placeholder || ''}
                               className="w-full px-3 py-2 rounded-xl text-xs bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                             />
+                          ) : field.type === 'Currency' ? (
+                            <div className="relative flex rounded-xl shadow-xs">
+                              <span className="inline-flex items-center px-3 rounded-l-xl border border-r-0 border-slate-200 bg-slate-100 text-slate-700 text-xs font-bold select-none">
+                                ₹
+                              </span>
+                              <input
+                                type="number"
+                                required={field.required}
+                                value={formData[field.key] || ''}
+                                onChange={(e) =>
+                                  setFormData({ ...formData, [field.key]: e.target.value })
+                                }
+                                placeholder={field.placeholder || 'Amount in INR'}
+                                className="w-full px-3 py-2 rounded-r-xl text-xs bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                              />
+                            </div>
+                          ) : field.type === 'Phone' ? (
+                            <div className="relative flex rounded-xl shadow-xs">
+                              <span className="inline-flex items-center px-2.5 rounded-l-xl border border-r-0 border-slate-200 bg-slate-100 text-slate-700 text-xs font-bold select-none">
+                                🇮🇳 +91
+                              </span>
+                              <input
+                                type="tel"
+                                required={field.required}
+                                value={formData[field.key] || ''}
+                                onChange={(e) =>
+                                  setFormData({ ...formData, [field.key]: e.target.value })
+                                }
+                                placeholder={field.placeholder || '98765 43210'}
+                                className="w-full px-3 py-2 rounded-r-xl text-xs bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                              />
+                            </div>
                           ) : (
                             <input
                               type={
@@ -1086,6 +1140,17 @@ const RecordsPage = () => {
                       const isEncryptedField =
                         activeRecord.encryptedFields && activeRecord.encryptedFields.includes(key);
 
+                      const lk = key.toLowerCase();
+                      let formattedVal = String(val || 'N/A');
+                      if (lk.includes('amount') || lk.includes('funding') || lk.includes('income')) {
+                        const num = Number(val);
+                        if (!isNaN(num) && num > 0) formattedVal = formatCurrency(num);
+                      } else if (lk.includes('aadhaar') || key === 'national_id') {
+                        formattedVal = maskAadhaar(val);
+                      } else if (lk.includes('phone')) {
+                        formattedVal = formatIndianPhone(val);
+                      }
+
                       return (
                         <div
                           key={key}
@@ -1101,7 +1166,7 @@ const RecordsPage = () => {
                             )}
                           </div>
                           <p className="text-xs font-semibold text-slate-900 break-words">
-                            {String(val || 'N/A')}
+                            {formattedVal}
                           </p>
                         </div>
                       );
@@ -1112,9 +1177,9 @@ const RecordsPage = () => {
                 {/* Audit & Compliance Metadata */}
                 <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2 text-xs text-slate-500">
                   <div className="flex items-center justify-between">
-                    <span>Created At:</span>
+                    <span>Created At (IST):</span>
                     <strong className="text-slate-800">
-                      {new Date(activeRecord.createdAt).toLocaleString()}
+                      {activeRecord.createdAt ? formatDateTimeIST(activeRecord.createdAt) : 'N/A'}
                     </strong>
                   </div>
                   <div className="flex items-center justify-between">
@@ -1336,7 +1401,7 @@ const RecordsPage = () => {
                   rows={8}
                   value={importCsvText}
                   onChange={(e) => setImportCsvText(e.target.value)}
-                  placeholder="Full Name,Gender,National ID / Aadhaar,Phone Number&#10;Maria Santos,Female,ID-12345,+1 555-0199"
+                  placeholder="Full Name,Gender,National ID / Aadhaar,Phone Number&#10;Sunita Devi,Female,XXXX XXXX 1234,+91 98260 12345"
                   className="w-full p-3 rounded-xl font-mono text-xs bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
               </div>
@@ -1435,7 +1500,7 @@ const RecordsPage = () => {
                   <Lock className="h-4 w-4 text-slate-400 group-hover:text-teal-600" />
                 </div>
                 <p className="text-[11px] text-slate-500">
-                  Redacts national IDs (****), phones (***-***-1234), and emails for external donors and grant reporting.
+                  Redacts masked Aadhaar (XXXX XXXX ****), Indian phones (+91 ***** 1234), and emails for external donors and statutory grant reporting under DPDP Act 2023.
                 </p>
               </div>
             </div>

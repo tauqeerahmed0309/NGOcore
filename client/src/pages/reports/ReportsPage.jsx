@@ -6,6 +6,12 @@ import auditService from '../../services/auditService';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import {
+  formatCurrency,
+  formatIndianCompact,
+  formatDateIST,
+  getCurrentFinancialYear
+} from '../../utils/format';
+import {
   BarChart3,
   PieChart,
   TrendingUp,
@@ -39,11 +45,11 @@ const ReportsPage = () => {
 
   const ngoName = ngo?.name || 'Humanitarian Vault';
 
-  // Sample Aggregated Metrics
+  // Sample Aggregated Metrics (Localized for India in INR)
   const summaryMetrics = [
     { title: 'Total Beneficiaries', value: '3,842', change: '+14.2%', period: 'vs last month', icon: Users, color: 'indigo' },
     { title: 'Relief Dispatches', value: '1,280 kits', change: '+8.4%', period: 'vs last month', icon: HeartHandshake, color: 'teal' },
-    { title: 'Grant Capital Inflow', value: '$248,500', change: '+22.5%', period: 'vs last month', icon: Receipt, color: 'emerald' },
+    { title: 'Grant Capital Inflow', value: '₹24.85 Lakh', change: '+22.5%', period: 'vs last month', icon: Receipt, color: 'emerald' },
     { title: 'Cryptographic Audits', value: '100% Valid', change: '0 Tampering', period: 'Merkle root synced', icon: ShieldCheck, color: 'purple' }
   ];
 
@@ -51,7 +57,7 @@ const ReportsPage = () => {
   const aidCategories = [
     { name: 'Food Ration Kits', percentage: 42, count: '538 Dispatches', color: 'bg-indigo-600' },
     { name: 'Emergency Healthcare', percentage: 28, count: '358 Kits', color: 'bg-teal-500' },
-    { name: 'Direct Cash Assistance', percentage: 18, count: '$44,700 disbursed', color: 'bg-emerald-500' },
+    { name: 'Direct Cash Assistance', percentage: 18, count: '₹4.47 Lakh disbursed', color: 'bg-emerald-500' },
     { name: 'Shelter & Tents', percentage: 12, count: '154 Units', color: 'bg-amber-500' }
   ];
 
@@ -75,8 +81,10 @@ const ReportsPage = () => {
 
   const handleExportReport = () => {
     const reportData = {
-      organization: ngoName,
-      generatedAt: new Date().toISOString(),
+      organisation: ngoName,
+      financialYear: getCurrentFinancialYear(),
+      generatedAtIST: formatDateIST(new Date()),
+      operatingCurrency: 'INR (₹)',
       reportingPeriod: timeRange,
       summary: summaryMetrics,
       aidDistribution: aidCategories,
@@ -94,7 +102,7 @@ const ReportsPage = () => {
     document.body.removeChild(a);
     window.URL.revokeObjectURL(url);
 
-    toast.success('Auditor compliance report exported');
+    toast.success('Auditor compliance report exported in INR');
   };
 
   return (
@@ -111,8 +119,11 @@ const ReportsPage = () => {
               <BarChart3 className="h-3 w-3 text-indigo-600" />
               <span>Grant & Donor Analytics</span>
             </span>
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+              {getCurrentFinancialYear()}
+            </span>
             <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-teal-50 text-teal-700 border border-teal-200">
-              UN & DPDP Auditable
+              DPDP Act 2023 Auditable
             </span>
           </div>
           <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight mt-1">

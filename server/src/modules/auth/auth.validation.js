@@ -1,10 +1,16 @@
 const { z } = require('zod');
+const { INDIAN_PHONE_REGEX } = require('../../utils/format');
 
 const signupSchema = {
   body: z.object({
     name: z.string().min(2, "Name must be at least 2 characters"),
     email: z.string().email("Invalid email format"),
-    phone: z.string().optional(),
+    phone: z.string()
+      .refine(
+        val => !val || INDIAN_PHONE_REGEX.test(val.replace(/[\s\-]/g, '')),
+        { message: "Enter a valid 10-digit Indian mobile number" }
+      )
+      .optional(),
     password: z.string()
       .min(8, "Password must be at least 8 characters")
       .regex(/[A-Z]/, "Must contain an uppercase letter")

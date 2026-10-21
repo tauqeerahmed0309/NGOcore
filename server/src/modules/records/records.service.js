@@ -392,9 +392,11 @@ class RecordsService {
     const sampleRow = recordType.fields.map((f) => {
       if (f.type === 'Date') return '2026-01-15';
       if (f.type === 'Number') return '10';
-      if (f.type === 'Phone') return '+1 555-0199';
+      if (f.type === 'Currency') return '25000';
+      if (f.type === 'Phone') return '+91 98765 43210';
       if (f.type === 'Email') return 'sample@domain.org';
       if (f.type === 'Dropdown' && f.options?.length > 0) return f.options[0];
+      if (f.key === 'national_id' || f.name.toLowerCase().includes('aadhaar')) return 'XXXX XXXX 1234';
       return `Sample ${f.name}`;
     });
 
@@ -575,7 +577,11 @@ class RecordsService {
     });
 
     dynamicKeysMap.forEach((meta, k) => {
-      headers.push({ key: `data_${k}`, label: meta.label });
+      let label = meta.label;
+      if (meta.type === 'Currency' && !label.includes('INR') && !label.includes('₹')) {
+        label = `${label} (₹ INR)`;
+      }
+      headers.push({ key: `data_${k}`, label });
     });
 
     const exportRows = records.map(r => {

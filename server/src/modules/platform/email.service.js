@@ -1,5 +1,6 @@
 const { queueEmail } = require('../../jobs/emailJob');
 const env = require('../../config/env');
+const { formatDateTimeIST } = require('../../utils/format');
 
 const sendNgoStatusNotificationEmail = async ({ to, ngoName, status, reason }) => {
   let subject = '';
@@ -77,7 +78,9 @@ const sendNgoStatusNotificationEmail = async ({ to, ngoName, status, reason }) =
         ` : ''}
       </div>
       <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid #EDF2F7; text-align: center; color: #A0AEC0; font-size: 12px;">
-        <p>&copy; ${new Date().getFullYear()} NGOcore. All rights reserved.</p>
+        <p style="margin: 0 0 4px;">Timestamp: ${formatDateTimeIST(new Date())} IST</p>
+        <p style="margin: 0 0 4px;">India Compliance Desk: <a href="tel:+9118005550199" style="color: #4F46E5;">+91 1800 555 0199</a> | support@ngocore.org</p>
+        <p style="margin: 0;">&copy; ${new Date().getFullYear()} NGOcore India. Governed under DPDP Act 2023.</p>
       </div>
     </div>
   `;

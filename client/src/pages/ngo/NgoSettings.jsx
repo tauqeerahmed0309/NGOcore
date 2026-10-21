@@ -3,6 +3,13 @@ import { Link } from 'react-router-dom';
 import { pageTransition } from '../../animations';
 import ngoService from '../../services/ngoService';
 import {
+  INDIAN_STATES,
+  NGO_REGISTRATION_TYPES,
+  isValidPan,
+  isValidPincode,
+  normalizeIndianPhone
+} from '../../utils/format';
+import {
   Building,
   ShieldCheck,
   Settings,
@@ -30,7 +37,10 @@ import {
   Database,
   Bell,
   ToggleLeft,
-  ToggleRight
+  ToggleRight,
+  Hash,
+  CreditCard,
+  Calendar
 } from 'lucide-react';
 
 export default function NgoSettings() {
@@ -47,8 +57,24 @@ export default function NgoSettings() {
   const [profileForm, setProfileForm] = useState({
     name: '',
     type: '',
+    registrationType: 'Registered Public Charitable Trust',
     registrationNumber: '',
+    registrationYear: '',
+    pan: '',
+    registration12A: '',
+    registration80G: '',
+    fcraNumber: '',
+    ngoDarpanId: '',
+    csr1Number: '',
+    gstin: '',
     address: '',
+    addressLine1: '',
+    addressLine2: '',
+    city: '',
+    district: '',
+    state: 'Karnataka',
+    pincode: '',
+    country: 'India',
     contactPhone: '',
     website: '',
     description: '',
@@ -90,9 +116,25 @@ export default function NgoSettings() {
 
       setProfileForm({
         name: data.name || '',
-        type: data.type || 'Trust',
+        type: data.type || '',
+        registrationType: data.registrationType || 'Registered Public Charitable Trust',
         registrationNumber: data.registrationNumber || '',
+        registrationYear: data.registrationYear ? String(data.registrationYear) : '',
+        pan: data.pan || '',
+        registration12A: data.registration12A || '',
+        registration80G: data.registration80G || '',
+        fcraNumber: data.fcraNumber || '',
+        ngoDarpanId: data.ngoDarpanId || '',
+        csr1Number: data.csr1Number || '',
+        gstin: data.gstin || '',
         address: data.address || '',
+        addressLine1: data.addressLine1 || '',
+        addressLine2: data.addressLine2 || '',
+        city: data.city || '',
+        district: data.district || '',
+        state: data.state || 'Karnataka',
+        pincode: data.pincode || '',
+        country: data.country || 'India',
         contactPhone: data.contactPhone || '',
         website: data.website || '',
         description: data.description || '',
@@ -422,7 +464,7 @@ export default function NgoSettings() {
                 </div>
               </div>
 
-              {/* Grid: Name & Legal Type */}
+              {/* Grid: Name & Registration Entity Type */}
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
@@ -433,89 +475,248 @@ export default function NgoSettings() {
                     required
                     value={profileForm.name}
                     onChange={(e) => setProfileForm(prev => ({ ...prev, name: e.target.value }))}
-                    placeholder="e.g. Hope International Foundation"
+                    placeholder="e.g. Asha Hope Foundation"
                     className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 text-sm text-slate-900 transition-all outline-none"
                   />
                 </div>
 
                 <div>
                   <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                    Entity Legal Type
+                    Registration Entity Type <span className="text-rose-500">*</span>
                   </label>
                   <select
-                    value={profileForm.type}
-                    onChange={(e) => setProfileForm(prev => ({ ...prev, type: e.target.value }))}
+                    value={profileForm.registrationType}
+                    onChange={(e) => setProfileForm(prev => ({ ...prev, registrationType: e.target.value }))}
                     className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 text-sm text-slate-900 transition-all outline-none bg-white"
                   >
-                    <option value="Trust">Registered Charitable Trust</option>
-                    <option value="Society">Registered Society</option>
-                    <option value="Section 8">Section 8 Company</option>
-                    <option value="Foundation">Non-Profit Foundation</option>
-                    <option value="Association">Voluntary Association</option>
+                    {NGO_REGISTRATION_TYPES.map((t) => (
+                      <option key={t} value={t}>{t}</option>
+                    ))}
                   </select>
                 </div>
               </div>
 
-              {/* Grid: Registration Number & Phone */}
-              <div className="grid sm:grid-cols-2 gap-4">
+              {/* Grid: Registration Number, Year & PAN */}
+              <div className="grid sm:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                    Registration / Deed Number
+                    Registration Number
                   </label>
                   <input
                     type="text"
                     value={profileForm.registrationNumber}
                     onChange={(e) => setProfileForm(prev => ({ ...prev, registrationNumber: e.target.value }))}
-                    placeholder="e.g. TR-2024-MH-4567"
+                    placeholder="e.g. TRUST/IND/2024/8849"
                     className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 text-sm text-slate-900 transition-all outline-none"
                   />
                 </div>
 
                 <div>
                   <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                    Official Contact Phone
+                    Registration Year
                   </label>
                   <input
-                    type="text"
-                    value={profileForm.contactPhone}
-                    onChange={(e) => setProfileForm(prev => ({ ...prev, contactPhone: e.target.value }))}
-                    placeholder="+91 22 2834 5678"
+                    type="number"
+                    min="1860"
+                    max={new Date().getFullYear()}
+                    value={profileForm.registrationYear}
+                    onChange={(e) => setProfileForm(prev => ({ ...prev, registrationYear: e.target.value }))}
+                    placeholder="e.g. 2018"
                     className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 text-sm text-slate-900 transition-all outline-none"
                   />
                 </div>
-              </div>
 
-              {/* Website URL */}
-              <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                  Official Website
-                </label>
-                <div className="relative">
-                  <Globe className="absolute left-3.5 top-3 h-4 w-4 text-slate-400" />
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                    Organization PAN
+                  </label>
                   <input
-                    type="url"
-                    value={profileForm.website}
-                    onChange={(e) => setProfileForm(prev => ({ ...prev, website: e.target.value }))}
-                    placeholder="https://www.yourorganization.org"
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 text-sm text-slate-900 transition-all outline-none"
+                    type="text"
+                    maxLength={10}
+                    value={profileForm.pan}
+                    onChange={(e) => setProfileForm(prev => ({ ...prev, pan: e.target.value.toUpperCase() }))}
+                    placeholder="e.g. AABTA4582K"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 text-sm font-mono uppercase text-slate-900 transition-all outline-none"
                   />
                 </div>
               </div>
 
-              {/* Registered Address */}
-              <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                  Registered Office Address
-                </label>
-                <div className="relative">
-                  <MapPin className="absolute left-3.5 top-3 h-4 w-4 text-slate-400" />
+              {/* Grid: 12A, 80G, NGO Darpan & CSR-1 */}
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                    12A Registration Order Number
+                  </label>
                   <input
                     type="text"
-                    value={profileForm.address}
-                    onChange={(e) => setProfileForm(prev => ({ ...prev, address: e.target.value }))}
-                    placeholder="Building, Street, City, State, PIN/ZIP, Country"
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 text-sm text-slate-900 transition-all outline-none"
+                    value={profileForm.registration12A}
+                    onChange={(e) => setProfileForm(prev => ({ ...prev, registration12A: e.target.value }))}
+                    placeholder="e.g. AAETA1234FE20214"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 text-sm text-slate-900 transition-all outline-none"
                   />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                    80G Certificate Number
+                  </label>
+                  <input
+                    type="text"
+                    value={profileForm.registration80G}
+                    onChange={(e) => setProfileForm(prev => ({ ...prev, registration80G: e.target.value }))}
+                    placeholder="e.g. AAETA1234FE20215"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 text-sm text-slate-900 transition-all outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                    NGO Darpan Unique ID (NITI Aayog)
+                  </label>
+                  <input
+                    type="text"
+                    value={profileForm.ngoDarpanId}
+                    onChange={(e) => setProfileForm(prev => ({ ...prev, ngoDarpanId: e.target.value }))}
+                    placeholder="e.g. MP/2021/0284918"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 text-sm text-slate-900 transition-all outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                    CSR-1 Registration Number (MCA)
+                  </label>
+                  <input
+                    type="text"
+                    value={profileForm.csr1Number}
+                    onChange={(e) => setProfileForm(prev => ({ ...prev, csr1Number: e.target.value }))}
+                    placeholder="e.g. CSR00018492"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 text-sm text-slate-900 transition-all outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                    FCRA Registration (Foreign Contributions)
+                  </label>
+                  <input
+                    type="text"
+                    value={profileForm.fcraNumber}
+                    onChange={(e) => setProfileForm(prev => ({ ...prev, fcraNumber: e.target.value }))}
+                    placeholder="e.g. 094421234"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 text-sm text-slate-900 transition-all outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                    GSTIN (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    maxLength={15}
+                    value={profileForm.gstin}
+                    onChange={(e) => setProfileForm(prev => ({ ...prev, gstin: e.target.value.toUpperCase() }))}
+                    placeholder="e.g. 23AABTA4582K1Z5"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 text-sm font-mono uppercase text-slate-900 transition-all outline-none"
+                  />
+                </div>
+              </div>
+
+              {/* Grid: Phone & Website */}
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                    Official Contact Phone
+                  </label>
+                  <div className="relative">
+                    <Phone className="absolute left-3.5 top-3 h-4 w-4 text-slate-400" />
+                    <input
+                      type="text"
+                      value={profileForm.contactPhone}
+                      onChange={(e) => setProfileForm(prev => ({ ...prev, contactPhone: e.target.value }))}
+                      placeholder="+91 98260 12345"
+                      className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 text-sm text-slate-900 transition-all outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                    Official Website
+                  </label>
+                  <div className="relative">
+                    <Globe className="absolute left-3.5 top-3 h-4 w-4 text-slate-400" />
+                    <input
+                      type="url"
+                      value={profileForm.website}
+                      onChange={(e) => setProfileForm(prev => ({ ...prev, website: e.target.value }))}
+                      placeholder="https://www.yourorganization.org"
+                      className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 text-sm text-slate-900 transition-all outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Registered Indian Address Fields */}
+              <div className="space-y-4 pt-2 border-t border-slate-100">
+                <span className="block text-xs font-bold text-slate-800 uppercase tracking-wider">
+                  Registered Indian Address
+                </span>
+                
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div className="sm:col-span-2">
+                    <input
+                      type="text"
+                      value={profileForm.addressLine1}
+                      onChange={(e) => setProfileForm(prev => ({ ...prev, addressLine1: e.target.value }))}
+                      placeholder="Address Line 1: Building / Street / Door No."
+                      className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 text-sm text-slate-900 transition-all outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <input
+                      type="text"
+                      value={profileForm.city}
+                      onChange={(e) => setProfileForm(prev => ({ ...prev, city: e.target.value }))}
+                      placeholder="City / Town (e.g. Indore, Pune)"
+                      className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 text-sm text-slate-900 transition-all outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <input
+                      type="text"
+                      value={profileForm.district}
+                      onChange={(e) => setProfileForm(prev => ({ ...prev, district: e.target.value }))}
+                      placeholder="District"
+                      className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 text-sm text-slate-900 transition-all outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <select
+                      value={profileForm.state}
+                      onChange={(e) => setProfileForm(prev => ({ ...prev, state: e.target.value }))}
+                      className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 text-sm text-slate-900 transition-all outline-none bg-white"
+                    >
+                      {INDIAN_STATES.map((s) => (
+                        <option key={s} value={s}>{s}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <input
+                      type="text"
+                      maxLength={6}
+                      value={profileForm.pincode}
+                      onChange={(e) => setProfileForm(prev => ({ ...prev, pincode: e.target.value }))}
+                      placeholder="6-digit PIN Code (e.g. 452001)"
+                      className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 text-sm text-slate-900 transition-all outline-none"
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -588,12 +789,10 @@ export default function NgoSettings() {
                     onChange={(e) => setSettingsForm(prev => ({ ...prev, currency: e.target.value }))}
                     className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 text-sm text-slate-900 transition-all outline-none bg-white"
                   >
-                    <option value="INR">₹ INR (Indian Rupee)</option>
-                    <option value="USD">$ USD (US Dollar)</option>
-                    <option value="EUR">€ EUR (Euro)</option>
-                    <option value="GBP">£ GBP (British Pound)</option>
-                    <option value="CAD">C$ CAD (Canadian Dollar)</option>
-                    <option value="AUD">A$ AUD (Australian Dollar)</option>
+                    <option value="INR">₹ INR (Indian Rupee - Official Standard)</option>
+                    <option value="EUR">€ EUR (Euro - Foreign FCRA Grants)</option>
+                    <option value="GBP">£ GBP (British Pound - Foreign FCRA Grants)</option>
+                    <option value="USD">USD (US Dollar - Foreign FCRA Grants)</option>
                   </select>
                   <span className="text-[11px] text-slate-500 block mt-1">Default for donation & aid records</span>
                 </div>
@@ -629,9 +828,8 @@ export default function NgoSettings() {
                     onChange={(e) => setSettingsForm(prev => ({ ...prev, dateFormat: e.target.value }))}
                     className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 text-sm text-slate-900 transition-all outline-none bg-white"
                   >
-                    <option value="DD/MM/YYYY">DD/MM/YYYY (e.g. 20/10/2026)</option>
-                    <option value="YYYY-MM-DD">YYYY-MM-DD (e.g. 2026-10-20)</option>
-                    <option value="MM/DD/YYYY">MM/DD/YYYY (e.g. 10/20/2026)</option>
+                    <option value="DD/MM/YYYY">DD/MM/YYYY (Indian Standard, e.g. 21/10/2026)</option>
+                    <option value="YYYY-MM-DD">YYYY-MM-DD (ISO Standard, e.g. 2026-10-21)</option>
                   </select>
                   <span className="text-[11px] text-slate-500 block mt-1">Applied to reports and tables</span>
                 </div>

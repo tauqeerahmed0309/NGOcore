@@ -1,14 +1,16 @@
 /**
- * Default Non-Profit & Humanitarian Predefined Record Types
+ * Default Non-Profit & Humanitarian Predefined Record Types (Localized for India)
  * Automatically provisioned for verified NGO tenants.
  */
+const { INDIAN_STATES } = require('../../utils/format');
+
 const PREDEFINED_RECORD_TYPES = [
   {
     name: 'Beneficiary',
     slug: 'beneficiary',
     prefix: 'BEN',
     icon: 'Users',
-    description: 'Core recipient and beneficiary demographic records with encrypted PII.',
+    description: 'Core recipient and beneficiary demographic records with DPDP-compliant masked Aadhaar and encrypted PII.',
     isPredefined: true,
     fields: [
       {
@@ -16,14 +18,14 @@ const PREDEFINED_RECORD_TYPES = [
         key: 'full_name',
         type: 'Text',
         required: true,
-        placeholder: 'e.g. Maria Gonzalez'
+        placeholder: 'e.g. Sunita Devi'
       },
       {
         name: 'Gender',
         key: 'gender',
         type: 'Dropdown',
         required: true,
-        options: ['Female', 'Male', 'Non-Binary', 'Other', 'Prefer not to say']
+        options: ['Female', 'Male', 'Transgender / Other', 'Prefer not to say']
       },
       {
         name: 'Date of Birth',
@@ -32,41 +34,95 @@ const PREDEFINED_RECORD_TYPES = [
         required: false
       },
       {
-        name: 'National ID / Aadhaar',
+        name: 'Aadhaar (Last 4 Digits / Masked)',
         key: 'national_id',
         type: 'Encrypted Text',
-        required: true,
+        required: false,
         isSensitive: true,
-        placeholder: 'National identification number (Encrypted with AES-256)'
+        placeholder: 'XXXX XXXX 1234 (UIDAI compliant: only masked/last 4 digits stored)'
       },
       {
-        name: 'Phone Number',
+        name: 'Mobile Phone',
         key: 'phone',
         type: 'Phone',
         required: false,
         isSensitive: true,
-        placeholder: '+1 (555) 000-0000'
+        placeholder: '+91 98765 43210'
       },
       {
-        name: 'Primary Address',
-        key: 'address',
-        type: 'Long Text',
+        name: 'Village / Ward',
+        key: 'village_ward',
+        type: 'Text',
         required: false,
-        placeholder: 'Village, district, or settlement'
+        placeholder: 'Village name or Municipal Ward number'
       },
       {
-        name: 'Assistance Category',
+        name: 'Block / Tehsil',
+        key: 'block_tehsil',
+        type: 'Text',
+        required: false,
+        placeholder: 'Block or Tehsil'
+      },
+      {
+        name: 'District',
+        key: 'district',
+        type: 'Text',
+        required: true,
+        placeholder: 'e.g. Indore, Pune, Bengaluru Urban, Lucknow'
+      },
+      {
+        name: 'State / UT',
+        key: 'state',
+        type: 'Dropdown',
+        required: true,
+        options: INDIAN_STATES
+      },
+      {
+        name: 'PIN Code',
+        key: 'pincode',
+        type: 'Text',
+        required: false,
+        placeholder: '6-digit PIN code (e.g. 560001)'
+      },
+      {
+        name: 'Assistance Scheme',
         key: 'assistance_category',
         type: 'Dropdown',
         required: true,
-        options: ['Food Security', 'Healthcare & Medical', 'Shelter & Housing', 'Emergency Cash', 'Education Support']
+        options: [
+          'Education Support',
+          'Healthcare Camp',
+          'Nutrition & Food Relief',
+          'Skill Training',
+          'Disaster Relief'
+        ]
       },
       {
-        name: 'Vulnerability Index',
+        name: 'Ration Card / BPL Status',
+        key: 'ration_card_category',
+        type: 'Dropdown',
+        required: false,
+        options: [
+          'Antyodaya Anna Yojana (AAY)',
+          'Below Poverty Line (BPL)',
+          'Above Poverty Line (APL)',
+          'No Ration Card'
+        ]
+      },
+      {
+        name: 'Caste Category (Govt Reporting)',
+        key: 'caste_category',
+        type: 'Dropdown',
+        required: false,
+        options: ['General', 'OBC', 'SC', 'ST', 'Prefer not to say'],
+        placeholder: 'Optional sensitive demographic collected solely for statutory reporting with explicit consent'
+      },
+      {
+        name: 'Vulnerability Priority',
         key: 'vulnerability_index',
         type: 'Dropdown',
         required: false,
-        options: ['High Priority', 'Moderate Need', 'Standard']
+        options: ['High Priority (Widow / Destitute / PwD)', 'Moderate Need', 'Standard']
       }
     ]
   },
@@ -75,7 +131,7 @@ const PREDEFINED_RECORD_TYPES = [
     slug: 'aid-distribution',
     prefix: 'AID',
     icon: 'HeartHandshake',
-    description: 'Log of humanitarian relief, medical supplies, food packages, or emergency grants disbursed.',
+    description: 'Log of humanitarian relief kits, medical supplies, food packages, or direct cash assistance disbursed.',
     isPredefined: true,
     fields: [
       {
@@ -83,21 +139,29 @@ const PREDEFINED_RECORD_TYPES = [
         key: 'beneficiary_ref',
         type: 'Text',
         required: true,
-        placeholder: 'Beneficiary name or Record ID'
+        placeholder: 'Beneficiary Name or BEN-2026-XXXXX'
       },
       {
-        name: 'Campaign / Project',
+        name: 'Campaign / Programme',
         key: 'campaign',
         type: 'Text',
         required: true,
-        placeholder: 'e.g. Winter Relief 2026'
+        placeholder: 'e.g. Monsoon Disaster Relief 2026'
       },
       {
         name: 'Aid Type',
         key: 'aid_type',
         type: 'Dropdown',
         required: true,
-        options: ['Food Ration Kit', 'Medical Supplies', 'Cash Assistance', 'Warm Blankets & Clothes', 'Clean Water Filtration Kit']
+        options: [
+          'Food Ration Kit',
+          'Emergency Healthcare Kit',
+          'Nutrition Supplement Pack',
+          'Educational Material Kit',
+          'Warm Blankets & Clothing',
+          'Clean Water Filter Kit',
+          'Direct Cash Assistance'
+        ]
       },
       {
         name: 'Disbursed Quantity / Amount',
@@ -111,7 +175,7 @@ const PREDEFINED_RECORD_TYPES = [
         key: 'unit',
         type: 'Dropdown',
         required: true,
-        options: ['Kits', 'Units', 'INR', 'USD', 'Kilograms']
+        options: ['Kits', 'Units', 'INR (₹)', 'Kilograms', 'Packets', 'Liters']
       },
       {
         name: 'Distribution Date',
@@ -125,6 +189,13 @@ const PREDEFINED_RECORD_TYPES = [
         type: 'Text',
         required: false,
         placeholder: 'Staff member verifying handover'
+      },
+      {
+        name: 'Camp / Distribution Location',
+        key: 'camp_location',
+        type: 'Text',
+        required: false,
+        placeholder: 'Community centre or relief camp'
       }
     ]
   },
@@ -133,7 +204,7 @@ const PREDEFINED_RECORD_TYPES = [
     slug: 'donation-grant',
     prefix: 'DON',
     icon: 'Receipt',
-    description: 'Funding sources, institutional grants, and philanthropic donor receipts.',
+    description: 'Indian funding sources, CSR grants, institutional foundations, and 80G tax exemption receipts.',
     isPredefined: true,
     fields: [
       {
@@ -141,41 +212,54 @@ const PREDEFINED_RECORD_TYPES = [
         key: 'donor_name',
         type: 'Text',
         required: true,
-        placeholder: 'Foundation, corporation, or individual'
+        placeholder: 'Individual, CSR entity, or Foundation'
       },
       {
         name: 'Donor Classification',
         key: 'donor_type',
         type: 'Dropdown',
         required: true,
-        options: ['Individual Donor', 'Corporate CSR Grant', 'Multilateral / UN Agency', 'Philanthropic Foundation', 'Government Aid']
+        options: [
+          'Individual Indian Donor',
+          'Corporate CSR Grant (India)',
+          'Institutional Foundation',
+          'Foreign Contribution (FCRA Approved)',
+          'Government Grant'
+        ]
       },
       {
-        name: 'Funding Amount',
+        name: 'Funding Amount (INR)',
         key: 'amount',
         type: 'Currency',
         required: true,
-        placeholder: '10000'
+        placeholder: '50000'
       },
       {
-        name: 'Designated Project',
+        name: 'Designated Programme',
         key: 'project_tag',
         type: 'Text',
         required: false,
-        placeholder: 'e.g. Rural Health Initiative'
+        placeholder: 'e.g. Rural Healthcare Initiative'
       },
       {
-        name: 'Tax Exemption Issued',
+        name: '80G Tax Exemption Issued',
         key: 'tax_exemption_issued',
         type: 'Checkbox',
         required: false
       },
       {
-        name: '80G / 501(c)(3) Receipt ID',
+        name: '80G Receipt Reference',
         key: 'receipt_id',
         type: 'Text',
         required: false,
-        placeholder: 'Receipt certificate reference'
+        placeholder: '80G-2026-XXXX'
+      },
+      {
+        name: 'Donor PAN',
+        key: 'donor_pan',
+        type: 'Text',
+        required: false,
+        placeholder: 'ABCDE1234F (For 10BD CSR filing)'
       }
     ]
   },
@@ -184,7 +268,7 @@ const PREDEFINED_RECORD_TYPES = [
     slug: 'volunteer-staff',
     prefix: 'VOL',
     icon: 'Briefcase',
-    description: 'Field workers, volunteers, medical practitioners, and disaster response staff.',
+    description: 'Field workers, social caseworkers, medical camp volunteers, and disaster response staff.',
     isPredefined: true,
     fields: [
       {
@@ -192,21 +276,27 @@ const PREDEFINED_RECORD_TYPES = [
         key: 'full_name',
         type: 'Text',
         required: true,
-        placeholder: 'e.g. Ahmed Khan'
+        placeholder: 'e.g. Aarav Sharma'
       },
       {
         name: 'Deployment Role',
         key: 'role',
         type: 'Dropdown',
         required: true,
-        options: ['Field Caseworker', 'Emergency Medic', 'Logistics Coordinator', 'Counselor / Social Worker', 'Community Volunteer']
+        options: [
+          'Field Caseworker',
+          'Emergency Medic',
+          'Logistics Coordinator',
+          'Counselor / Social Worker',
+          'Community Volunteer'
+        ]
       },
       {
-        name: 'Primary Contact Phone',
+        name: 'Primary Contact Mobile',
         key: 'phone',
         type: 'Phone',
         required: true,
-        placeholder: '+1 555-0199'
+        placeholder: '+91 98765 43210'
       },
       {
         name: 'Emergency Contact Details',
@@ -217,7 +307,7 @@ const PREDEFINED_RECORD_TYPES = [
         placeholder: 'Next of kin & contact (Encrypted)'
       },
       {
-        name: 'Assigned Field Zone',
+        name: 'Assigned State / District',
         key: 'assigned_zone',
         type: 'Text',
         required: false,

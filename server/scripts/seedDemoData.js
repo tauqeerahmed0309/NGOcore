@@ -24,23 +24,45 @@ async function seedDemoData() {
     // 1. Setup Demo NGO
     console.log('[1/7] Initializing Asha Hope Foundation NGO...');
     let ngo = await NGO.findOne({ contactEmail: 'asha@hope-foundation.org' });
+    const ngoIndianData = {
+      name: 'Asha Hope Foundation',
+      contactEmail: 'asha@hope-foundation.org',
+      status: 'approved',
+      contactPhone: '+91 98260 12345',
+      registrationType: 'Registered Public Charitable Trust',
+      registrationNumber: 'TRUST/IND/2024/8849',
+      registrationYear: 2018,
+      pan: 'AABTA4582K',
+      registration12A: 'AAETA1234FE20214',
+      registration80G: 'AAETA1234FE20215',
+      ngoDarpanId: 'MP/2021/0284918',
+      csr1Number: 'CSR00018492',
+      gstin: '23AABTA4582K1Z5',
+      addressLine1: '12 Civil Lines, Residency Area',
+      city: 'Indore',
+      district: 'Indore',
+      state: 'Madhya Pradesh',
+      pincode: '452001',
+      country: 'India',
+      address: '12 Civil Lines, Residency Area, Indore, Madhya Pradesh - 452001, India',
+      settings: {
+        currency: 'INR',
+        timezone: 'Asia/Kolkata',
+        dateFormat: 'DD/MM/YYYY',
+        twoFactorRequired: false,
+        sessionTimeoutMinutes: 60,
+        retentionDays: 1825,
+        allowedIpRanges: []
+      }
+    };
+
     if (!ngo) {
-      ngo = await NGO.create({
-        name: 'Asha Hope Foundation',
-        contactEmail: 'asha@hope-foundation.org',
-        status: 'approved',
-        contactPhone: '+91 98260 12345',
-        registrationNumber: 'NGO-IND-2024-8849',
-        address: '12 Civil Lines, Residency Area, Indore, Madhya Pradesh 452001',
-        settings: {
-          twoFactorRequired: false,
-          sessionTimeoutMinutes: 60,
-          allowedIpRanges: []
-        }
-      });
+      ngo = await NGO.create(ngoIndianData);
       console.log(`  ✓ NGO created with ID: ${ngo._id}`);
     } else {
-      console.log(`  ✓ Using existing NGO ID: ${ngo._id}`);
+      Object.assign(ngo, ngoIndianData);
+      await ngo.save();
+      console.log(`  ✓ Using updated NGO ID: ${ngo._id}`);
     }
 
     // 2. Setup Roles & Users
@@ -123,74 +145,100 @@ async function seedDemoData() {
       {
         recordNumber: 'BEN-2026-00001',
         data: {
-          fullName: 'Sunita Devi',
-          phone: '9826112233',
-          aadhaarNumber: '2233-4455-6677',
-          dateOfBirth: '1984-04-12',
+          full_name: 'Sunita Devi',
+          phone: '+91 98261 12233',
+          national_id: 'XXXX XXXX 6677',
+          date_of_birth: '1984-04-12',
           gender: 'Female',
           district: 'Indore',
-          annualIncome: 18000,
+          state: 'Madhya Pradesh',
+          pincode: '452001',
+          village_ward: 'Ward 14, Pardeshipura',
+          annualIncome: 180000,
           familySize: 5,
-          vulnerabilityTier: 'High',
-          category: 'Flood Relief'
+          vulnerability_index: 'High Priority (Widow / Destitute / PwD)',
+          assistance_category: 'Disaster Relief',
+          ration_card_category: 'Below Poverty Line (BPL)',
+          caste_category: 'OBC'
         }
       },
       {
         recordNumber: 'BEN-2026-00002',
         // Phonetic duplicate of BEN-2026-00001 for AI scanning demo
         data: {
-          fullName: 'Suneeta Daivy', // Phonetic match
-          phone: '9826112233',      // Exact phone match
+          full_name: 'Suneeta Daivy', // Phonetic match
+          phone: '+91 98261 12233',   // Exact phone match
+          national_id: 'XXXX XXXX 6677',
           district: 'Indore',
-          annualIncome: 18000,
+          state: 'Madhya Pradesh',
+          pincode: '452001',
+          village_ward: 'Ward 14, Pardeshipura',
+          annualIncome: 180000,
           familySize: 5,
-          vulnerabilityTier: 'High',
-          category: 'Flood Relief'
+          vulnerability_index: 'High Priority (Widow / Destitute / PwD)',
+          assistance_category: 'Disaster Relief',
+          ration_card_category: 'Below Poverty Line (BPL)',
+          caste_category: 'OBC'
         }
       },
       {
         recordNumber: 'BEN-2026-00003',
         data: {
-          fullName: 'Mohammad Farooq',
-          phone: '9876543210',
-          aadhaarNumber: '5566-7788-9900',
-          dateOfBirth: '1976-11-20',
+          full_name: 'Mohammad Farooq',
+          phone: '+91 98765 43210',
+          national_id: 'XXXX XXXX 9900',
+          date_of_birth: '1976-11-20',
           gender: 'Male',
           district: 'Bhopal',
-          annualIncome: 35000,
+          state: 'Madhya Pradesh',
+          pincode: '462001',
+          village_ward: 'Old City, Ward 22',
+          annualIncome: 350000,
           familySize: 4,
-          vulnerabilityTier: 'Medium',
-          category: 'Medical Aid'
+          vulnerability_index: 'Moderate Need',
+          assistance_category: 'Healthcare Camp',
+          ration_card_category: 'Above Poverty Line (APL)',
+          caste_category: 'General'
         }
       },
       {
         recordNumber: 'BEN-2026-00004',
         data: {
-          fullName: 'Kavita Rathore',
-          phone: '9123456780',
-          aadhaarNumber: '3344-5566-7788',
-          dateOfBirth: '1992-08-15',
+          full_name: 'Kavita Rathore',
+          phone: '+91 91234 56780',
+          national_id: 'XXXX XXXX 7788',
+          date_of_birth: '1992-08-15',
           gender: 'Female',
           district: 'Ujjain',
-          annualIncome: 12000,
+          state: 'Madhya Pradesh',
+          pincode: '456001',
+          village_ward: 'Mahakal Marg, Ward 5',
+          annualIncome: 120000,
           familySize: 6,
-          vulnerabilityTier: 'High',
-          category: 'Nutrition Support'
+          vulnerability_index: 'High Priority (Widow / Destitute / PwD)',
+          assistance_category: 'Nutrition & Food Relief',
+          ration_card_category: 'Antyodaya Anna Yojana (AAY)',
+          caste_category: 'SC'
         }
       },
       {
         recordNumber: 'BEN-2026-00005',
         data: {
-          fullName: 'Rajesh Malviya',
-          phone: '9988776655',
-          aadhaarNumber: '8899-0011-2233',
-          dateOfBirth: '1988-03-05',
+          full_name: 'Rajesh Malviya',
+          phone: '+91 99887 76655',
+          national_id: 'XXXX XXXX 2233',
+          date_of_birth: '1988-03-05',
           gender: 'Male',
           district: 'Dewas',
-          annualIncome: 48000,
+          state: 'Madhya Pradesh',
+          pincode: '455001',
+          village_ward: 'Gram Panchayat Siya',
+          annualIncome: 480000,
           familySize: 3,
-          vulnerabilityTier: 'Low',
-          category: 'Livelihood Training'
+          vulnerability_index: 'Standard',
+          assistance_category: 'Skill Training',
+          ration_card_category: 'Above Poverty Line (APL)',
+          caste_category: 'General'
         }
       }
     ];

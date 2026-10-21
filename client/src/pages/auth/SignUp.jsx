@@ -5,6 +5,7 @@ import { User, Mail, Phone, Lock, Eye, EyeOff, Loader2, ShieldCheck, AlertCircle
 import { pageTransition } from '../../animations';
 import api from '../../services/api';
 import AnimatedBackground from '../../components/common/AnimatedBackground';
+import { isValidIndianPhone, normalizeIndianPhone } from '../../utils/format';
 
 const SignUp = () => {
   const pageRef = useRef(null);
@@ -60,6 +61,9 @@ const SignUp = () => {
     if (!formData.phone.trim()) {
       return setError('Please enter a primary contact phone number');
     }
+    if (!isValidIndianPhone(formData.phone)) {
+      return setError('Enter a valid 10-digit Indian mobile number (e.g. +91 98765 43210)');
+    }
 
     setStep(2);
   };
@@ -85,7 +89,7 @@ const SignUp = () => {
       const res = await api.post('/auth/signup', {
         name: formData.name,
         email: formData.email,
-        phone: formData.phone,
+        phone: normalizeIndianPhone(formData.phone) || formData.phone,
         password: formData.password
       });
 

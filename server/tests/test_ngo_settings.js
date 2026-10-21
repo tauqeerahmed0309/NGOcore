@@ -151,9 +151,9 @@ async function runNgoSettingsTests() {
     const updatedSettings = await ngoService.updateNgoSettings(
       ngoAId,
       {
-        currency: 'USD',
-        timezone: 'UTC',
-        dateFormat: 'YYYY-MM-DD',
+        currency: 'INR',
+        timezone: 'Asia/Kolkata',
+        dateFormat: 'DD/MM/YYYY',
         retentionDays: 2555, // 7 years
         require2FA: true,
         sessionTimeoutMinutes: 60,
@@ -167,9 +167,9 @@ async function runNgoSettingsTests() {
       { ip: '127.0.0.1', userAgent: 'Test Runner' }
     );
 
-    if (updatedSettings.currency !== 'USD') throw new Error(`Currency not updated: ${updatedSettings.currency}`);
-    if (updatedSettings.timezone !== 'UTC') throw new Error(`Timezone not updated: ${updatedSettings.timezone}`);
-    if (updatedSettings.dateFormat !== 'YYYY-MM-DD') throw new Error(`DateFormat not updated: ${updatedSettings.dateFormat}`);
+    if (updatedSettings.currency !== 'INR') throw new Error(`Currency not updated: ${updatedSettings.currency}`);
+    if (updatedSettings.timezone !== 'Asia/Kolkata') throw new Error(`Timezone not updated: ${updatedSettings.timezone}`);
+    if (updatedSettings.dateFormat !== 'DD/MM/YYYY') throw new Error(`DateFormat not updated: ${updatedSettings.dateFormat}`);
     if (updatedSettings.retentionDays !== 2555) throw new Error(`RetentionDays not updated: ${updatedSettings.retentionDays}`);
     if (updatedSettings.require2FA !== true) throw new Error(`require2FA not updated: ${updatedSettings.require2FA}`);
     if (updatedSettings.sessionTimeoutMinutes !== 60) throw new Error(`sessionTimeoutMinutes not updated: ${updatedSettings.sessionTimeoutMinutes}`);

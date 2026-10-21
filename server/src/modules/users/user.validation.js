@@ -1,4 +1,5 @@
 const { z } = require('zod');
+const { INDIAN_PHONE_REGEX } = require('../../utils/format');
 
 const changePasswordSchema = {
   body: z.object({
@@ -14,7 +15,12 @@ const changePasswordSchema = {
 const updateProfileSchema = {
   body: z.object({
     name: z.string().min(2, 'Name must be at least 2 characters').max(100).optional(),
-    phone: z.string().max(25).optional(),
+    phone: z.string()
+      .refine(
+        (val) => !val || INDIAN_PHONE_REGEX.test(val.replace(/[\s\-]/g, '')) || /^[0-9+\-\s()]{7,25}$/.test(val),
+        { message: 'Enter a valid 10-digit Indian mobile number' }
+      )
+      .optional(),
     designation: z.string().max(100).optional(),
     avatarUrl: z.string().url('Invalid avatar URL').optional().or(z.literal(''))
   })

@@ -2,9 +2,25 @@ const mongoose = require('mongoose');
 
 const ngoSchema = new mongoose.Schema({
   name: { type: String, required: true },
-  type: { type: String },
+  type: { type: String }, // Focus sector (e.g. Education, Healthcare, Disaster Relief)
+  registrationType: { type: String, default: 'Trust' }, // Trust, Society, Section 8 Company
   registrationNumber: { type: String },
-  address: { type: String },
+  registrationYear: { type: Number },
+  pan: { type: String, uppercase: true, trim: true }, // Organization PAN
+  registration12A: { type: String, trim: true }, // 12A Order / Unique Registration Number
+  registration80G: { type: String, trim: true }, // 80G Certificate Reference
+  fcraNumber: { type: String, trim: true }, // FCRA registration if applicable
+  ngoDarpanId: { type: String, trim: true }, // NITI Aayog NGO Darpan portal UID
+  csr1Number: { type: String, trim: true }, // MCA CSR-1 registration number
+  gstin: { type: String, uppercase: true, trim: true }, // Goods & Services Tax ID
+  address: { type: String }, // Legacy/Joined address
+  addressLine1: { type: String },
+  addressLine2: { type: String },
+  city: { type: String },
+  district: { type: String },
+  state: { type: String },
+  pincode: { type: String, trim: true },
+  country: { type: String, default: 'India' },
   contactEmail: { type: String, required: true, unique: true },
   contactPhone: { type: String },
   logoUrl: { type: String },

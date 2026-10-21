@@ -5,6 +5,11 @@ import { Link } from 'react-router-dom';
 import { pageTransition } from '../../animations';
 import auditService from '../../services/auditService';
 import {
+  formatIndianNumber,
+  formatDateIST,
+  getCurrentFinancialYear
+} from '../../utils/format';
+import {
   ShieldCheck,
   FolderLock,
   Cpu,
@@ -149,6 +154,9 @@ const Dashboard = () => {
               <span className="px-3 py-1 rounded-full text-xs font-bold bg-teal-500/20 text-teal-300 border border-teal-500/30 flex items-center space-x-1.5">
                 <CheckCircle2 className="h-3.5 w-3.5" />
                 <span>Verified NGO Vault</span>
+              </span>
+              <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                {getCurrentFinancialYear()}
               </span>
               <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
                 {ngo?.registrationNumber || 'ID: REG-VERIFIED'}

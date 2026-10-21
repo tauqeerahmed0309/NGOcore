@@ -61,7 +61,7 @@ def scan_anomalies(records: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
                         issues.append({
                             "field": key,
                             "severity": "Medium",
-                            "message": f"High value grant transaction: ${num_val:,.2f}",
+                            "message": f"High value grant transaction: ₹{num_val:,.2f}",
                             "action": "Verify institutional grant charter"
                         })
                 except (ValueError, TypeError):
