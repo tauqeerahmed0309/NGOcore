@@ -1,0 +1,5098 @@
+{
+  "version": "2.0.0",
+  "timestamp": "2026-10-20T17:22:51.672Z",
+  "metadata": {
+    "totalCollections": 10,
+    "ngoCount": 7,
+    "userCount": 7,
+    "recordCount": 20,
+    "auditLogCount": 28,
+    "blockchainAnchorCount": 4
+  },
+  "collections": {
+    "ngos": [
+      {
+        "_id": "6ad79df16820b39d71cc78ef",
+        "name": "Apex Humanitarian Care",
+        "contactEmail": "contact@apex-care.org",
+        "settings": {
+          "emailNotifications": {
+            "notifyOnNewMember": true,
+            "notifyOnRecordExport": true,
+            "notifyOnSecurityAlert": true
+          },
+          "currency": "INR",
+          "timezone": "Asia/Kolkata",
+          "dateFormat": "DD/MM/YYYY",
+          "retentionDays": 1825,
+          "require2FA": false,
+          "sessionTimeoutMinutes": 120
+        },
+        "status": "approved",
+        "createdAt": "2026-10-20T16:59:29.141Z",
+        "updatedAt": "2026-10-20T16:59:29.141Z",
+        "__v": 0
+      },
+      {
+        "_id": "6ad79df16820b39d71cc78f0",
+        "name": "Foreign Aid Organization",
+        "contactEmail": "contact@foreign-aid.org",
+        "settings": {
+          "emailNotifications": {
+            "notifyOnNewMember": true,
+            "notifyOnRecordExport": true,
+            "notifyOnSecurityAlert": true
+          },
+          "currency": "INR",
+          "timezone": "Asia/Kolkata",
+          "dateFormat": "DD/MM/YYYY",
+          "retentionDays": 1825,
+          "require2FA": false,
+          "sessionTimeoutMinutes": 120
+        },
+        "status": "approved",
+        "createdAt": "2026-10-20T16:59:29.147Z",
+        "updatedAt": "2026-10-20T16:59:29.147Z",
+        "__v": 0
+      },
+      {
+        "_id": "6ad7a0193411a3837f9fa710",
+        "name": "Polygon Humanitarian Trust",
+        "contactEmail": "contact@polygon-trust.org",
+        "settings": {
+          "emailNotifications": {
+            "notifyOnNewMember": true,
+            "notifyOnRecordExport": true,
+            "notifyOnSecurityAlert": true
+          },
+          "currency": "INR",
+          "timezone": "Asia/Kolkata",
+          "dateFormat": "DD/MM/YYYY",
+          "retentionDays": 1825,
+          "require2FA": false,
+          "sessionTimeoutMinutes": 120
+        },
+        "status": "approved",
+        "createdAt": "2026-10-20T17:08:41.688Z",
+        "updatedAt": "2026-10-20T17:08:41.688Z",
+        "__v": 0
+      },
+      {
+        "_id": "6ad7a0193411a3837f9fa711",
+        "name": "Independent Foundation",
+        "contactEmail": "contact@crypto-test.org",
+        "settings": {
+          "emailNotifications": {
+            "notifyOnNewMember": true,
+            "notifyOnRecordExport": true,
+            "notifyOnSecurityAlert": true
+          },
+          "currency": "INR",
+          "timezone": "Asia/Kolkata",
+          "dateFormat": "DD/MM/YYYY",
+          "retentionDays": 1825,
+          "require2FA": false,
+          "sessionTimeoutMinutes": 120
+        },
+        "status": "approved",
+        "createdAt": "2026-10-20T17:08:41.712Z",
+        "updatedAt": "2026-10-20T17:08:41.712Z",
+        "__v": 0
+      },
+      {
+        "_id": "6ad7a2030ae1ae2a64bd0b59",
+        "name": "Asha Hope Foundation",
+        "registrationNumber": "NGO-IND-2024-8849",
+        "address": "12 Civil Lines, Residency Area, Indore, Madhya Pradesh 452001",
+        "contactEmail": "asha@hope-foundation.org",
+        "contactPhone": "+91 98260 12345",
+        "settings": {
+          "sessionTimeoutMinutes": 60,
+          "currency": "INR",
+          "timezone": "Asia/Kolkata",
+          "dateFormat": "DD/MM/YYYY",
+          "retentionDays": 1825,
+          "require2FA": false,
+          "emailNotifications": {
+            "notifyOnNewMember": true,
+            "notifyOnRecordExport": true,
+            "notifyOnSecurityAlert": true
+          }
+        },
+        "status": "approved",
+        "createdAt": "2026-10-20T17:16:51.374Z",
+        "updatedAt": "2026-10-20T17:16:51.374Z",
+        "__v": 0
+      },
+      {
+        "_id": "6ad7a32cc88b1107417fb162",
+        "name": "Security Test NGO A",
+        "contactEmail": "sec-test-a@ngo.org",
+        "settings": {
+          "emailNotifications": {
+            "notifyOnNewMember": true,
+            "notifyOnRecordExport": true,
+            "notifyOnSecurityAlert": true
+          },
+          "currency": "INR",
+          "timezone": "Asia/Kolkata",
+          "dateFormat": "DD/MM/YYYY",
+          "retentionDays": 1825,
+          "require2FA": false,
+          "sessionTimeoutMinutes": 120
+        },
+        "status": "approved",
+        "createdAt": "2026-10-20T17:21:48.348Z",
+        "updatedAt": "2026-10-20T17:21:48.348Z",
+        "__v": 0
+      },
+      {
+        "_id": "6ad7a32cc88b1107417fb163",
+        "name": "Security Test NGO B",
+        "contactEmail": "sec-test-b@ngo.org",
+        "settings": {
+          "emailNotifications": {
+            "notifyOnNewMember": true,
+            "notifyOnRecordExport": true,
+            "notifyOnSecurityAlert": true
+          },
+          "currency": "INR",
+          "timezone": "Asia/Kolkata",
+          "dateFormat": "DD/MM/YYYY",
+          "retentionDays": 1825,
+          "require2FA": false,
+          "sessionTimeoutMinutes": 120
+        },
+        "status": "approved",
+        "createdAt": "2026-10-20T17:21:48.358Z",
+        "updatedAt": "2026-10-20T17:21:48.358Z",
+        "__v": 0
+      }
+    ],
+    "users": [
+      {
+        "_id": "6ad79df16820b39d71cc78f1",
+        "ngoId": "6ad79df16820b39d71cc78ef",
+        "name": "Arjun Mehta",
+        "email": "arjun@apex-care.org",
+        "password": "SamplePassword123!",
+        "status": "active",
+        "createdAt": "2026-10-20T16:59:29.149Z",
+        "updatedAt": "2026-10-20T16:59:29.149Z",
+        "__v": 0
+      },
+      {
+        "_id": "6ad7a0193411a3837f9fa712",
+        "ngoId": "6ad7a0193411a3837f9fa710",
+        "name": "Siddharth Rao",
+        "email": "compliance@polygon-trust.org",
+        "password": "SamplePassword123!",
+        "status": "active",
+        "createdAt": "2026-10-20T17:08:41.718Z",
+        "updatedAt": "2026-10-20T17:08:41.718Z",
+        "__v": 0
+      },
+      {
+        "_id": "6ad7a2030ae1ae2a64bd0b5a",
+        "ngoId": "6ad7a2030ae1ae2a64bd0b59",
+        "name": "Aarav Sharma",
+        "email": "admin@hope-foundation.org",
+        "password": "$argon2id$v=19$m=65536,p=4,t=3$8knQsebiZA3/WneXvQhhZQ$CIUcF8q0fTW+pCTBcuYPcbKsWbYT+xLodRvyjFgVIE8",
+        "status": "active",
+        "createdAt": "2026-10-20T17:16:51.526Z",
+        "updatedAt": "2026-10-20T17:16:51.526Z",
+        "__v": 0
+      },
+      {
+        "_id": "6ad7a2030ae1ae2a64bd0b5b",
+        "ngoId": "6ad7a2030ae1ae2a64bd0b59",
+        "name": "Priya Nair",
+        "email": "priya@hope-foundation.org",
+        "password": "$argon2id$v=19$m=65536,p=4,t=3$8knQsebiZA3/WneXvQhhZQ$CIUcF8q0fTW+pCTBcuYPcbKsWbYT+xLodRvyjFgVIE8",
+        "status": "active",
+        "createdAt": "2026-10-20T17:16:51.531Z",
+        "updatedAt": "2026-10-20T17:16:51.531Z",
+        "__v": 0
+      },
+      {
+        "_id": "6ad7a2030ae1ae2a64bd0b5c",
+        "ngoId": "6ad7a2030ae1ae2a64bd0b59",
+        "name": "Vikram Patel",
+        "email": "vikram@hope-foundation.org",
+        "password": "$argon2id$v=19$m=65536,p=4,t=3$8knQsebiZA3/WneXvQhhZQ$CIUcF8q0fTW+pCTBcuYPcbKsWbYT+xLodRvyjFgVIE8",
+        "status": "active",
+        "createdAt": "2026-10-20T17:16:51.537Z",
+        "updatedAt": "2026-10-20T17:16:51.537Z",
+        "__v": 0
+      },
+      {
+        "_id": "6ad7a32cc88b1107417fb164",
+        "ngoId": "6ad7a32cc88b1107417fb162",
+        "name": "Agent A",
+        "email": "admin@sec-test-a.org",
+        "password": "SamplePassword123!",
+        "status": "active",
+        "createdAt": "2026-10-20T17:21:48.366Z",
+        "updatedAt": "2026-10-20T17:21:48.366Z",
+        "__v": 0
+      },
+      {
+        "_id": "6ad7a32cc88b1107417fb165",
+        "ngoId": "6ad7a32cc88b1107417fb163",
+        "name": "Agent B",
+        "email": "admin@sec-test-b.org",
+        "password": "SamplePassword123!",
+        "status": "active",
+        "createdAt": "2026-10-20T17:21:48.372Z",
+        "updatedAt": "2026-10-20T17:21:48.372Z",
+        "__v": 0
+      }
+    ],
+    "recordTypes": [
+      {
+        "_id": "6ad79688f9a233ac1f54285e",
+        "ngoId": "6ad796882c5e94f113ed75f0",
+        "slug": "beneficiary",
+        "__v": 0,
+        "createdAt": "2026-10-20T16:27:52.850Z",
+        "description": "Core recipient and beneficiary demographic records with encrypted PII.",
+        "fields": [
+          {
+            "name": "Full Name",
+            "key": "full_name",
+            "type": "Text",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "e.g. Maria Gonzalez"
+          },
+          {
+            "name": "Gender",
+            "key": "gender",
+            "type": "Dropdown",
+            "required": true,
+            "options": [
+              "Female",
+              "Male",
+              "Non-Binary",
+              "Other",
+              "Prefer not to say"
+            ],
+            "isSensitive": false
+          },
+          {
+            "name": "Date of Birth",
+            "key": "date_of_birth",
+            "type": "Date",
+            "required": false,
+            "options": [],
+            "isSensitive": false
+          },
+          {
+            "name": "National ID / Aadhaar",
+            "key": "national_id",
+            "type": "Encrypted Text",
+            "required": true,
+            "options": [],
+            "isSensitive": true,
+            "placeholder": "National identification number (Encrypted with AES-256)"
+          },
+          {
+            "name": "Phone Number",
+            "key": "phone",
+            "type": "Phone",
+            "required": false,
+            "options": [],
+            "isSensitive": true,
+            "placeholder": "+1 (555) 000-0000"
+          },
+          {
+            "name": "Primary Address",
+            "key": "address",
+            "type": "Long Text",
+            "required": false,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "Village, district, or settlement"
+          },
+          {
+            "name": "Assistance Category",
+            "key": "assistance_category",
+            "type": "Dropdown",
+            "required": true,
+            "options": [
+              "Food Security",
+              "Healthcare & Medical",
+              "Shelter & Housing",
+              "Emergency Cash",
+              "Education Support"
+            ],
+            "isSensitive": false
+          },
+          {
+            "name": "Vulnerability Index",
+            "key": "vulnerability_index",
+            "type": "Dropdown",
+            "required": false,
+            "options": [
+              "High Priority",
+              "Moderate Need",
+              "Standard"
+            ],
+            "isSensitive": false
+          }
+        ],
+        "icon": "Users",
+        "isArchived": false,
+        "isPredefined": true,
+        "name": "Beneficiary",
+        "prefix": "BEN",
+        "updatedAt": "2026-10-20T16:27:52.850Z"
+      },
+      {
+        "_id": "6ad79688f9a233ac1f54285f",
+        "ngoId": "6ad796882c5e94f113ed75f0",
+        "slug": "aid-distribution",
+        "__v": 0,
+        "createdAt": "2026-10-20T16:27:52.888Z",
+        "description": "Log of humanitarian relief, medical supplies, food packages, or emergency grants disbursed.",
+        "fields": [
+          {
+            "name": "Beneficiary Reference",
+            "key": "beneficiary_ref",
+            "type": "Text",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "Beneficiary name or Record ID"
+          },
+          {
+            "name": "Campaign / Project",
+            "key": "campaign",
+            "type": "Text",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "e.g. Winter Relief 2026"
+          },
+          {
+            "name": "Aid Type",
+            "key": "aid_type",
+            "type": "Dropdown",
+            "required": true,
+            "options": [
+              "Food Ration Kit",
+              "Medical Supplies",
+              "Cash Assistance",
+              "Warm Blankets & Clothes",
+              "Clean Water Filtration Kit"
+            ],
+            "isSensitive": false
+          },
+          {
+            "name": "Disbursed Quantity / Amount",
+            "key": "quantity",
+            "type": "Number",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "e.g. 5"
+          },
+          {
+            "name": "Unit of Measure",
+            "key": "unit",
+            "type": "Dropdown",
+            "required": true,
+            "options": [
+              "Kits",
+              "Units",
+              "INR",
+              "USD",
+              "Kilograms"
+            ],
+            "isSensitive": false
+          },
+          {
+            "name": "Distribution Date",
+            "key": "distribution_date",
+            "type": "Date",
+            "required": true,
+            "options": [],
+            "isSensitive": false
+          },
+          {
+            "name": "Field Officer Name",
+            "key": "officer_name",
+            "type": "Text",
+            "required": false,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "Staff member verifying handover"
+          }
+        ],
+        "icon": "HeartHandshake",
+        "isArchived": false,
+        "isPredefined": true,
+        "name": "Aid Distribution",
+        "prefix": "AID",
+        "updatedAt": "2026-10-20T16:27:52.888Z"
+      },
+      {
+        "_id": "6ad79688f9a233ac1f542860",
+        "ngoId": "6ad796882c5e94f113ed75f0",
+        "slug": "donation-grant",
+        "__v": 0,
+        "createdAt": "2026-10-20T16:27:52.908Z",
+        "description": "Funding sources, institutional grants, and philanthropic donor receipts.",
+        "fields": [
+          {
+            "name": "Donor / Grantor Name",
+            "key": "donor_name",
+            "type": "Text",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "Foundation, corporation, or individual"
+          },
+          {
+            "name": "Donor Classification",
+            "key": "donor_type",
+            "type": "Dropdown",
+            "required": true,
+            "options": [
+              "Individual Donor",
+              "Corporate CSR Grant",
+              "Multilateral / UN Agency",
+              "Philanthropic Foundation",
+              "Government Aid"
+            ],
+            "isSensitive": false
+          },
+          {
+            "name": "Funding Amount",
+            "key": "amount",
+            "type": "Currency",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "10000"
+          },
+          {
+            "name": "Designated Project",
+            "key": "project_tag",
+            "type": "Text",
+            "required": false,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "e.g. Rural Health Initiative"
+          },
+          {
+            "name": "Tax Exemption Issued",
+            "key": "tax_exemption_issued",
+            "type": "Checkbox",
+            "required": false,
+            "options": [],
+            "isSensitive": false
+          },
+          {
+            "name": "80G / 501(c)(3) Receipt ID",
+            "key": "receipt_id",
+            "type": "Text",
+            "required": false,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "Receipt certificate reference"
+          }
+        ],
+        "icon": "Receipt",
+        "isArchived": false,
+        "isPredefined": true,
+        "name": "Donation & Grant",
+        "prefix": "DON",
+        "updatedAt": "2026-10-20T16:27:52.908Z"
+      },
+      {
+        "_id": "6ad79688f9a233ac1f542861",
+        "ngoId": "6ad796882c5e94f113ed75f0",
+        "slug": "volunteer-staff",
+        "__v": 0,
+        "createdAt": "2026-10-20T16:27:52.912Z",
+        "description": "Field workers, volunteers, medical practitioners, and disaster response staff.",
+        "fields": [
+          {
+            "name": "Full Name",
+            "key": "full_name",
+            "type": "Text",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "e.g. Ahmed Khan"
+          },
+          {
+            "name": "Deployment Role",
+            "key": "role",
+            "type": "Dropdown",
+            "required": true,
+            "options": [
+              "Field Caseworker",
+              "Emergency Medic",
+              "Logistics Coordinator",
+              "Counselor / Social Worker",
+              "Community Volunteer"
+            ],
+            "isSensitive": false
+          },
+          {
+            "name": "Primary Contact Phone",
+            "key": "phone",
+            "type": "Phone",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "+1 555-0199"
+          },
+          {
+            "name": "Emergency Contact Details",
+            "key": "emergency_contact",
+            "type": "Encrypted Text",
+            "required": false,
+            "options": [],
+            "isSensitive": true,
+            "placeholder": "Next of kin & contact (Encrypted)"
+          },
+          {
+            "name": "Assigned Field Zone",
+            "key": "assigned_zone",
+            "type": "Text",
+            "required": false,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "District or field base"
+          }
+        ],
+        "icon": "Briefcase",
+        "isArchived": false,
+        "isPredefined": true,
+        "name": "Volunteer & Staff",
+        "prefix": "VOL",
+        "updatedAt": "2026-10-20T16:27:52.912Z"
+      },
+      {
+        "_id": "6ad79df16820b39d71cc78f5",
+        "ngoId": "6ad79df16820b39d71cc78ef",
+        "name": "Beneficiary Profile",
+        "slug": "beneficiary-profile",
+        "icon": "FileText",
+        "prefix": "BEN",
+        "fields": [
+          {
+            "name": "Full Name",
+            "key": "fullName",
+            "type": "Text",
+            "required": true,
+            "options": [],
+            "isSensitive": false
+          },
+          {
+            "name": "Phone Number",
+            "key": "phone",
+            "type": "Phone",
+            "required": false,
+            "options": [],
+            "isSensitive": false
+          },
+          {
+            "name": "Aadhaar / ID",
+            "key": "aadhaarNumber",
+            "type": "Text",
+            "required": false,
+            "options": [],
+            "isSensitive": false
+          },
+          {
+            "name": "District",
+            "key": "district",
+            "type": "Text",
+            "required": false,
+            "options": [],
+            "isSensitive": false
+          },
+          {
+            "name": "Annual Income",
+            "key": "annualIncome",
+            "type": "Number",
+            "required": false,
+            "options": [],
+            "isSensitive": false
+          },
+          {
+            "name": "Family Size",
+            "key": "familySize",
+            "type": "Number",
+            "required": false,
+            "options": [],
+            "isSensitive": false
+          }
+        ],
+        "isPredefined": false,
+        "isArchived": false,
+        "createdAt": "2026-10-20T16:59:29.159Z",
+        "updatedAt": "2026-10-20T16:59:29.159Z",
+        "__v": 0
+      },
+      {
+        "_id": "6ad7a203f9a233ac1f542870",
+        "slug": "beneficiary",
+        "ngoId": "6ad7a2030ae1ae2a64bd0b59",
+        "__v": 0,
+        "createdAt": "2026-10-20T17:16:51.540Z",
+        "description": "Core recipient and beneficiary demographic records with encrypted PII.",
+        "fields": [
+          {
+            "name": "Full Name",
+            "key": "full_name",
+            "type": "Text",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "e.g. Maria Gonzalez"
+          },
+          {
+            "name": "Gender",
+            "key": "gender",
+            "type": "Dropdown",
+            "required": true,
+            "options": [
+              "Female",
+              "Male",
+              "Non-Binary",
+              "Other",
+              "Prefer not to say"
+            ],
+            "isSensitive": false
+          },
+          {
+            "name": "Date of Birth",
+            "key": "date_of_birth",
+            "type": "Date",
+            "required": false,
+            "options": [],
+            "isSensitive": false
+          },
+          {
+            "name": "National ID / Aadhaar",
+            "key": "national_id",
+            "type": "Encrypted Text",
+            "required": true,
+            "options": [],
+            "isSensitive": true,
+            "placeholder": "National identification number (Encrypted with AES-256)"
+          },
+          {
+            "name": "Phone Number",
+            "key": "phone",
+            "type": "Phone",
+            "required": false,
+            "options": [],
+            "isSensitive": true,
+            "placeholder": "+1 (555) 000-0000"
+          },
+          {
+            "name": "Primary Address",
+            "key": "address",
+            "type": "Long Text",
+            "required": false,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "Village, district, or settlement"
+          },
+          {
+            "name": "Assistance Category",
+            "key": "assistance_category",
+            "type": "Dropdown",
+            "required": true,
+            "options": [
+              "Food Security",
+              "Healthcare & Medical",
+              "Shelter & Housing",
+              "Emergency Cash",
+              "Education Support"
+            ],
+            "isSensitive": false
+          },
+          {
+            "name": "Vulnerability Index",
+            "key": "vulnerability_index",
+            "type": "Dropdown",
+            "required": false,
+            "options": [
+              "High Priority",
+              "Moderate Need",
+              "Standard"
+            ],
+            "isSensitive": false
+          }
+        ],
+        "icon": "Users",
+        "isArchived": false,
+        "isPredefined": true,
+        "name": "Beneficiary",
+        "prefix": "BEN",
+        "updatedAt": "2026-10-20T17:17:57.053Z"
+      },
+      {
+        "_id": "6ad7a203f9a233ac1f542871",
+        "slug": "aid-distribution",
+        "ngoId": "6ad7a2030ae1ae2a64bd0b59",
+        "__v": 0,
+        "createdAt": "2026-10-20T17:16:51.555Z",
+        "description": "Log of humanitarian relief, medical supplies, food packages, or emergency grants disbursed.",
+        "fields": [
+          {
+            "name": "Beneficiary Reference",
+            "key": "beneficiary_ref",
+            "type": "Text",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "Beneficiary name or Record ID"
+          },
+          {
+            "name": "Campaign / Project",
+            "key": "campaign",
+            "type": "Text",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "e.g. Winter Relief 2026"
+          },
+          {
+            "name": "Aid Type",
+            "key": "aid_type",
+            "type": "Dropdown",
+            "required": true,
+            "options": [
+              "Food Ration Kit",
+              "Medical Supplies",
+              "Cash Assistance",
+              "Warm Blankets & Clothes",
+              "Clean Water Filtration Kit"
+            ],
+            "isSensitive": false
+          },
+          {
+            "name": "Disbursed Quantity / Amount",
+            "key": "quantity",
+            "type": "Number",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "e.g. 5"
+          },
+          {
+            "name": "Unit of Measure",
+            "key": "unit",
+            "type": "Dropdown",
+            "required": true,
+            "options": [
+              "Kits",
+              "Units",
+              "INR",
+              "USD",
+              "Kilograms"
+            ],
+            "isSensitive": false
+          },
+          {
+            "name": "Distribution Date",
+            "key": "distribution_date",
+            "type": "Date",
+            "required": true,
+            "options": [],
+            "isSensitive": false
+          },
+          {
+            "name": "Field Officer Name",
+            "key": "officer_name",
+            "type": "Text",
+            "required": false,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "Staff member verifying handover"
+          }
+        ],
+        "icon": "HeartHandshake",
+        "isArchived": false,
+        "isPredefined": true,
+        "name": "Aid Distribution",
+        "prefix": "AID",
+        "updatedAt": "2026-10-20T17:17:57.069Z"
+      },
+      {
+        "_id": "6ad7a203f9a233ac1f542872",
+        "slug": "donation-grant",
+        "ngoId": "6ad7a2030ae1ae2a64bd0b59",
+        "__v": 0,
+        "createdAt": "2026-10-20T17:16:51.558Z",
+        "description": "Funding sources, institutional grants, and philanthropic donor receipts.",
+        "fields": [
+          {
+            "name": "Donor / Grantor Name",
+            "key": "donor_name",
+            "type": "Text",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "Foundation, corporation, or individual"
+          },
+          {
+            "name": "Donor Classification",
+            "key": "donor_type",
+            "type": "Dropdown",
+            "required": true,
+            "options": [
+              "Individual Donor",
+              "Corporate CSR Grant",
+              "Multilateral / UN Agency",
+              "Philanthropic Foundation",
+              "Government Aid"
+            ],
+            "isSensitive": false
+          },
+          {
+            "name": "Funding Amount",
+            "key": "amount",
+            "type": "Currency",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "10000"
+          },
+          {
+            "name": "Designated Project",
+            "key": "project_tag",
+            "type": "Text",
+            "required": false,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "e.g. Rural Health Initiative"
+          },
+          {
+            "name": "Tax Exemption Issued",
+            "key": "tax_exemption_issued",
+            "type": "Checkbox",
+            "required": false,
+            "options": [],
+            "isSensitive": false
+          },
+          {
+            "name": "80G / 501(c)(3) Receipt ID",
+            "key": "receipt_id",
+            "type": "Text",
+            "required": false,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "Receipt certificate reference"
+          }
+        ],
+        "icon": "Receipt",
+        "isArchived": false,
+        "isPredefined": true,
+        "name": "Donation & Grant",
+        "prefix": "DON",
+        "updatedAt": "2026-10-20T17:17:57.078Z"
+      },
+      {
+        "_id": "6ad7a203f9a233ac1f542873",
+        "slug": "volunteer-staff",
+        "ngoId": "6ad7a2030ae1ae2a64bd0b59",
+        "__v": 0,
+        "createdAt": "2026-10-20T17:16:51.563Z",
+        "description": "Field workers, volunteers, medical practitioners, and disaster response staff.",
+        "fields": [
+          {
+            "name": "Full Name",
+            "key": "full_name",
+            "type": "Text",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "e.g. Ahmed Khan"
+          },
+          {
+            "name": "Deployment Role",
+            "key": "role",
+            "type": "Dropdown",
+            "required": true,
+            "options": [
+              "Field Caseworker",
+              "Emergency Medic",
+              "Logistics Coordinator",
+              "Counselor / Social Worker",
+              "Community Volunteer"
+            ],
+            "isSensitive": false
+          },
+          {
+            "name": "Primary Contact Phone",
+            "key": "phone",
+            "type": "Phone",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "+1 555-0199"
+          },
+          {
+            "name": "Emergency Contact Details",
+            "key": "emergency_contact",
+            "type": "Encrypted Text",
+            "required": false,
+            "options": [],
+            "isSensitive": true,
+            "placeholder": "Next of kin & contact (Encrypted)"
+          },
+          {
+            "name": "Assigned Field Zone",
+            "key": "assigned_zone",
+            "type": "Text",
+            "required": false,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "District or field base"
+          }
+        ],
+        "icon": "Briefcase",
+        "isArchived": false,
+        "isPredefined": true,
+        "name": "Volunteer & Staff",
+        "prefix": "VOL",
+        "updatedAt": "2026-10-20T17:17:57.083Z"
+      },
+      {
+        "_id": "6ad7a279f9a233ac1f542874",
+        "ngoId": "6ad7a279525a879889e7cd58",
+        "slug": "beneficiary",
+        "__v": 0,
+        "createdAt": "2026-10-20T17:18:49.323Z",
+        "description": "Core recipient and beneficiary demographic records with encrypted PII.",
+        "fields": [
+          {
+            "name": "Full Name",
+            "key": "full_name",
+            "type": "Text",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "e.g. Maria Gonzalez"
+          },
+          {
+            "name": "Gender",
+            "key": "gender",
+            "type": "Dropdown",
+            "required": true,
+            "options": [
+              "Female",
+              "Male",
+              "Non-Binary",
+              "Other",
+              "Prefer not to say"
+            ],
+            "isSensitive": false
+          },
+          {
+            "name": "Date of Birth",
+            "key": "date_of_birth",
+            "type": "Date",
+            "required": false,
+            "options": [],
+            "isSensitive": false
+          },
+          {
+            "name": "National ID / Aadhaar",
+            "key": "national_id",
+            "type": "Encrypted Text",
+            "required": true,
+            "options": [],
+            "isSensitive": true,
+            "placeholder": "National identification number (Encrypted with AES-256)"
+          },
+          {
+            "name": "Phone Number",
+            "key": "phone",
+            "type": "Phone",
+            "required": false,
+            "options": [],
+            "isSensitive": true,
+            "placeholder": "+1 (555) 000-0000"
+          },
+          {
+            "name": "Primary Address",
+            "key": "address",
+            "type": "Long Text",
+            "required": false,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "Village, district, or settlement"
+          },
+          {
+            "name": "Assistance Category",
+            "key": "assistance_category",
+            "type": "Dropdown",
+            "required": true,
+            "options": [
+              "Food Security",
+              "Healthcare & Medical",
+              "Shelter & Housing",
+              "Emergency Cash",
+              "Education Support"
+            ],
+            "isSensitive": false
+          },
+          {
+            "name": "Vulnerability Index",
+            "key": "vulnerability_index",
+            "type": "Dropdown",
+            "required": false,
+            "options": [
+              "High Priority",
+              "Moderate Need",
+              "Standard"
+            ],
+            "isSensitive": false
+          }
+        ],
+        "icon": "Users",
+        "isArchived": false,
+        "isPredefined": true,
+        "name": "Beneficiary",
+        "prefix": "BEN",
+        "updatedAt": "2026-10-20T17:18:49.323Z"
+      },
+      {
+        "_id": "6ad7a279f9a233ac1f542875",
+        "ngoId": "6ad7a279525a879889e7cd58",
+        "slug": "aid-distribution",
+        "__v": 0,
+        "createdAt": "2026-10-20T17:18:49.335Z",
+        "description": "Log of humanitarian relief, medical supplies, food packages, or emergency grants disbursed.",
+        "fields": [
+          {
+            "name": "Beneficiary Reference",
+            "key": "beneficiary_ref",
+            "type": "Text",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "Beneficiary name or Record ID"
+          },
+          {
+            "name": "Campaign / Project",
+            "key": "campaign",
+            "type": "Text",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "e.g. Winter Relief 2026"
+          },
+          {
+            "name": "Aid Type",
+            "key": "aid_type",
+            "type": "Dropdown",
+            "required": true,
+            "options": [
+              "Food Ration Kit",
+              "Medical Supplies",
+              "Cash Assistance",
+              "Warm Blankets & Clothes",
+              "Clean Water Filtration Kit"
+            ],
+            "isSensitive": false
+          },
+          {
+            "name": "Disbursed Quantity / Amount",
+            "key": "quantity",
+            "type": "Number",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "e.g. 5"
+          },
+          {
+            "name": "Unit of Measure",
+            "key": "unit",
+            "type": "Dropdown",
+            "required": true,
+            "options": [
+              "Kits",
+              "Units",
+              "INR",
+              "USD",
+              "Kilograms"
+            ],
+            "isSensitive": false
+          },
+          {
+            "name": "Distribution Date",
+            "key": "distribution_date",
+            "type": "Date",
+            "required": true,
+            "options": [],
+            "isSensitive": false
+          },
+          {
+            "name": "Field Officer Name",
+            "key": "officer_name",
+            "type": "Text",
+            "required": false,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "Staff member verifying handover"
+          }
+        ],
+        "icon": "HeartHandshake",
+        "isArchived": false,
+        "isPredefined": true,
+        "name": "Aid Distribution",
+        "prefix": "AID",
+        "updatedAt": "2026-10-20T17:18:49.335Z"
+      },
+      {
+        "_id": "6ad7a279f9a233ac1f542876",
+        "ngoId": "6ad7a279525a879889e7cd58",
+        "slug": "donation-grant",
+        "__v": 0,
+        "createdAt": "2026-10-20T17:18:49.339Z",
+        "description": "Funding sources, institutional grants, and philanthropic donor receipts.",
+        "fields": [
+          {
+            "name": "Donor / Grantor Name",
+            "key": "donor_name",
+            "type": "Text",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "Foundation, corporation, or individual"
+          },
+          {
+            "name": "Donor Classification",
+            "key": "donor_type",
+            "type": "Dropdown",
+            "required": true,
+            "options": [
+              "Individual Donor",
+              "Corporate CSR Grant",
+              "Multilateral / UN Agency",
+              "Philanthropic Foundation",
+              "Government Aid"
+            ],
+            "isSensitive": false
+          },
+          {
+            "name": "Funding Amount",
+            "key": "amount",
+            "type": "Currency",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "10000"
+          },
+          {
+            "name": "Designated Project",
+            "key": "project_tag",
+            "type": "Text",
+            "required": false,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "e.g. Rural Health Initiative"
+          },
+          {
+            "name": "Tax Exemption Issued",
+            "key": "tax_exemption_issued",
+            "type": "Checkbox",
+            "required": false,
+            "options": [],
+            "isSensitive": false
+          },
+          {
+            "name": "80G / 501(c)(3) Receipt ID",
+            "key": "receipt_id",
+            "type": "Text",
+            "required": false,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "Receipt certificate reference"
+          }
+        ],
+        "icon": "Receipt",
+        "isArchived": false,
+        "isPredefined": true,
+        "name": "Donation & Grant",
+        "prefix": "DON",
+        "updatedAt": "2026-10-20T17:18:49.339Z"
+      },
+      {
+        "_id": "6ad7a279f9a233ac1f542877",
+        "ngoId": "6ad7a279525a879889e7cd58",
+        "slug": "volunteer-staff",
+        "__v": 0,
+        "createdAt": "2026-10-20T17:18:49.342Z",
+        "description": "Field workers, volunteers, medical practitioners, and disaster response staff.",
+        "fields": [
+          {
+            "name": "Full Name",
+            "key": "full_name",
+            "type": "Text",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "e.g. Ahmed Khan"
+          },
+          {
+            "name": "Deployment Role",
+            "key": "role",
+            "type": "Dropdown",
+            "required": true,
+            "options": [
+              "Field Caseworker",
+              "Emergency Medic",
+              "Logistics Coordinator",
+              "Counselor / Social Worker",
+              "Community Volunteer"
+            ],
+            "isSensitive": false
+          },
+          {
+            "name": "Primary Contact Phone",
+            "key": "phone",
+            "type": "Phone",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "+1 555-0199"
+          },
+          {
+            "name": "Emergency Contact Details",
+            "key": "emergency_contact",
+            "type": "Encrypted Text",
+            "required": false,
+            "options": [],
+            "isSensitive": true,
+            "placeholder": "Next of kin & contact (Encrypted)"
+          },
+          {
+            "name": "Assigned Field Zone",
+            "key": "assigned_zone",
+            "type": "Text",
+            "required": false,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "District or field base"
+          }
+        ],
+        "icon": "Briefcase",
+        "isArchived": false,
+        "isPredefined": true,
+        "name": "Volunteer & Staff",
+        "prefix": "VOL",
+        "updatedAt": "2026-10-20T17:18:49.342Z"
+      },
+      {
+        "_id": "6ad7a279f9a233ac1f542878",
+        "ngoId": "6ad7a279525a879889e7cd59",
+        "slug": "beneficiary",
+        "__v": 0,
+        "createdAt": "2026-10-20T17:18:49.345Z",
+        "description": "Core recipient and beneficiary demographic records with encrypted PII.",
+        "fields": [
+          {
+            "name": "Full Name",
+            "key": "full_name",
+            "type": "Text",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "e.g. Maria Gonzalez"
+          },
+          {
+            "name": "Gender",
+            "key": "gender",
+            "type": "Dropdown",
+            "required": true,
+            "options": [
+              "Female",
+              "Male",
+              "Non-Binary",
+              "Other",
+              "Prefer not to say"
+            ],
+            "isSensitive": false
+          },
+          {
+            "name": "Date of Birth",
+            "key": "date_of_birth",
+            "type": "Date",
+            "required": false,
+            "options": [],
+            "isSensitive": false
+          },
+          {
+            "name": "National ID / Aadhaar",
+            "key": "national_id",
+            "type": "Encrypted Text",
+            "required": true,
+            "options": [],
+            "isSensitive": true,
+            "placeholder": "National identification number (Encrypted with AES-256)"
+          },
+          {
+            "name": "Phone Number",
+            "key": "phone",
+            "type": "Phone",
+            "required": false,
+            "options": [],
+            "isSensitive": true,
+            "placeholder": "+1 (555) 000-0000"
+          },
+          {
+            "name": "Primary Address",
+            "key": "address",
+            "type": "Long Text",
+            "required": false,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "Village, district, or settlement"
+          },
+          {
+            "name": "Assistance Category",
+            "key": "assistance_category",
+            "type": "Dropdown",
+            "required": true,
+            "options": [
+              "Food Security",
+              "Healthcare & Medical",
+              "Shelter & Housing",
+              "Emergency Cash",
+              "Education Support"
+            ],
+            "isSensitive": false
+          },
+          {
+            "name": "Vulnerability Index",
+            "key": "vulnerability_index",
+            "type": "Dropdown",
+            "required": false,
+            "options": [
+              "High Priority",
+              "Moderate Need",
+              "Standard"
+            ],
+            "isSensitive": false
+          }
+        ],
+        "icon": "Users",
+        "isArchived": false,
+        "isPredefined": true,
+        "name": "Beneficiary",
+        "prefix": "BEN",
+        "updatedAt": "2026-10-20T17:18:49.345Z"
+      },
+      {
+        "_id": "6ad7a279f9a233ac1f542879",
+        "ngoId": "6ad7a279525a879889e7cd59",
+        "slug": "aid-distribution",
+        "__v": 0,
+        "createdAt": "2026-10-20T17:18:49.349Z",
+        "description": "Log of humanitarian relief, medical supplies, food packages, or emergency grants disbursed.",
+        "fields": [
+          {
+            "name": "Beneficiary Reference",
+            "key": "beneficiary_ref",
+            "type": "Text",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "Beneficiary name or Record ID"
+          },
+          {
+            "name": "Campaign / Project",
+            "key": "campaign",
+            "type": "Text",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "e.g. Winter Relief 2026"
+          },
+          {
+            "name": "Aid Type",
+            "key": "aid_type",
+            "type": "Dropdown",
+            "required": true,
+            "options": [
+              "Food Ration Kit",
+              "Medical Supplies",
+              "Cash Assistance",
+              "Warm Blankets & Clothes",
+              "Clean Water Filtration Kit"
+            ],
+            "isSensitive": false
+          },
+          {
+            "name": "Disbursed Quantity / Amount",
+            "key": "quantity",
+            "type": "Number",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "e.g. 5"
+          },
+          {
+            "name": "Unit of Measure",
+            "key": "unit",
+            "type": "Dropdown",
+            "required": true,
+            "options": [
+              "Kits",
+              "Units",
+              "INR",
+              "USD",
+              "Kilograms"
+            ],
+            "isSensitive": false
+          },
+          {
+            "name": "Distribution Date",
+            "key": "distribution_date",
+            "type": "Date",
+            "required": true,
+            "options": [],
+            "isSensitive": false
+          },
+          {
+            "name": "Field Officer Name",
+            "key": "officer_name",
+            "type": "Text",
+            "required": false,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "Staff member verifying handover"
+          }
+        ],
+        "icon": "HeartHandshake",
+        "isArchived": false,
+        "isPredefined": true,
+        "name": "Aid Distribution",
+        "prefix": "AID",
+        "updatedAt": "2026-10-20T17:18:49.349Z"
+      },
+      {
+        "_id": "6ad7a279f9a233ac1f54287a",
+        "ngoId": "6ad7a279525a879889e7cd59",
+        "slug": "donation-grant",
+        "__v": 0,
+        "createdAt": "2026-10-20T17:18:49.353Z",
+        "description": "Funding sources, institutional grants, and philanthropic donor receipts.",
+        "fields": [
+          {
+            "name": "Donor / Grantor Name",
+            "key": "donor_name",
+            "type": "Text",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "Foundation, corporation, or individual"
+          },
+          {
+            "name": "Donor Classification",
+            "key": "donor_type",
+            "type": "Dropdown",
+            "required": true,
+            "options": [
+              "Individual Donor",
+              "Corporate CSR Grant",
+              "Multilateral / UN Agency",
+              "Philanthropic Foundation",
+              "Government Aid"
+            ],
+            "isSensitive": false
+          },
+          {
+            "name": "Funding Amount",
+            "key": "amount",
+            "type": "Currency",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "10000"
+          },
+          {
+            "name": "Designated Project",
+            "key": "project_tag",
+            "type": "Text",
+            "required": false,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "e.g. Rural Health Initiative"
+          },
+          {
+            "name": "Tax Exemption Issued",
+            "key": "tax_exemption_issued",
+            "type": "Checkbox",
+            "required": false,
+            "options": [],
+            "isSensitive": false
+          },
+          {
+            "name": "80G / 501(c)(3) Receipt ID",
+            "key": "receipt_id",
+            "type": "Text",
+            "required": false,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "Receipt certificate reference"
+          }
+        ],
+        "icon": "Receipt",
+        "isArchived": false,
+        "isPredefined": true,
+        "name": "Donation & Grant",
+        "prefix": "DON",
+        "updatedAt": "2026-10-20T17:18:49.353Z"
+      },
+      {
+        "_id": "6ad7a279f9a233ac1f54287b",
+        "ngoId": "6ad7a279525a879889e7cd59",
+        "slug": "volunteer-staff",
+        "__v": 0,
+        "createdAt": "2026-10-20T17:18:49.356Z",
+        "description": "Field workers, volunteers, medical practitioners, and disaster response staff.",
+        "fields": [
+          {
+            "name": "Full Name",
+            "key": "full_name",
+            "type": "Text",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "e.g. Ahmed Khan"
+          },
+          {
+            "name": "Deployment Role",
+            "key": "role",
+            "type": "Dropdown",
+            "required": true,
+            "options": [
+              "Field Caseworker",
+              "Emergency Medic",
+              "Logistics Coordinator",
+              "Counselor / Social Worker",
+              "Community Volunteer"
+            ],
+            "isSensitive": false
+          },
+          {
+            "name": "Primary Contact Phone",
+            "key": "phone",
+            "type": "Phone",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "+1 555-0199"
+          },
+          {
+            "name": "Emergency Contact Details",
+            "key": "emergency_contact",
+            "type": "Encrypted Text",
+            "required": false,
+            "options": [],
+            "isSensitive": true,
+            "placeholder": "Next of kin & contact (Encrypted)"
+          },
+          {
+            "name": "Assigned Field Zone",
+            "key": "assigned_zone",
+            "type": "Text",
+            "required": false,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "District or field base"
+          }
+        ],
+        "icon": "Briefcase",
+        "isArchived": false,
+        "isPredefined": true,
+        "name": "Volunteer & Staff",
+        "prefix": "VOL",
+        "updatedAt": "2026-10-20T17:18:49.356Z"
+      },
+      {
+        "_id": "6ad7a2c5f9a233ac1f54287c",
+        "slug": "beneficiary",
+        "ngoId": "6ad7a2c563cd51d379edbfb0",
+        "__v": 0,
+        "createdAt": "2026-10-20T17:20:05.649Z",
+        "description": "Core recipient and beneficiary demographic records with encrypted PII.",
+        "fields": [
+          {
+            "name": "Full Name",
+            "key": "full_name",
+            "type": "Text",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "e.g. Maria Gonzalez"
+          },
+          {
+            "name": "Gender",
+            "key": "gender",
+            "type": "Dropdown",
+            "required": true,
+            "options": [
+              "Female",
+              "Male",
+              "Non-Binary",
+              "Other",
+              "Prefer not to say"
+            ],
+            "isSensitive": false
+          },
+          {
+            "name": "Date of Birth",
+            "key": "date_of_birth",
+            "type": "Date",
+            "required": false,
+            "options": [],
+            "isSensitive": false
+          },
+          {
+            "name": "National ID / Aadhaar",
+            "key": "national_id",
+            "type": "Encrypted Text",
+            "required": true,
+            "options": [],
+            "isSensitive": true,
+            "placeholder": "National identification number (Encrypted with AES-256)"
+          },
+          {
+            "name": "Phone Number",
+            "key": "phone",
+            "type": "Phone",
+            "required": false,
+            "options": [],
+            "isSensitive": true,
+            "placeholder": "+1 (555) 000-0000"
+          },
+          {
+            "name": "Primary Address",
+            "key": "address",
+            "type": "Long Text",
+            "required": false,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "Village, district, or settlement"
+          },
+          {
+            "name": "Assistance Category",
+            "key": "assistance_category",
+            "type": "Dropdown",
+            "required": true,
+            "options": [
+              "Food Security",
+              "Healthcare & Medical",
+              "Shelter & Housing",
+              "Emergency Cash",
+              "Education Support"
+            ],
+            "isSensitive": false
+          },
+          {
+            "name": "Vulnerability Index",
+            "key": "vulnerability_index",
+            "type": "Dropdown",
+            "required": false,
+            "options": [
+              "High Priority",
+              "Moderate Need",
+              "Standard"
+            ],
+            "isSensitive": false
+          }
+        ],
+        "icon": "Users",
+        "isArchived": false,
+        "isPredefined": true,
+        "name": "Beneficiary",
+        "prefix": "BEN",
+        "updatedAt": "2026-10-20T17:20:05.649Z"
+      },
+      {
+        "_id": "6ad7a2c5f9a233ac1f54287d",
+        "slug": "aid-distribution",
+        "ngoId": "6ad7a2c563cd51d379edbfb0",
+        "__v": 0,
+        "createdAt": "2026-10-20T17:20:05.659Z",
+        "description": "Log of humanitarian relief, medical supplies, food packages, or emergency grants disbursed.",
+        "fields": [
+          {
+            "name": "Beneficiary Reference",
+            "key": "beneficiary_ref",
+            "type": "Text",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "Beneficiary name or Record ID"
+          },
+          {
+            "name": "Campaign / Project",
+            "key": "campaign",
+            "type": "Text",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "e.g. Winter Relief 2026"
+          },
+          {
+            "name": "Aid Type",
+            "key": "aid_type",
+            "type": "Dropdown",
+            "required": true,
+            "options": [
+              "Food Ration Kit",
+              "Medical Supplies",
+              "Cash Assistance",
+              "Warm Blankets & Clothes",
+              "Clean Water Filtration Kit"
+            ],
+            "isSensitive": false
+          },
+          {
+            "name": "Disbursed Quantity / Amount",
+            "key": "quantity",
+            "type": "Number",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "e.g. 5"
+          },
+          {
+            "name": "Unit of Measure",
+            "key": "unit",
+            "type": "Dropdown",
+            "required": true,
+            "options": [
+              "Kits",
+              "Units",
+              "INR",
+              "USD",
+              "Kilograms"
+            ],
+            "isSensitive": false
+          },
+          {
+            "name": "Distribution Date",
+            "key": "distribution_date",
+            "type": "Date",
+            "required": true,
+            "options": [],
+            "isSensitive": false
+          },
+          {
+            "name": "Field Officer Name",
+            "key": "officer_name",
+            "type": "Text",
+            "required": false,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "Staff member verifying handover"
+          }
+        ],
+        "icon": "HeartHandshake",
+        "isArchived": false,
+        "isPredefined": true,
+        "name": "Aid Distribution",
+        "prefix": "AID",
+        "updatedAt": "2026-10-20T17:20:05.659Z"
+      },
+      {
+        "_id": "6ad7a2c5f9a233ac1f54287e",
+        "slug": "donation-grant",
+        "ngoId": "6ad7a2c563cd51d379edbfb0",
+        "__v": 0,
+        "createdAt": "2026-10-20T17:20:05.662Z",
+        "description": "Funding sources, institutional grants, and philanthropic donor receipts.",
+        "fields": [
+          {
+            "name": "Donor / Grantor Name",
+            "key": "donor_name",
+            "type": "Text",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "Foundation, corporation, or individual"
+          },
+          {
+            "name": "Donor Classification",
+            "key": "donor_type",
+            "type": "Dropdown",
+            "required": true,
+            "options": [
+              "Individual Donor",
+              "Corporate CSR Grant",
+              "Multilateral / UN Agency",
+              "Philanthropic Foundation",
+              "Government Aid"
+            ],
+            "isSensitive": false
+          },
+          {
+            "name": "Funding Amount",
+            "key": "amount",
+            "type": "Currency",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "10000"
+          },
+          {
+            "name": "Designated Project",
+            "key": "project_tag",
+            "type": "Text",
+            "required": false,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "e.g. Rural Health Initiative"
+          },
+          {
+            "name": "Tax Exemption Issued",
+            "key": "tax_exemption_issued",
+            "type": "Checkbox",
+            "required": false,
+            "options": [],
+            "isSensitive": false
+          },
+          {
+            "name": "80G / 501(c)(3) Receipt ID",
+            "key": "receipt_id",
+            "type": "Text",
+            "required": false,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "Receipt certificate reference"
+          }
+        ],
+        "icon": "Receipt",
+        "isArchived": false,
+        "isPredefined": true,
+        "name": "Donation & Grant",
+        "prefix": "DON",
+        "updatedAt": "2026-10-20T17:20:05.662Z"
+      },
+      {
+        "_id": "6ad7a2c5f9a233ac1f54287f",
+        "slug": "volunteer-staff",
+        "ngoId": "6ad7a2c563cd51d379edbfb0",
+        "__v": 0,
+        "createdAt": "2026-10-20T17:20:05.666Z",
+        "description": "Field workers, volunteers, medical practitioners, and disaster response staff.",
+        "fields": [
+          {
+            "name": "Full Name",
+            "key": "full_name",
+            "type": "Text",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "e.g. Ahmed Khan"
+          },
+          {
+            "name": "Deployment Role",
+            "key": "role",
+            "type": "Dropdown",
+            "required": true,
+            "options": [
+              "Field Caseworker",
+              "Emergency Medic",
+              "Logistics Coordinator",
+              "Counselor / Social Worker",
+              "Community Volunteer"
+            ],
+            "isSensitive": false
+          },
+          {
+            "name": "Primary Contact Phone",
+            "key": "phone",
+            "type": "Phone",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "+1 555-0199"
+          },
+          {
+            "name": "Emergency Contact Details",
+            "key": "emergency_contact",
+            "type": "Encrypted Text",
+            "required": false,
+            "options": [],
+            "isSensitive": true,
+            "placeholder": "Next of kin & contact (Encrypted)"
+          },
+          {
+            "name": "Assigned Field Zone",
+            "key": "assigned_zone",
+            "type": "Text",
+            "required": false,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "District or field base"
+          }
+        ],
+        "icon": "Briefcase",
+        "isArchived": false,
+        "isPredefined": true,
+        "name": "Volunteer & Staff",
+        "prefix": "VOL",
+        "updatedAt": "2026-10-20T17:20:05.666Z"
+      },
+      {
+        "_id": "6ad7a2c5f9a233ac1f542880",
+        "slug": "beneficiary",
+        "ngoId": "6ad7a2c563cd51d379edbfb1",
+        "__v": 0,
+        "createdAt": "2026-10-20T17:20:05.668Z",
+        "description": "Core recipient and beneficiary demographic records with encrypted PII.",
+        "fields": [
+          {
+            "name": "Full Name",
+            "key": "full_name",
+            "type": "Text",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "e.g. Maria Gonzalez"
+          },
+          {
+            "name": "Gender",
+            "key": "gender",
+            "type": "Dropdown",
+            "required": true,
+            "options": [
+              "Female",
+              "Male",
+              "Non-Binary",
+              "Other",
+              "Prefer not to say"
+            ],
+            "isSensitive": false
+          },
+          {
+            "name": "Date of Birth",
+            "key": "date_of_birth",
+            "type": "Date",
+            "required": false,
+            "options": [],
+            "isSensitive": false
+          },
+          {
+            "name": "National ID / Aadhaar",
+            "key": "national_id",
+            "type": "Encrypted Text",
+            "required": true,
+            "options": [],
+            "isSensitive": true,
+            "placeholder": "National identification number (Encrypted with AES-256)"
+          },
+          {
+            "name": "Phone Number",
+            "key": "phone",
+            "type": "Phone",
+            "required": false,
+            "options": [],
+            "isSensitive": true,
+            "placeholder": "+1 (555) 000-0000"
+          },
+          {
+            "name": "Primary Address",
+            "key": "address",
+            "type": "Long Text",
+            "required": false,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "Village, district, or settlement"
+          },
+          {
+            "name": "Assistance Category",
+            "key": "assistance_category",
+            "type": "Dropdown",
+            "required": true,
+            "options": [
+              "Food Security",
+              "Healthcare & Medical",
+              "Shelter & Housing",
+              "Emergency Cash",
+              "Education Support"
+            ],
+            "isSensitive": false
+          },
+          {
+            "name": "Vulnerability Index",
+            "key": "vulnerability_index",
+            "type": "Dropdown",
+            "required": false,
+            "options": [
+              "High Priority",
+              "Moderate Need",
+              "Standard"
+            ],
+            "isSensitive": false
+          }
+        ],
+        "icon": "Users",
+        "isArchived": false,
+        "isPredefined": true,
+        "name": "Beneficiary",
+        "prefix": "BEN",
+        "updatedAt": "2026-10-20T17:20:05.668Z"
+      },
+      {
+        "_id": "6ad7a2c5f9a233ac1f542881",
+        "slug": "aid-distribution",
+        "ngoId": "6ad7a2c563cd51d379edbfb1",
+        "__v": 0,
+        "createdAt": "2026-10-20T17:20:05.672Z",
+        "description": "Log of humanitarian relief, medical supplies, food packages, or emergency grants disbursed.",
+        "fields": [
+          {
+            "name": "Beneficiary Reference",
+            "key": "beneficiary_ref",
+            "type": "Text",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "Beneficiary name or Record ID"
+          },
+          {
+            "name": "Campaign / Project",
+            "key": "campaign",
+            "type": "Text",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "e.g. Winter Relief 2026"
+          },
+          {
+            "name": "Aid Type",
+            "key": "aid_type",
+            "type": "Dropdown",
+            "required": true,
+            "options": [
+              "Food Ration Kit",
+              "Medical Supplies",
+              "Cash Assistance",
+              "Warm Blankets & Clothes",
+              "Clean Water Filtration Kit"
+            ],
+            "isSensitive": false
+          },
+          {
+            "name": "Disbursed Quantity / Amount",
+            "key": "quantity",
+            "type": "Number",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "e.g. 5"
+          },
+          {
+            "name": "Unit of Measure",
+            "key": "unit",
+            "type": "Dropdown",
+            "required": true,
+            "options": [
+              "Kits",
+              "Units",
+              "INR",
+              "USD",
+              "Kilograms"
+            ],
+            "isSensitive": false
+          },
+          {
+            "name": "Distribution Date",
+            "key": "distribution_date",
+            "type": "Date",
+            "required": true,
+            "options": [],
+            "isSensitive": false
+          },
+          {
+            "name": "Field Officer Name",
+            "key": "officer_name",
+            "type": "Text",
+            "required": false,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "Staff member verifying handover"
+          }
+        ],
+        "icon": "HeartHandshake",
+        "isArchived": false,
+        "isPredefined": true,
+        "name": "Aid Distribution",
+        "prefix": "AID",
+        "updatedAt": "2026-10-20T17:20:05.672Z"
+      },
+      {
+        "_id": "6ad7a2c5f9a233ac1f542882",
+        "slug": "donation-grant",
+        "ngoId": "6ad7a2c563cd51d379edbfb1",
+        "__v": 0,
+        "createdAt": "2026-10-20T17:20:05.675Z",
+        "description": "Funding sources, institutional grants, and philanthropic donor receipts.",
+        "fields": [
+          {
+            "name": "Donor / Grantor Name",
+            "key": "donor_name",
+            "type": "Text",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "Foundation, corporation, or individual"
+          },
+          {
+            "name": "Donor Classification",
+            "key": "donor_type",
+            "type": "Dropdown",
+            "required": true,
+            "options": [
+              "Individual Donor",
+              "Corporate CSR Grant",
+              "Multilateral / UN Agency",
+              "Philanthropic Foundation",
+              "Government Aid"
+            ],
+            "isSensitive": false
+          },
+          {
+            "name": "Funding Amount",
+            "key": "amount",
+            "type": "Currency",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "10000"
+          },
+          {
+            "name": "Designated Project",
+            "key": "project_tag",
+            "type": "Text",
+            "required": false,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "e.g. Rural Health Initiative"
+          },
+          {
+            "name": "Tax Exemption Issued",
+            "key": "tax_exemption_issued",
+            "type": "Checkbox",
+            "required": false,
+            "options": [],
+            "isSensitive": false
+          },
+          {
+            "name": "80G / 501(c)(3) Receipt ID",
+            "key": "receipt_id",
+            "type": "Text",
+            "required": false,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "Receipt certificate reference"
+          }
+        ],
+        "icon": "Receipt",
+        "isArchived": false,
+        "isPredefined": true,
+        "name": "Donation & Grant",
+        "prefix": "DON",
+        "updatedAt": "2026-10-20T17:20:05.675Z"
+      },
+      {
+        "_id": "6ad7a2c5f9a233ac1f542883",
+        "slug": "volunteer-staff",
+        "ngoId": "6ad7a2c563cd51d379edbfb1",
+        "__v": 0,
+        "createdAt": "2026-10-20T17:20:05.678Z",
+        "description": "Field workers, volunteers, medical practitioners, and disaster response staff.",
+        "fields": [
+          {
+            "name": "Full Name",
+            "key": "full_name",
+            "type": "Text",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "e.g. Ahmed Khan"
+          },
+          {
+            "name": "Deployment Role",
+            "key": "role",
+            "type": "Dropdown",
+            "required": true,
+            "options": [
+              "Field Caseworker",
+              "Emergency Medic",
+              "Logistics Coordinator",
+              "Counselor / Social Worker",
+              "Community Volunteer"
+            ],
+            "isSensitive": false
+          },
+          {
+            "name": "Primary Contact Phone",
+            "key": "phone",
+            "type": "Phone",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "+1 555-0199"
+          },
+          {
+            "name": "Emergency Contact Details",
+            "key": "emergency_contact",
+            "type": "Encrypted Text",
+            "required": false,
+            "options": [],
+            "isSensitive": true,
+            "placeholder": "Next of kin & contact (Encrypted)"
+          },
+          {
+            "name": "Assigned Field Zone",
+            "key": "assigned_zone",
+            "type": "Text",
+            "required": false,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "District or field base"
+          }
+        ],
+        "icon": "Briefcase",
+        "isArchived": false,
+        "isPredefined": true,
+        "name": "Volunteer & Staff",
+        "prefix": "VOL",
+        "updatedAt": "2026-10-20T17:20:05.678Z"
+      },
+      {
+        "_id": "6ad7a30af9a233ac1f542884",
+        "ngoId": "6ad7a30a1862c3da80342fd2",
+        "slug": "beneficiary",
+        "__v": 0,
+        "createdAt": "2026-10-20T17:21:14.607Z",
+        "description": "Core recipient and beneficiary demographic records with encrypted PII.",
+        "fields": [
+          {
+            "name": "Full Name",
+            "key": "full_name",
+            "type": "Text",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "e.g. Maria Gonzalez"
+          },
+          {
+            "name": "Gender",
+            "key": "gender",
+            "type": "Dropdown",
+            "required": true,
+            "options": [
+              "Female",
+              "Male",
+              "Non-Binary",
+              "Other",
+              "Prefer not to say"
+            ],
+            "isSensitive": false
+          },
+          {
+            "name": "Date of Birth",
+            "key": "date_of_birth",
+            "type": "Date",
+            "required": false,
+            "options": [],
+            "isSensitive": false
+          },
+          {
+            "name": "National ID / Aadhaar",
+            "key": "national_id",
+            "type": "Encrypted Text",
+            "required": true,
+            "options": [],
+            "isSensitive": true,
+            "placeholder": "National identification number (Encrypted with AES-256)"
+          },
+          {
+            "name": "Phone Number",
+            "key": "phone",
+            "type": "Phone",
+            "required": false,
+            "options": [],
+            "isSensitive": true,
+            "placeholder": "+1 (555) 000-0000"
+          },
+          {
+            "name": "Primary Address",
+            "key": "address",
+            "type": "Long Text",
+            "required": false,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "Village, district, or settlement"
+          },
+          {
+            "name": "Assistance Category",
+            "key": "assistance_category",
+            "type": "Dropdown",
+            "required": true,
+            "options": [
+              "Food Security",
+              "Healthcare & Medical",
+              "Shelter & Housing",
+              "Emergency Cash",
+              "Education Support"
+            ],
+            "isSensitive": false
+          },
+          {
+            "name": "Vulnerability Index",
+            "key": "vulnerability_index",
+            "type": "Dropdown",
+            "required": false,
+            "options": [
+              "High Priority",
+              "Moderate Need",
+              "Standard"
+            ],
+            "isSensitive": false
+          }
+        ],
+        "icon": "Users",
+        "isArchived": false,
+        "isPredefined": true,
+        "name": "Beneficiary",
+        "prefix": "BEN",
+        "updatedAt": "2026-10-20T17:21:14.607Z"
+      },
+      {
+        "_id": "6ad7a30af9a233ac1f542885",
+        "ngoId": "6ad7a30a1862c3da80342fd2",
+        "slug": "aid-distribution",
+        "__v": 0,
+        "createdAt": "2026-10-20T17:21:14.620Z",
+        "description": "Log of humanitarian relief, medical supplies, food packages, or emergency grants disbursed.",
+        "fields": [
+          {
+            "name": "Beneficiary Reference",
+            "key": "beneficiary_ref",
+            "type": "Text",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "Beneficiary name or Record ID"
+          },
+          {
+            "name": "Campaign / Project",
+            "key": "campaign",
+            "type": "Text",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "e.g. Winter Relief 2026"
+          },
+          {
+            "name": "Aid Type",
+            "key": "aid_type",
+            "type": "Dropdown",
+            "required": true,
+            "options": [
+              "Food Ration Kit",
+              "Medical Supplies",
+              "Cash Assistance",
+              "Warm Blankets & Clothes",
+              "Clean Water Filtration Kit"
+            ],
+            "isSensitive": false
+          },
+          {
+            "name": "Disbursed Quantity / Amount",
+            "key": "quantity",
+            "type": "Number",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "e.g. 5"
+          },
+          {
+            "name": "Unit of Measure",
+            "key": "unit",
+            "type": "Dropdown",
+            "required": true,
+            "options": [
+              "Kits",
+              "Units",
+              "INR",
+              "USD",
+              "Kilograms"
+            ],
+            "isSensitive": false
+          },
+          {
+            "name": "Distribution Date",
+            "key": "distribution_date",
+            "type": "Date",
+            "required": true,
+            "options": [],
+            "isSensitive": false
+          },
+          {
+            "name": "Field Officer Name",
+            "key": "officer_name",
+            "type": "Text",
+            "required": false,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "Staff member verifying handover"
+          }
+        ],
+        "icon": "HeartHandshake",
+        "isArchived": false,
+        "isPredefined": true,
+        "name": "Aid Distribution",
+        "prefix": "AID",
+        "updatedAt": "2026-10-20T17:21:14.620Z"
+      },
+      {
+        "_id": "6ad7a30af9a233ac1f542886",
+        "ngoId": "6ad7a30a1862c3da80342fd2",
+        "slug": "donation-grant",
+        "__v": 0,
+        "createdAt": "2026-10-20T17:21:14.624Z",
+        "description": "Funding sources, institutional grants, and philanthropic donor receipts.",
+        "fields": [
+          {
+            "name": "Donor / Grantor Name",
+            "key": "donor_name",
+            "type": "Text",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "Foundation, corporation, or individual"
+          },
+          {
+            "name": "Donor Classification",
+            "key": "donor_type",
+            "type": "Dropdown",
+            "required": true,
+            "options": [
+              "Individual Donor",
+              "Corporate CSR Grant",
+              "Multilateral / UN Agency",
+              "Philanthropic Foundation",
+              "Government Aid"
+            ],
+            "isSensitive": false
+          },
+          {
+            "name": "Funding Amount",
+            "key": "amount",
+            "type": "Currency",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "10000"
+          },
+          {
+            "name": "Designated Project",
+            "key": "project_tag",
+            "type": "Text",
+            "required": false,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "e.g. Rural Health Initiative"
+          },
+          {
+            "name": "Tax Exemption Issued",
+            "key": "tax_exemption_issued",
+            "type": "Checkbox",
+            "required": false,
+            "options": [],
+            "isSensitive": false
+          },
+          {
+            "name": "80G / 501(c)(3) Receipt ID",
+            "key": "receipt_id",
+            "type": "Text",
+            "required": false,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "Receipt certificate reference"
+          }
+        ],
+        "icon": "Receipt",
+        "isArchived": false,
+        "isPredefined": true,
+        "name": "Donation & Grant",
+        "prefix": "DON",
+        "updatedAt": "2026-10-20T17:21:14.624Z"
+      },
+      {
+        "_id": "6ad7a30af9a233ac1f542887",
+        "ngoId": "6ad7a30a1862c3da80342fd2",
+        "slug": "volunteer-staff",
+        "__v": 0,
+        "createdAt": "2026-10-20T17:21:14.628Z",
+        "description": "Field workers, volunteers, medical practitioners, and disaster response staff.",
+        "fields": [
+          {
+            "name": "Full Name",
+            "key": "full_name",
+            "type": "Text",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "e.g. Ahmed Khan"
+          },
+          {
+            "name": "Deployment Role",
+            "key": "role",
+            "type": "Dropdown",
+            "required": true,
+            "options": [
+              "Field Caseworker",
+              "Emergency Medic",
+              "Logistics Coordinator",
+              "Counselor / Social Worker",
+              "Community Volunteer"
+            ],
+            "isSensitive": false
+          },
+          {
+            "name": "Primary Contact Phone",
+            "key": "phone",
+            "type": "Phone",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "+1 555-0199"
+          },
+          {
+            "name": "Emergency Contact Details",
+            "key": "emergency_contact",
+            "type": "Encrypted Text",
+            "required": false,
+            "options": [],
+            "isSensitive": true,
+            "placeholder": "Next of kin & contact (Encrypted)"
+          },
+          {
+            "name": "Assigned Field Zone",
+            "key": "assigned_zone",
+            "type": "Text",
+            "required": false,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "District or field base"
+          }
+        ],
+        "icon": "Briefcase",
+        "isArchived": false,
+        "isPredefined": true,
+        "name": "Volunteer & Staff",
+        "prefix": "VOL",
+        "updatedAt": "2026-10-20T17:21:14.628Z"
+      },
+      {
+        "_id": "6ad7a30af9a233ac1f542888",
+        "ngoId": "6ad7a30a1862c3da80342fd3",
+        "slug": "beneficiary",
+        "__v": 0,
+        "createdAt": "2026-10-20T17:21:14.631Z",
+        "description": "Core recipient and beneficiary demographic records with encrypted PII.",
+        "fields": [
+          {
+            "name": "Full Name",
+            "key": "full_name",
+            "type": "Text",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "e.g. Maria Gonzalez"
+          },
+          {
+            "name": "Gender",
+            "key": "gender",
+            "type": "Dropdown",
+            "required": true,
+            "options": [
+              "Female",
+              "Male",
+              "Non-Binary",
+              "Other",
+              "Prefer not to say"
+            ],
+            "isSensitive": false
+          },
+          {
+            "name": "Date of Birth",
+            "key": "date_of_birth",
+            "type": "Date",
+            "required": false,
+            "options": [],
+            "isSensitive": false
+          },
+          {
+            "name": "National ID / Aadhaar",
+            "key": "national_id",
+            "type": "Encrypted Text",
+            "required": true,
+            "options": [],
+            "isSensitive": true,
+            "placeholder": "National identification number (Encrypted with AES-256)"
+          },
+          {
+            "name": "Phone Number",
+            "key": "phone",
+            "type": "Phone",
+            "required": false,
+            "options": [],
+            "isSensitive": true,
+            "placeholder": "+1 (555) 000-0000"
+          },
+          {
+            "name": "Primary Address",
+            "key": "address",
+            "type": "Long Text",
+            "required": false,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "Village, district, or settlement"
+          },
+          {
+            "name": "Assistance Category",
+            "key": "assistance_category",
+            "type": "Dropdown",
+            "required": true,
+            "options": [
+              "Food Security",
+              "Healthcare & Medical",
+              "Shelter & Housing",
+              "Emergency Cash",
+              "Education Support"
+            ],
+            "isSensitive": false
+          },
+          {
+            "name": "Vulnerability Index",
+            "key": "vulnerability_index",
+            "type": "Dropdown",
+            "required": false,
+            "options": [
+              "High Priority",
+              "Moderate Need",
+              "Standard"
+            ],
+            "isSensitive": false
+          }
+        ],
+        "icon": "Users",
+        "isArchived": false,
+        "isPredefined": true,
+        "name": "Beneficiary",
+        "prefix": "BEN",
+        "updatedAt": "2026-10-20T17:21:14.631Z"
+      },
+      {
+        "_id": "6ad7a30af9a233ac1f542889",
+        "ngoId": "6ad7a30a1862c3da80342fd3",
+        "slug": "aid-distribution",
+        "__v": 0,
+        "createdAt": "2026-10-20T17:21:14.636Z",
+        "description": "Log of humanitarian relief, medical supplies, food packages, or emergency grants disbursed.",
+        "fields": [
+          {
+            "name": "Beneficiary Reference",
+            "key": "beneficiary_ref",
+            "type": "Text",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "Beneficiary name or Record ID"
+          },
+          {
+            "name": "Campaign / Project",
+            "key": "campaign",
+            "type": "Text",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "e.g. Winter Relief 2026"
+          },
+          {
+            "name": "Aid Type",
+            "key": "aid_type",
+            "type": "Dropdown",
+            "required": true,
+            "options": [
+              "Food Ration Kit",
+              "Medical Supplies",
+              "Cash Assistance",
+              "Warm Blankets & Clothes",
+              "Clean Water Filtration Kit"
+            ],
+            "isSensitive": false
+          },
+          {
+            "name": "Disbursed Quantity / Amount",
+            "key": "quantity",
+            "type": "Number",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "e.g. 5"
+          },
+          {
+            "name": "Unit of Measure",
+            "key": "unit",
+            "type": "Dropdown",
+            "required": true,
+            "options": [
+              "Kits",
+              "Units",
+              "INR",
+              "USD",
+              "Kilograms"
+            ],
+            "isSensitive": false
+          },
+          {
+            "name": "Distribution Date",
+            "key": "distribution_date",
+            "type": "Date",
+            "required": true,
+            "options": [],
+            "isSensitive": false
+          },
+          {
+            "name": "Field Officer Name",
+            "key": "officer_name",
+            "type": "Text",
+            "required": false,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "Staff member verifying handover"
+          }
+        ],
+        "icon": "HeartHandshake",
+        "isArchived": false,
+        "isPredefined": true,
+        "name": "Aid Distribution",
+        "prefix": "AID",
+        "updatedAt": "2026-10-20T17:21:14.636Z"
+      },
+      {
+        "_id": "6ad7a30af9a233ac1f54288a",
+        "ngoId": "6ad7a30a1862c3da80342fd3",
+        "slug": "donation-grant",
+        "__v": 0,
+        "createdAt": "2026-10-20T17:21:14.639Z",
+        "description": "Funding sources, institutional grants, and philanthropic donor receipts.",
+        "fields": [
+          {
+            "name": "Donor / Grantor Name",
+            "key": "donor_name",
+            "type": "Text",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "Foundation, corporation, or individual"
+          },
+          {
+            "name": "Donor Classification",
+            "key": "donor_type",
+            "type": "Dropdown",
+            "required": true,
+            "options": [
+              "Individual Donor",
+              "Corporate CSR Grant",
+              "Multilateral / UN Agency",
+              "Philanthropic Foundation",
+              "Government Aid"
+            ],
+            "isSensitive": false
+          },
+          {
+            "name": "Funding Amount",
+            "key": "amount",
+            "type": "Currency",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "10000"
+          },
+          {
+            "name": "Designated Project",
+            "key": "project_tag",
+            "type": "Text",
+            "required": false,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "e.g. Rural Health Initiative"
+          },
+          {
+            "name": "Tax Exemption Issued",
+            "key": "tax_exemption_issued",
+            "type": "Checkbox",
+            "required": false,
+            "options": [],
+            "isSensitive": false
+          },
+          {
+            "name": "80G / 501(c)(3) Receipt ID",
+            "key": "receipt_id",
+            "type": "Text",
+            "required": false,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "Receipt certificate reference"
+          }
+        ],
+        "icon": "Receipt",
+        "isArchived": false,
+        "isPredefined": true,
+        "name": "Donation & Grant",
+        "prefix": "DON",
+        "updatedAt": "2026-10-20T17:21:14.639Z"
+      },
+      {
+        "_id": "6ad7a30af9a233ac1f54288b",
+        "ngoId": "6ad7a30a1862c3da80342fd3",
+        "slug": "volunteer-staff",
+        "__v": 0,
+        "createdAt": "2026-10-20T17:21:14.643Z",
+        "description": "Field workers, volunteers, medical practitioners, and disaster response staff.",
+        "fields": [
+          {
+            "name": "Full Name",
+            "key": "full_name",
+            "type": "Text",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "e.g. Ahmed Khan"
+          },
+          {
+            "name": "Deployment Role",
+            "key": "role",
+            "type": "Dropdown",
+            "required": true,
+            "options": [
+              "Field Caseworker",
+              "Emergency Medic",
+              "Logistics Coordinator",
+              "Counselor / Social Worker",
+              "Community Volunteer"
+            ],
+            "isSensitive": false
+          },
+          {
+            "name": "Primary Contact Phone",
+            "key": "phone",
+            "type": "Phone",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "+1 555-0199"
+          },
+          {
+            "name": "Emergency Contact Details",
+            "key": "emergency_contact",
+            "type": "Encrypted Text",
+            "required": false,
+            "options": [],
+            "isSensitive": true,
+            "placeholder": "Next of kin & contact (Encrypted)"
+          },
+          {
+            "name": "Assigned Field Zone",
+            "key": "assigned_zone",
+            "type": "Text",
+            "required": false,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "District or field base"
+          }
+        ],
+        "icon": "Briefcase",
+        "isArchived": false,
+        "isPredefined": true,
+        "name": "Volunteer & Staff",
+        "prefix": "VOL",
+        "updatedAt": "2026-10-20T17:21:14.643Z"
+      },
+      {
+        "_id": "6ad7a32cf9a233ac1f54288c",
+        "ngoId": "6ad7a32cc88b1107417fb162",
+        "slug": "beneficiary",
+        "__v": 0,
+        "createdAt": "2026-10-20T17:21:48.378Z",
+        "description": "Core recipient and beneficiary demographic records with encrypted PII.",
+        "fields": [
+          {
+            "name": "Full Name",
+            "key": "full_name",
+            "type": "Text",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "e.g. Maria Gonzalez"
+          },
+          {
+            "name": "Gender",
+            "key": "gender",
+            "type": "Dropdown",
+            "required": true,
+            "options": [
+              "Female",
+              "Male",
+              "Non-Binary",
+              "Other",
+              "Prefer not to say"
+            ],
+            "isSensitive": false
+          },
+          {
+            "name": "Date of Birth",
+            "key": "date_of_birth",
+            "type": "Date",
+            "required": false,
+            "options": [],
+            "isSensitive": false
+          },
+          {
+            "name": "National ID / Aadhaar",
+            "key": "national_id",
+            "type": "Encrypted Text",
+            "required": true,
+            "options": [],
+            "isSensitive": true,
+            "placeholder": "National identification number (Encrypted with AES-256)"
+          },
+          {
+            "name": "Phone Number",
+            "key": "phone",
+            "type": "Phone",
+            "required": false,
+            "options": [],
+            "isSensitive": true,
+            "placeholder": "+1 (555) 000-0000"
+          },
+          {
+            "name": "Primary Address",
+            "key": "address",
+            "type": "Long Text",
+            "required": false,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "Village, district, or settlement"
+          },
+          {
+            "name": "Assistance Category",
+            "key": "assistance_category",
+            "type": "Dropdown",
+            "required": true,
+            "options": [
+              "Food Security",
+              "Healthcare & Medical",
+              "Shelter & Housing",
+              "Emergency Cash",
+              "Education Support"
+            ],
+            "isSensitive": false
+          },
+          {
+            "name": "Vulnerability Index",
+            "key": "vulnerability_index",
+            "type": "Dropdown",
+            "required": false,
+            "options": [
+              "High Priority",
+              "Moderate Need",
+              "Standard"
+            ],
+            "isSensitive": false
+          }
+        ],
+        "icon": "Users",
+        "isArchived": false,
+        "isPredefined": true,
+        "name": "Beneficiary",
+        "prefix": "BEN",
+        "updatedAt": "2026-10-20T17:21:48.378Z"
+      },
+      {
+        "_id": "6ad7a32cf9a233ac1f54288d",
+        "ngoId": "6ad7a32cc88b1107417fb162",
+        "slug": "aid-distribution",
+        "__v": 0,
+        "createdAt": "2026-10-20T17:21:48.392Z",
+        "description": "Log of humanitarian relief, medical supplies, food packages, or emergency grants disbursed.",
+        "fields": [
+          {
+            "name": "Beneficiary Reference",
+            "key": "beneficiary_ref",
+            "type": "Text",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "Beneficiary name or Record ID"
+          },
+          {
+            "name": "Campaign / Project",
+            "key": "campaign",
+            "type": "Text",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "e.g. Winter Relief 2026"
+          },
+          {
+            "name": "Aid Type",
+            "key": "aid_type",
+            "type": "Dropdown",
+            "required": true,
+            "options": [
+              "Food Ration Kit",
+              "Medical Supplies",
+              "Cash Assistance",
+              "Warm Blankets & Clothes",
+              "Clean Water Filtration Kit"
+            ],
+            "isSensitive": false
+          },
+          {
+            "name": "Disbursed Quantity / Amount",
+            "key": "quantity",
+            "type": "Number",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "e.g. 5"
+          },
+          {
+            "name": "Unit of Measure",
+            "key": "unit",
+            "type": "Dropdown",
+            "required": true,
+            "options": [
+              "Kits",
+              "Units",
+              "INR",
+              "USD",
+              "Kilograms"
+            ],
+            "isSensitive": false
+          },
+          {
+            "name": "Distribution Date",
+            "key": "distribution_date",
+            "type": "Date",
+            "required": true,
+            "options": [],
+            "isSensitive": false
+          },
+          {
+            "name": "Field Officer Name",
+            "key": "officer_name",
+            "type": "Text",
+            "required": false,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "Staff member verifying handover"
+          }
+        ],
+        "icon": "HeartHandshake",
+        "isArchived": false,
+        "isPredefined": true,
+        "name": "Aid Distribution",
+        "prefix": "AID",
+        "updatedAt": "2026-10-20T17:21:48.392Z"
+      },
+      {
+        "_id": "6ad7a32cf9a233ac1f54288e",
+        "ngoId": "6ad7a32cc88b1107417fb162",
+        "slug": "donation-grant",
+        "__v": 0,
+        "createdAt": "2026-10-20T17:21:48.397Z",
+        "description": "Funding sources, institutional grants, and philanthropic donor receipts.",
+        "fields": [
+          {
+            "name": "Donor / Grantor Name",
+            "key": "donor_name",
+            "type": "Text",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "Foundation, corporation, or individual"
+          },
+          {
+            "name": "Donor Classification",
+            "key": "donor_type",
+            "type": "Dropdown",
+            "required": true,
+            "options": [
+              "Individual Donor",
+              "Corporate CSR Grant",
+              "Multilateral / UN Agency",
+              "Philanthropic Foundation",
+              "Government Aid"
+            ],
+            "isSensitive": false
+          },
+          {
+            "name": "Funding Amount",
+            "key": "amount",
+            "type": "Currency",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "10000"
+          },
+          {
+            "name": "Designated Project",
+            "key": "project_tag",
+            "type": "Text",
+            "required": false,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "e.g. Rural Health Initiative"
+          },
+          {
+            "name": "Tax Exemption Issued",
+            "key": "tax_exemption_issued",
+            "type": "Checkbox",
+            "required": false,
+            "options": [],
+            "isSensitive": false
+          },
+          {
+            "name": "80G / 501(c)(3) Receipt ID",
+            "key": "receipt_id",
+            "type": "Text",
+            "required": false,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "Receipt certificate reference"
+          }
+        ],
+        "icon": "Receipt",
+        "isArchived": false,
+        "isPredefined": true,
+        "name": "Donation & Grant",
+        "prefix": "DON",
+        "updatedAt": "2026-10-20T17:21:48.397Z"
+      },
+      {
+        "_id": "6ad7a32cf9a233ac1f54288f",
+        "ngoId": "6ad7a32cc88b1107417fb162",
+        "slug": "volunteer-staff",
+        "__v": 0,
+        "createdAt": "2026-10-20T17:21:48.400Z",
+        "description": "Field workers, volunteers, medical practitioners, and disaster response staff.",
+        "fields": [
+          {
+            "name": "Full Name",
+            "key": "full_name",
+            "type": "Text",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "e.g. Ahmed Khan"
+          },
+          {
+            "name": "Deployment Role",
+            "key": "role",
+            "type": "Dropdown",
+            "required": true,
+            "options": [
+              "Field Caseworker",
+              "Emergency Medic",
+              "Logistics Coordinator",
+              "Counselor / Social Worker",
+              "Community Volunteer"
+            ],
+            "isSensitive": false
+          },
+          {
+            "name": "Primary Contact Phone",
+            "key": "phone",
+            "type": "Phone",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "+1 555-0199"
+          },
+          {
+            "name": "Emergency Contact Details",
+            "key": "emergency_contact",
+            "type": "Encrypted Text",
+            "required": false,
+            "options": [],
+            "isSensitive": true,
+            "placeholder": "Next of kin & contact (Encrypted)"
+          },
+          {
+            "name": "Assigned Field Zone",
+            "key": "assigned_zone",
+            "type": "Text",
+            "required": false,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "District or field base"
+          }
+        ],
+        "icon": "Briefcase",
+        "isArchived": false,
+        "isPredefined": true,
+        "name": "Volunteer & Staff",
+        "prefix": "VOL",
+        "updatedAt": "2026-10-20T17:21:48.400Z"
+      },
+      {
+        "_id": "6ad7a32cf9a233ac1f542890",
+        "ngoId": "6ad7a32cc88b1107417fb163",
+        "slug": "beneficiary",
+        "__v": 0,
+        "createdAt": "2026-10-20T17:21:48.404Z",
+        "description": "Core recipient and beneficiary demographic records with encrypted PII.",
+        "fields": [
+          {
+            "name": "Full Name",
+            "key": "full_name",
+            "type": "Text",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "e.g. Maria Gonzalez"
+          },
+          {
+            "name": "Gender",
+            "key": "gender",
+            "type": "Dropdown",
+            "required": true,
+            "options": [
+              "Female",
+              "Male",
+              "Non-Binary",
+              "Other",
+              "Prefer not to say"
+            ],
+            "isSensitive": false
+          },
+          {
+            "name": "Date of Birth",
+            "key": "date_of_birth",
+            "type": "Date",
+            "required": false,
+            "options": [],
+            "isSensitive": false
+          },
+          {
+            "name": "National ID / Aadhaar",
+            "key": "national_id",
+            "type": "Encrypted Text",
+            "required": true,
+            "options": [],
+            "isSensitive": true,
+            "placeholder": "National identification number (Encrypted with AES-256)"
+          },
+          {
+            "name": "Phone Number",
+            "key": "phone",
+            "type": "Phone",
+            "required": false,
+            "options": [],
+            "isSensitive": true,
+            "placeholder": "+1 (555) 000-0000"
+          },
+          {
+            "name": "Primary Address",
+            "key": "address",
+            "type": "Long Text",
+            "required": false,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "Village, district, or settlement"
+          },
+          {
+            "name": "Assistance Category",
+            "key": "assistance_category",
+            "type": "Dropdown",
+            "required": true,
+            "options": [
+              "Food Security",
+              "Healthcare & Medical",
+              "Shelter & Housing",
+              "Emergency Cash",
+              "Education Support"
+            ],
+            "isSensitive": false
+          },
+          {
+            "name": "Vulnerability Index",
+            "key": "vulnerability_index",
+            "type": "Dropdown",
+            "required": false,
+            "options": [
+              "High Priority",
+              "Moderate Need",
+              "Standard"
+            ],
+            "isSensitive": false
+          }
+        ],
+        "icon": "Users",
+        "isArchived": false,
+        "isPredefined": true,
+        "name": "Beneficiary",
+        "prefix": "BEN",
+        "updatedAt": "2026-10-20T17:21:48.404Z"
+      },
+      {
+        "_id": "6ad7a32cf9a233ac1f542891",
+        "ngoId": "6ad7a32cc88b1107417fb163",
+        "slug": "aid-distribution",
+        "__v": 0,
+        "createdAt": "2026-10-20T17:21:48.408Z",
+        "description": "Log of humanitarian relief, medical supplies, food packages, or emergency grants disbursed.",
+        "fields": [
+          {
+            "name": "Beneficiary Reference",
+            "key": "beneficiary_ref",
+            "type": "Text",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "Beneficiary name or Record ID"
+          },
+          {
+            "name": "Campaign / Project",
+            "key": "campaign",
+            "type": "Text",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "e.g. Winter Relief 2026"
+          },
+          {
+            "name": "Aid Type",
+            "key": "aid_type",
+            "type": "Dropdown",
+            "required": true,
+            "options": [
+              "Food Ration Kit",
+              "Medical Supplies",
+              "Cash Assistance",
+              "Warm Blankets & Clothes",
+              "Clean Water Filtration Kit"
+            ],
+            "isSensitive": false
+          },
+          {
+            "name": "Disbursed Quantity / Amount",
+            "key": "quantity",
+            "type": "Number",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "e.g. 5"
+          },
+          {
+            "name": "Unit of Measure",
+            "key": "unit",
+            "type": "Dropdown",
+            "required": true,
+            "options": [
+              "Kits",
+              "Units",
+              "INR",
+              "USD",
+              "Kilograms"
+            ],
+            "isSensitive": false
+          },
+          {
+            "name": "Distribution Date",
+            "key": "distribution_date",
+            "type": "Date",
+            "required": true,
+            "options": [],
+            "isSensitive": false
+          },
+          {
+            "name": "Field Officer Name",
+            "key": "officer_name",
+            "type": "Text",
+            "required": false,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "Staff member verifying handover"
+          }
+        ],
+        "icon": "HeartHandshake",
+        "isArchived": false,
+        "isPredefined": true,
+        "name": "Aid Distribution",
+        "prefix": "AID",
+        "updatedAt": "2026-10-20T17:21:48.408Z"
+      },
+      {
+        "_id": "6ad7a32cf9a233ac1f542892",
+        "ngoId": "6ad7a32cc88b1107417fb163",
+        "slug": "donation-grant",
+        "__v": 0,
+        "createdAt": "2026-10-20T17:21:48.412Z",
+        "description": "Funding sources, institutional grants, and philanthropic donor receipts.",
+        "fields": [
+          {
+            "name": "Donor / Grantor Name",
+            "key": "donor_name",
+            "type": "Text",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "Foundation, corporation, or individual"
+          },
+          {
+            "name": "Donor Classification",
+            "key": "donor_type",
+            "type": "Dropdown",
+            "required": true,
+            "options": [
+              "Individual Donor",
+              "Corporate CSR Grant",
+              "Multilateral / UN Agency",
+              "Philanthropic Foundation",
+              "Government Aid"
+            ],
+            "isSensitive": false
+          },
+          {
+            "name": "Funding Amount",
+            "key": "amount",
+            "type": "Currency",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "10000"
+          },
+          {
+            "name": "Designated Project",
+            "key": "project_tag",
+            "type": "Text",
+            "required": false,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "e.g. Rural Health Initiative"
+          },
+          {
+            "name": "Tax Exemption Issued",
+            "key": "tax_exemption_issued",
+            "type": "Checkbox",
+            "required": false,
+            "options": [],
+            "isSensitive": false
+          },
+          {
+            "name": "80G / 501(c)(3) Receipt ID",
+            "key": "receipt_id",
+            "type": "Text",
+            "required": false,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "Receipt certificate reference"
+          }
+        ],
+        "icon": "Receipt",
+        "isArchived": false,
+        "isPredefined": true,
+        "name": "Donation & Grant",
+        "prefix": "DON",
+        "updatedAt": "2026-10-20T17:21:48.412Z"
+      },
+      {
+        "_id": "6ad7a32cf9a233ac1f542893",
+        "ngoId": "6ad7a32cc88b1107417fb163",
+        "slug": "volunteer-staff",
+        "__v": 0,
+        "createdAt": "2026-10-20T17:21:48.415Z",
+        "description": "Field workers, volunteers, medical practitioners, and disaster response staff.",
+        "fields": [
+          {
+            "name": "Full Name",
+            "key": "full_name",
+            "type": "Text",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "e.g. Ahmed Khan"
+          },
+          {
+            "name": "Deployment Role",
+            "key": "role",
+            "type": "Dropdown",
+            "required": true,
+            "options": [
+              "Field Caseworker",
+              "Emergency Medic",
+              "Logistics Coordinator",
+              "Counselor / Social Worker",
+              "Community Volunteer"
+            ],
+            "isSensitive": false
+          },
+          {
+            "name": "Primary Contact Phone",
+            "key": "phone",
+            "type": "Phone",
+            "required": true,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "+1 555-0199"
+          },
+          {
+            "name": "Emergency Contact Details",
+            "key": "emergency_contact",
+            "type": "Encrypted Text",
+            "required": false,
+            "options": [],
+            "isSensitive": true,
+            "placeholder": "Next of kin & contact (Encrypted)"
+          },
+          {
+            "name": "Assigned Field Zone",
+            "key": "assigned_zone",
+            "type": "Text",
+            "required": false,
+            "options": [],
+            "isSensitive": false,
+            "placeholder": "District or field base"
+          }
+        ],
+        "icon": "Briefcase",
+        "isArchived": false,
+        "isPredefined": true,
+        "name": "Volunteer & Staff",
+        "prefix": "VOL",
+        "updatedAt": "2026-10-20T17:21:48.415Z"
+      }
+    ],
+    "records": [
+      {
+        "_id": "6ad796882c5e94f113ed75f4",
+        "ngoId": "6ad796882c5e94f113ed75f0",
+        "recordTypeId": "6ad79688f9a233ac1f54285e",
+        "recordNumber": "BEN-2026-00001",
+        "status": "Approved",
+        "data": {
+          "full_name": "Fatima Zahra",
+          "gender": "Female",
+          "national_id": "enc:v1:c58d19c1580ca657fbbd637e2a122d57:cf3d482fb1c1af35024357d8b8041dea:ac03c42557a206a3264c0aca",
+          "phone": "enc:v1:9ef6613a149054526322cec09207c8e5:fe4ab08e972e970070bcbd77814c9898:1bf6a2fb93aaf9d8002e7186392b1d",
+          "address": "Sector 4 Camp West",
+          "assistance_category": "Food Security"
+        },
+        "encryptedFields": [
+          "national_id",
+          "phone"
+        ],
+        "tags": [
+          "BulkBatch-01"
+        ],
+        "isDeleted": false,
+        "createdBy": "6ad796882c5e94f113ed75f1",
+        "updatedBy": "6ad796882c5e94f113ed75f1",
+        "__v": 0,
+        "createdAt": "2026-10-20T16:27:52.976Z",
+        "updatedAt": "2026-10-20T16:27:52.976Z"
+      },
+      {
+        "_id": "6ad796882c5e94f113ed75f5",
+        "ngoId": "6ad796882c5e94f113ed75f0",
+        "recordTypeId": "6ad79688f9a233ac1f54285e",
+        "recordNumber": "BEN-2026-00002",
+        "status": "Approved",
+        "data": {
+          "full_name": "Ravi Kumar",
+          "gender": "Male",
+          "national_id": "enc:v1:d4c54e0509199de1b1c9e74920acfd71:b7855f27f3c5619dae0ef22b20599eca:97edd438eff95c0af0378494",
+          "phone": "enc:v1:c98a1fbc40a58fda00c78e0018393a7d:2c18c9be57c762ac63863a697c81f4de:7a12874346e4c5637b1c84e9c39918",
+          "address": "Plot 12 Riverside",
+          "assistance_category": "Healthcare & Medical"
+        },
+        "encryptedFields": [
+          "national_id",
+          "phone"
+        ],
+        "tags": [
+          "BulkBatch-01"
+        ],
+        "isDeleted": false,
+        "createdBy": "6ad796882c5e94f113ed75f1",
+        "updatedBy": "6ad796882c5e94f113ed75f1",
+        "__v": 0,
+        "createdAt": "2026-10-20T16:27:52.977Z",
+        "updatedAt": "2026-10-20T16:27:52.977Z"
+      },
+      {
+        "_id": "6ad796882c5e94f113ed75f6",
+        "ngoId": "6ad796882c5e94f113ed75f0",
+        "recordTypeId": "6ad79688f9a233ac1f54285e",
+        "recordNumber": "BEN-2026-00003",
+        "status": "Approved",
+        "data": {
+          "full_name": "Sunita Devi",
+          "gender": "Female",
+          "national_id": "enc:v1:402cb85791b844ef6308f03f8dd71636:8667c35593462574f910a9fab34a080d:c09acb05fc8330f1752b84fa",
+          "phone": "enc:v1:374535546d86484167dd1328e30d7dd3:332a583644681dfe2a1e009a04fbd3ed:a5be6a52f50cddc7387f0d376fbaf6",
+          "address": "Block B Tent 18",
+          "assistance_category": "Emergency Cash"
+        },
+        "encryptedFields": [
+          "national_id",
+          "phone"
+        ],
+        "tags": [
+          "BulkBatch-01"
+        ],
+        "isDeleted": false,
+        "createdBy": "6ad796882c5e94f113ed75f1",
+        "updatedBy": "6ad796882c5e94f113ed75f1",
+        "__v": 0,
+        "createdAt": "2026-10-20T16:27:52.977Z",
+        "updatedAt": "2026-10-20T16:27:52.977Z"
+      },
+      {
+        "_id": "6ad79df16820b39d71cc78f6",
+        "ngoId": "6ad79df16820b39d71cc78ef",
+        "recordTypeId": "6ad79df16820b39d71cc78f5",
+        "recordNumber": "BEN-1001",
+        "status": "Submitted",
+        "data": {
+          "fullName": "Rahul Verma",
+          "phone": "9876543210",
+          "district": "Indore",
+          "annualIncome": 18000,
+          "familySize": 4,
+          "aadhaarNumber": "1122-3344-5566",
+          "note": "Merged during AI deduplication review"
+        },
+        "encryptedFields": [],
+        "tags": [],
+        "isDeleted": false,
+        "createdAt": "2026-10-20T16:59:29.165Z",
+        "updatedAt": "2026-10-20T16:59:29.278Z",
+        "__v": 0,
+        "updatedBy": "6ad79df16820b39d71cc78f1"
+      },
+      {
+        "_id": "6ad79df16820b39d71cc78f7",
+        "ngoId": "6ad79df16820b39d71cc78ef",
+        "recordTypeId": "6ad79df16820b39d71cc78f5",
+        "recordNumber": "BEN-1002",
+        "status": "Submitted",
+        "data": {
+          "fullName": "Rahool Varma",
+          "phone": "9876543210",
+          "district": "Indore",
+          "annualIncome": 18000,
+          "familySize": 4
+        },
+        "encryptedFields": [],
+        "tags": [],
+        "isDeleted": true,
+        "createdAt": "2026-10-20T16:59:29.168Z",
+        "updatedAt": "2026-10-20T16:59:29.283Z",
+        "__v": 0,
+        "deletedAt": "2026-10-20T16:59:29.283Z",
+        "deletedBy": "6ad79df16820b39d71cc78f1",
+        "mergedInto": "6ad79df16820b39d71cc78f6"
+      },
+      {
+        "_id": "6ad79df16820b39d71cc78f9",
+        "ngoId": "6ad79df16820b39d71cc78ef",
+        "recordTypeId": "6ad79df16820b39d71cc78f5",
+        "recordNumber": "BEN-1003",
+        "status": "Submitted",
+        "data": {
+          "fullName": "",
+          "phone": "1234",
+          "dateOfBirth": "2031-10-20T16:59:29.247Z",
+          "annualIncome": -500
+        },
+        "encryptedFields": [],
+        "tags": [],
+        "isDeleted": false,
+        "createdAt": "2026-10-20T16:59:29.248Z",
+        "updatedAt": "2026-10-20T16:59:29.248Z",
+        "__v": 0
+      },
+      {
+        "_id": "6ad79df16820b39d71cc78fe",
+        "ngoId": "6ad79df16820b39d71cc78f0",
+        "recordTypeId": "6ad79df16820b39d71cc78f5",
+        "recordNumber": "BEN-9999",
+        "status": "Submitted",
+        "data": {
+          "fullName": "Rahul Verma",
+          "phone": "9876543210"
+        },
+        "encryptedFields": [],
+        "tags": [],
+        "isDeleted": false,
+        "createdAt": "2026-10-20T16:59:29.343Z",
+        "updatedAt": "2026-10-20T16:59:29.343Z",
+        "__v": 0
+      },
+      {
+        "_id": "6ad7a2030ae1ae2a64bd0b5d",
+        "ngoId": "6ad7a2030ae1ae2a64bd0b59",
+        "recordTypeId": "6ad7a203f9a233ac1f542870",
+        "recordNumber": "BEN-2026-00001",
+        "status": "Approved",
+        "data": {
+          "fullName": "Sunita Devi",
+          "phone": "9826112233",
+          "aadhaarNumber": "2233-4455-6677",
+          "dateOfBirth": "1984-04-12",
+          "gender": "Female",
+          "district": "Indore",
+          "annualIncome": 18000,
+          "familySize": 5,
+          "vulnerabilityTier": "High",
+          "category": "Flood Relief"
+        },
+        "encryptedFields": [],
+        "tags": [],
+        "isDeleted": false,
+        "createdBy": "6ad7a2030ae1ae2a64bd0b5a",
+        "createdAt": "2026-10-20T17:16:51.572Z",
+        "updatedAt": "2026-10-20T17:16:51.572Z",
+        "__v": 0
+      },
+      {
+        "_id": "6ad7a2030ae1ae2a64bd0b5e",
+        "ngoId": "6ad7a2030ae1ae2a64bd0b59",
+        "recordTypeId": "6ad7a203f9a233ac1f542870",
+        "recordNumber": "BEN-2026-00002",
+        "status": "Approved",
+        "data": {
+          "fullName": "Suneeta Daivy",
+          "phone": "9826112233",
+          "district": "Indore",
+          "annualIncome": 18000,
+          "familySize": 5,
+          "vulnerabilityTier": "High",
+          "category": "Flood Relief"
+        },
+        "encryptedFields": [],
+        "tags": [],
+        "isDeleted": false,
+        "createdBy": "6ad7a2030ae1ae2a64bd0b5a",
+        "createdAt": "2026-10-20T17:16:51.579Z",
+        "updatedAt": "2026-10-20T17:16:51.579Z",
+        "__v": 0
+      },
+      {
+        "_id": "6ad7a2030ae1ae2a64bd0b5f",
+        "ngoId": "6ad7a2030ae1ae2a64bd0b59",
+        "recordTypeId": "6ad7a203f9a233ac1f542870",
+        "recordNumber": "BEN-2026-00003",
+        "status": "Approved",
+        "data": {
+          "fullName": "Mohammad Farooq",
+          "phone": "9876543210",
+          "aadhaarNumber": "5566-7788-9900",
+          "dateOfBirth": "1976-11-20",
+          "gender": "Male",
+          "district": "Bhopal",
+          "annualIncome": 35000,
+          "familySize": 4,
+          "vulnerabilityTier": "Medium",
+          "category": "Medical Aid"
+        },
+        "encryptedFields": [],
+        "tags": [],
+        "isDeleted": false,
+        "createdBy": "6ad7a2030ae1ae2a64bd0b5a",
+        "createdAt": "2026-10-20T17:16:51.586Z",
+        "updatedAt": "2026-10-20T17:16:51.586Z",
+        "__v": 0
+      },
+      {
+        "_id": "6ad7a2030ae1ae2a64bd0b60",
+        "ngoId": "6ad7a2030ae1ae2a64bd0b59",
+        "recordTypeId": "6ad7a203f9a233ac1f542870",
+        "recordNumber": "BEN-2026-00004",
+        "status": "Approved",
+        "data": {
+          "fullName": "Kavita Rathore",
+          "phone": "9123456780",
+          "aadhaarNumber": "3344-5566-7788",
+          "dateOfBirth": "1992-08-15",
+          "gender": "Female",
+          "district": "Ujjain",
+          "annualIncome": 12000,
+          "familySize": 6,
+          "vulnerabilityTier": "High",
+          "category": "Nutrition Support"
+        },
+        "encryptedFields": [],
+        "tags": [],
+        "isDeleted": false,
+        "createdBy": "6ad7a2030ae1ae2a64bd0b5a",
+        "createdAt": "2026-10-20T17:16:51.591Z",
+        "updatedAt": "2026-10-20T17:16:51.591Z",
+        "__v": 0
+      },
+      {
+        "_id": "6ad7a2030ae1ae2a64bd0b61",
+        "ngoId": "6ad7a2030ae1ae2a64bd0b59",
+        "recordTypeId": "6ad7a203f9a233ac1f542870",
+        "recordNumber": "BEN-2026-00005",
+        "status": "Approved",
+        "data": {
+          "fullName": "Rajesh Malviya",
+          "phone": "9988776655",
+          "aadhaarNumber": "8899-0011-2233",
+          "dateOfBirth": "1988-03-05",
+          "gender": "Male",
+          "district": "Dewas",
+          "annualIncome": 48000,
+          "familySize": 3,
+          "vulnerabilityTier": "Low",
+          "category": "Livelihood Training"
+        },
+        "encryptedFields": [],
+        "tags": [],
+        "isDeleted": false,
+        "createdBy": "6ad7a2030ae1ae2a64bd0b5a",
+        "createdAt": "2026-10-20T17:16:51.595Z",
+        "updatedAt": "2026-10-20T17:16:51.595Z",
+        "__v": 0
+      },
+      {
+        "_id": "6ad7a2030ae1ae2a64bd0b62",
+        "ngoId": "6ad7a2030ae1ae2a64bd0b59",
+        "recordTypeId": "6ad7a203f9a233ac1f542871",
+        "recordNumber": "AID-2026-00101",
+        "status": "Approved",
+        "data": {
+          "reliefType": "Emergency Ration Kit",
+          "quantity": 150,
+          "unit": "Kits",
+          "campLocation": "Indore Flood Shelter 2",
+          "distributionDate": "2026-07-22T17:16:51.597Z"
+        },
+        "encryptedFields": [],
+        "tags": [],
+        "isDeleted": false,
+        "createdBy": "6ad7a2030ae1ae2a64bd0b5a",
+        "createdAt": "2026-10-20T17:16:51.601Z",
+        "updatedAt": "2026-10-20T17:16:51.601Z",
+        "__v": 0
+      },
+      {
+        "_id": "6ad7a2030ae1ae2a64bd0b63",
+        "ngoId": "6ad7a2030ae1ae2a64bd0b59",
+        "recordTypeId": "6ad7a203f9a233ac1f542871",
+        "recordNumber": "AID-2026-00102",
+        "status": "Approved",
+        "data": {
+          "reliefType": "Pediatric Healthcare Packs",
+          "quantity": 220,
+          "unit": "Packs",
+          "campLocation": "Ujjain Community Clinic",
+          "distributionDate": "2026-08-21T17:16:51.597Z"
+        },
+        "encryptedFields": [],
+        "tags": [],
+        "isDeleted": false,
+        "createdBy": "6ad7a2030ae1ae2a64bd0b5a",
+        "createdAt": "2026-10-20T17:16:51.607Z",
+        "updatedAt": "2026-10-20T17:16:51.607Z",
+        "__v": 0
+      },
+      {
+        "_id": "6ad7a2030ae1ae2a64bd0b64",
+        "ngoId": "6ad7a2030ae1ae2a64bd0b59",
+        "recordTypeId": "6ad7a203f9a233ac1f542871",
+        "recordNumber": "AID-2026-00103",
+        "status": "Approved",
+        "data": {
+          "reliefType": "Clean Water Filtration Units",
+          "quantity": 310,
+          "unit": "Units",
+          "campLocation": "Dewas Water Point",
+          "distributionDate": "2026-09-20T17:16:51.597Z"
+        },
+        "encryptedFields": [],
+        "tags": [],
+        "isDeleted": false,
+        "createdBy": "6ad7a2030ae1ae2a64bd0b5a",
+        "createdAt": "2026-10-20T17:16:51.612Z",
+        "updatedAt": "2026-10-20T17:16:51.612Z",
+        "__v": 0
+      },
+      {
+        "_id": "6ad7a2030ae1ae2a64bd0b65",
+        "ngoId": "6ad7a2030ae1ae2a64bd0b59",
+        "recordTypeId": "6ad7a203f9a233ac1f542871",
+        "recordNumber": "AID-2026-00104",
+        "status": "Approved",
+        "data": {
+          "reliefType": "Winter Thermal Blankets",
+          "quantity": 420,
+          "unit": "Blankets",
+          "campLocation": "Residency Area Night Shelter",
+          "distributionDate": "2026-10-20T17:16:51.597Z"
+        },
+        "encryptedFields": [],
+        "tags": [],
+        "isDeleted": false,
+        "createdBy": "6ad7a2030ae1ae2a64bd0b5a",
+        "createdAt": "2026-10-20T17:16:51.615Z",
+        "updatedAt": "2026-10-20T17:16:51.615Z",
+        "__v": 0
+      },
+      {
+        "_id": "6ad7a30a1862c3da80342fda",
+        "ngoId": "6ad7a30a1862c3da80342fd2",
+        "recordTypeId": "6ad7a30af9a233ac1f542884",
+        "recordNumber": "BEN-2026-00001",
+        "status": "Submitted",
+        "data": {
+          "full_name": "Tariq Mansoor",
+          "gender": "Male",
+          "national_id": "enc:v1:e65a92e16769270adbf76678a0bfb61a:de9478b216b1c835672922ab4637d85a:03a74c3c498dfe45ca645d45df00",
+          "phone": "enc:v1:e2028e89730001f146848a97687f3495:8b5367c4479bc93e7e79c0ce42da8a03:eb7024b8a4b204ff0d91",
+          "assistance_category": "Healthcare & Medical",
+          "verificationStatus": "AI-Verified-Merged"
+        },
+        "encryptedFields": [
+          "national_id",
+          "phone"
+        ],
+        "tags": [],
+        "isDeleted": false,
+        "createdBy": "6ad7a30a1862c3da80342fd4",
+        "updatedBy": "6ad7a30a1862c3da80342fd4",
+        "createdAt": "2026-10-20T17:21:14.665Z",
+        "updatedAt": "2026-10-20T17:21:14.756Z",
+        "__v": 0
+      },
+      {
+        "_id": "6ad7a30a1862c3da80342fdc",
+        "ngoId": "6ad7a30a1862c3da80342fd2",
+        "recordTypeId": "6ad7a30af9a233ac1f542884",
+        "recordNumber": "BEN-2026-00002",
+        "status": "Submitted",
+        "data": {
+          "full_name": "Tareeq Mansoor",
+          "gender": "Male",
+          "national_id": "enc:v1:229512a30b82650a24a5f6ceae4ee7e1:be10bf5271cc48ee31e4c5e38e41c7e6:ba54a352c2b5c7f5e39af2e9b0c8",
+          "phone": "enc:v1:5b42c3dc7b0896355e218b741824b9c2:03dcab60db949eff5c392777201c0d55:a780abe9e3972f2d112a",
+          "assistance_category": "Healthcare & Medical"
+        },
+        "encryptedFields": [
+          "national_id",
+          "phone"
+        ],
+        "tags": [],
+        "isDeleted": true,
+        "createdBy": "6ad7a30a1862c3da80342fd4",
+        "updatedBy": "6ad7a30a1862c3da80342fd4",
+        "createdAt": "2026-10-20T17:21:14.701Z",
+        "updatedAt": "2026-10-20T17:21:14.762Z",
+        "__v": 0,
+        "deletedAt": "2026-10-20T17:21:14.762Z",
+        "deletedBy": "6ad7a30a1862c3da80342fd4",
+        "mergedInto": "6ad7a30a1862c3da80342fda"
+      },
+      {
+        "_id": "6ad7a32cc88b1107417fb16a",
+        "ngoId": "6ad7a32cc88b1107417fb162",
+        "recordTypeId": "6ad7a32cf9a233ac1f54288c",
+        "recordNumber": "BEN-2026-00001",
+        "status": "Submitted",
+        "data": {
+          "full_name": "Tariq Mansoor",
+          "gender": "Male",
+          "national_id": "enc:v1:68e92f96e85429505d6f17dbfe4a5bb0:a1888b06fde7276b8978b1b2a59c95ee:4af1ef2ca055ed0d61f0c914cf8b",
+          "phone": "enc:v1:59f1924b35fb99cc9206a9f1b7ed7eff:3f5335dd75b2a12bb8569f22cc9fb57c:da14210d99b8cfedb233",
+          "assistance_category": "Healthcare & Medical",
+          "verificationStatus": "AI-Verified-Merged"
+        },
+        "encryptedFields": [
+          "national_id",
+          "phone"
+        ],
+        "tags": [],
+        "isDeleted": false,
+        "createdBy": "6ad7a32cc88b1107417fb164",
+        "updatedBy": "6ad7a32cc88b1107417fb164",
+        "createdAt": "2026-10-20T17:21:48.436Z",
+        "updatedAt": "2026-10-20T17:21:48.533Z",
+        "__v": 0
+      },
+      {
+        "_id": "6ad7a32cc88b1107417fb16c",
+        "ngoId": "6ad7a32cc88b1107417fb162",
+        "recordTypeId": "6ad7a32cf9a233ac1f54288c",
+        "recordNumber": "BEN-2026-00002",
+        "status": "Submitted",
+        "data": {
+          "full_name": "Tareeq Mansoor",
+          "gender": "Male",
+          "national_id": "enc:v1:4f227231116f95ed3d4909cbdbd83bbc:b15aaaf30ad820085d41984942a1e42b:82f6fdd0a03aae90ff76baa33263",
+          "phone": "enc:v1:a77f72ac25fc3e4a79a19f34d8227500:75bca3688c8949b37d2ea9589ce10328:1cc923ac59a60a3f3e8a",
+          "assistance_category": "Healthcare & Medical"
+        },
+        "encryptedFields": [
+          "national_id",
+          "phone"
+        ],
+        "tags": [],
+        "isDeleted": true,
+        "createdBy": "6ad7a32cc88b1107417fb164",
+        "updatedBy": "6ad7a32cc88b1107417fb164",
+        "createdAt": "2026-10-20T17:21:48.475Z",
+        "updatedAt": "2026-10-20T17:21:48.538Z",
+        "__v": 0,
+        "deletedAt": "2026-10-20T17:21:48.537Z",
+        "deletedBy": "6ad7a32cc88b1107417fb164",
+        "mergedInto": "6ad7a32cc88b1107417fb16a"
+      }
+    ],
+    "consents": [
+      {
+        "_id": "6ad7a245b0ecc1a1f3ccd230",
+        "ngoId": "6ad7a2030ae1ae2a64bd0b59",
+        "recordId": "6ad7a2030ae1ae2a64bd0b5d",
+        "purpose": "Humanitarian Aid & Relief",
+        "status": "granted",
+        "proofType": "Written Form",
+        "witnessName": "Priya Nair (Field Coordinator)",
+        "validUntil": "2027-10-20T17:17:57.113Z",
+        "createdAt": "2026-10-20T17:17:57.120Z",
+        "updatedAt": "2026-10-20T17:17:57.120Z",
+        "__v": 0
+      }
+    ],
+    "dataRequests": [],
+    "files": [],
+    "auditLogs": [
+      {
+        "_id": "6ad4eedd8a9f3282eb0bc6d6",
+        "userId": "6ad4eedd8a9f3282eb0bc6d5",
+        "action": "PLATFORM_ADMIN_BOOTSTRAP",
+        "resource": "PlatformAdmin",
+        "resourceId": "6ad4eedd8a9f3282eb0bc6d5",
+        "details": {
+          "email": "admin@ngoplatform.com"
+        },
+        "createdAt": "2026-10-18T16:07:57.454Z",
+        "updatedAt": "2026-10-18T16:07:57.454Z",
+        "__v": 0
+      },
+      {
+        "_id": "6ad4f2d2556ee20ef409d56f",
+        "userId": "6ad4eedd8a9f3282eb0bc6d5",
+        "action": "PLATFORM_ADMIN_LOGIN",
+        "resource": "PlatformAdmin",
+        "resourceId": "6ad4eedd8a9f3282eb0bc6d5",
+        "details": {
+          "email": "admin@ngoplatform.com",
+          "method": "2FA_TOTP"
+        },
+        "ip": "127.0.0.1",
+        "createdAt": "2026-10-18T16:24:50.527Z",
+        "updatedAt": "2026-10-18T16:24:50.527Z",
+        "__v": 0
+      },
+      {
+        "_id": "6ad4f5c4dbe8f4f3fe3d1bf1",
+        "userId": "6ad4eedd8a9f3282eb0bc6d5",
+        "action": "PLATFORM_ADMIN_LOGIN",
+        "resource": "PlatformAdmin",
+        "resourceId": "6ad4eedd8a9f3282eb0bc6d5",
+        "details": {
+          "email": "admin@ngoplatform.com",
+          "method": "2FA_TOTP"
+        },
+        "ip": "127.0.0.1",
+        "createdAt": "2026-10-18T16:37:24.258Z",
+        "updatedAt": "2026-10-18T16:37:24.258Z",
+        "__v": 0
+      },
+      {
+        "_id": "6ad4f5f55951dcc3b26ef195",
+        "userId": "6ad4eedd8a9f3282eb0bc6d5",
+        "action": "PLATFORM_ADMIN_LOGIN",
+        "resource": "PlatformAdmin",
+        "resourceId": "6ad4eedd8a9f3282eb0bc6d5",
+        "details": {
+          "email": "admin@ngoplatform.com",
+          "method": "2FA_TOTP"
+        },
+        "ip": "127.0.0.1",
+        "createdAt": "2026-10-18T16:38:13.770Z",
+        "updatedAt": "2026-10-18T16:38:13.770Z",
+        "__v": 0
+      },
+      {
+        "_id": "6ad770761d460b2d895ece9f",
+        "ngoId": "6ad770761d460b2d895ece94",
+        "userId": "6ad770761d460b2d895ece95",
+        "action": "SESSION_REVOKED",
+        "resource": "Session",
+        "resourceId": "6ad770761d460b2d895ece9e",
+        "details": {
+          "revokedSessionId": "6ad770761d460b2d895ece9e",
+          "deviceInfo": "Firefox on Android Tablet",
+          "ip": "103.24.50.12"
+        },
+        "ip": "127.0.0.1",
+        "userAgent": "Test Suite",
+        "createdAt": "2026-10-20T13:45:26.534Z",
+        "updatedAt": "2026-10-20T13:45:26.534Z",
+        "__v": 0
+      },
+      {
+        "_id": "6ad7710c8e58ab6055a42882",
+        "ngoId": "6ad7710b8e58ab6055a42877",
+        "userId": "6ad7710b8e58ab6055a42878",
+        "action": "SESSION_REVOKED",
+        "resource": "Session",
+        "resourceId": "6ad7710c8e58ab6055a42881",
+        "details": {
+          "revokedSessionId": "6ad7710c8e58ab6055a42881",
+          "deviceInfo": "Firefox on Android Tablet",
+          "ip": "103.24.50.12"
+        },
+        "ip": "127.0.0.1",
+        "userAgent": "Test Suite",
+        "createdAt": "2026-10-20T13:47:56.156Z",
+        "updatedAt": "2026-10-20T13:47:56.156Z",
+        "__v": 0
+      },
+      {
+        "_id": "6ad77c4204579b17153d0aac",
+        "ngoId": "6ad77c4204579b17153d0aa1",
+        "userId": "6ad77c4204579b17153d0aa2",
+        "action": "SESSION_REVOKED",
+        "resource": "Session",
+        "resourceId": "6ad77c4204579b17153d0aab",
+        "details": {
+          "revokedSessionId": "6ad77c4204579b17153d0aab",
+          "deviceInfo": "Firefox on Android Tablet",
+          "ip": "103.24.50.12"
+        },
+        "ip": "127.0.0.1",
+        "userAgent": "Test Suite",
+        "previousHash": "0000000000000000000000000000000000000000000000000000000000000000",
+        "createdAt": "2026-10-20T14:35:46.443Z",
+        "updatedAt": "2026-10-20T14:35:46.443Z",
+        "hash": "dbb607f2d5d39cc976c0e7210295836745592191da58b8019004abe0faac5698",
+        "__v": 0
+      },
+      {
+        "_id": "6ad77d253e5722f587fc5b51",
+        "ngoId": "6ad77d253e5722f587fc5b46",
+        "userId": "6ad77d253e5722f587fc5b47",
+        "action": "SESSION_REVOKED",
+        "resource": "Session",
+        "resourceId": "6ad77d253e5722f587fc5b50",
+        "details": {
+          "revokedSessionId": "6ad77d253e5722f587fc5b50",
+          "deviceInfo": "Firefox on Android Tablet",
+          "ip": "103.24.50.12"
+        },
+        "ip": "127.0.0.1",
+        "userAgent": "Test Suite",
+        "previousHash": "0000000000000000000000000000000000000000000000000000000000000000",
+        "createdAt": "2026-10-20T14:39:33.282Z",
+        "updatedAt": "2026-10-20T14:39:33.282Z",
+        "hash": "b2ba44769a48da622585c0536580bd9ba34301310faf4139d0f70774fc3bdb26",
+        "__v": 0
+      },
+      {
+        "_id": "6ad796882c5e94f113ed75f7",
+        "ngoId": "6ad796882c5e94f113ed75f0",
+        "userId": "6ad796882c5e94f113ed75f1",
+        "action": "BULK_IMPORT_RECORDS",
+        "resource": "records",
+        "details": {
+          "recordType": "Beneficiary",
+          "totalRows": 3,
+          "importedCount": 3,
+          "failedCount": 0
+        },
+        "ip": null,
+        "userAgent": null,
+        "previousHash": "0000000000000000000000000000000000000000000000000000000000000000",
+        "createdAt": "2026-10-20T16:27:52.986Z",
+        "updatedAt": "2026-10-20T16:27:52.986Z",
+        "hash": "10de5b90da77693c307b6b0e47abb27f7e8ac3b07559f3e9abe2ecb561d9fd15",
+        "__v": 0
+      },
+      {
+        "_id": "6ad796892c5e94f113ed75f8",
+        "ngoId": "6ad796882c5e94f113ed75f0",
+        "userId": "6ad796882c5e94f113ed75f1",
+        "action": "EXPORT_RECORDS",
+        "resource": "records",
+        "details": {
+          "exportedCount": 3,
+          "masked": false,
+          "recordTypeId": "6ad79688f9a233ac1f54285e"
+        },
+        "ip": null,
+        "userAgent": null,
+        "previousHash": "10de5b90da77693c307b6b0e47abb27f7e8ac3b07559f3e9abe2ecb561d9fd15",
+        "createdAt": "2026-10-20T16:27:53.026Z",
+        "updatedAt": "2026-10-20T16:27:53.026Z",
+        "hash": "aba2e384e256626d5a112825c286bed0f3ee3ef229f7e8de4a541c62351566a3",
+        "__v": 0
+      },
+      {
+        "_id": "6ad796892c5e94f113ed75f9",
+        "ngoId": "6ad796882c5e94f113ed75f0",
+        "userId": "6ad796882c5e94f113ed75f1",
+        "action": "EXPORT_RECORDS",
+        "resource": "records",
+        "details": {
+          "exportedCount": 3,
+          "masked": true,
+          "recordTypeId": "6ad79688f9a233ac1f54285e"
+        },
+        "ip": null,
+        "userAgent": null,
+        "previousHash": "aba2e384e256626d5a112825c286bed0f3ee3ef229f7e8de4a541c62351566a3",
+        "createdAt": "2026-10-20T16:27:53.042Z",
+        "updatedAt": "2026-10-20T16:27:53.042Z",
+        "hash": "a3148053f3e72d76566c215687bd04d3b77947a7c85e7f2cb9bb573cc1d37da5",
+        "__v": 0
+      },
+      {
+        "_id": "6ad79df16820b39d71cc78fb",
+        "ngoId": "6ad79df16820b39d71cc78ef",
+        "userId": "6ad79df16820b39d71cc78f1",
+        "action": "RECORD_MERGED",
+        "resource": "Record",
+        "resourceId": "6ad79df16820b39d71cc78f6",
+        "details": {
+          "masterRecordNumber": "BEN-1001",
+          "mergedDuplicateId": "6ad79df16820b39d71cc78f7",
+          "mergedDuplicateNumber": "BEN-1002",
+          "mergedFields": [
+            "note"
+          ]
+        },
+        "previousHash": "0000000000000000000000000000000000000000000000000000000000000000",
+        "createdAt": "2026-10-20T16:59:29.286Z",
+        "updatedAt": "2026-10-20T16:59:29.286Z",
+        "hash": "0266d1ff338f8a586bba5b22864f132d6fb7b0e211acb37672d0dee28e0af775",
+        "__v": 0
+      },
+      {
+        "_id": "6ad79fa58b5ec820eaa5c072",
+        "ngoId": "6ad79fa58b5ec820eaa5c06c",
+        "userId": "6ad79fa58b5ec820eaa5c06e",
+        "action": "GRANT_ALLOCATED",
+        "resource": "Grant",
+        "details": {
+          "amount": 50000,
+          "recipient": "Indore Children Hospital"
+        },
+        "previousHash": "0000000000000000000000000000000000000000000000000000000000000000",
+        "createdAt": "2026-10-20T17:06:45.292Z",
+        "updatedAt": "2026-10-20T17:06:45.292Z",
+        "hash": "8d8e8d09ac27aa2a731cd58006969476acda43744d5a790ae252dd36ab9de8b9",
+        "__v": 0
+      },
+      {
+        "_id": "6ad79fa58b5ec820eaa5c073",
+        "ngoId": "6ad79fa58b5ec820eaa5c06c",
+        "userId": "6ad79fa58b5ec820eaa5c06e",
+        "action": "DISASTER_RELIEF_DISPATCHED",
+        "resource": "DisasterRelief",
+        "details": {
+          "kits": 250,
+          "location": "Sector 4 Flood Camp"
+        },
+        "previousHash": "8d8e8d09ac27aa2a731cd58006969476acda43744d5a790ae252dd36ab9de8b9",
+        "createdAt": "2026-10-20T17:06:45.300Z",
+        "updatedAt": "2026-10-20T17:06:45.300Z",
+        "hash": "a2eb0e1f13e9f322f122dfaa67a93d76240293a28858833d5c053da98feb20c7",
+        "__v": 0
+      },
+      {
+        "_id": "6ad79fd67891d7b0d4a2a13a",
+        "ngoId": "6ad79fd67891d7b0d4a2a134",
+        "userId": "6ad79fd67891d7b0d4a2a136",
+        "action": "GRANT_ALLOCATED",
+        "resource": "Grant",
+        "details": {
+          "amount": 50000,
+          "recipient": "Indore Children Hospital"
+        },
+        "previousHash": "0000000000000000000000000000000000000000000000000000000000000000",
+        "createdAt": "2026-10-20T17:07:34.678Z",
+        "updatedAt": "2026-10-20T17:07:34.678Z",
+        "hash": "bed4e68792a4e7b717682d03cca59f471d4a6f9258d474881ff657f47342b8e3",
+        "__v": 0
+      },
+      {
+        "_id": "6ad79fd67891d7b0d4a2a13b",
+        "ngoId": "6ad79fd67891d7b0d4a2a134",
+        "userId": "6ad79fd67891d7b0d4a2a136",
+        "action": "DISASTER_RELIEF_DISPATCHED",
+        "resource": "DisasterRelief",
+        "details": {
+          "kits": 999999,
+          "location": "Sector 4 Flood Camp"
+        },
+        "previousHash": "bed4e68792a4e7b717682d03cca59f471d4a6f9258d474881ff657f47342b8e3",
+        "createdAt": "2026-10-20T17:07:34.687Z",
+        "updatedAt": "2026-10-20T17:07:34.687Z",
+        "hash": "f001954d581afdf64aca8e0c82bf3e4dbd833d8d266fefa3ff526fe7ad5c59d8",
+        "__v": 0
+      },
+      {
+        "_id": "6ad7a0193411a3837f9fa716",
+        "ngoId": "6ad7a0193411a3837f9fa710",
+        "userId": "6ad7a0193411a3837f9fa712",
+        "action": "GRANT_ALLOCATED",
+        "resource": "Grant",
+        "details": {
+          "amount": 50000,
+          "recipient": "Indore Children Hospital"
+        },
+        "previousHash": "0000000000000000000000000000000000000000000000000000000000000000",
+        "createdAt": "2026-10-20T17:08:41.723Z",
+        "updatedAt": "2026-10-20T17:08:41.723Z",
+        "hash": "e9e04f7fcfd6fea0c66b18dc037c34a608ba73459e890baf315b6d8905e804f5",
+        "__v": 0
+      },
+      {
+        "_id": "6ad7a0193411a3837f9fa717",
+        "ngoId": "6ad7a0193411a3837f9fa710",
+        "userId": "6ad7a0193411a3837f9fa712",
+        "action": "DISASTER_RELIEF_DISPATCHED",
+        "resource": "DisasterRelief",
+        "details": {
+          "kits": 999999,
+          "location": "Sector 4 Flood Camp"
+        },
+        "previousHash": "e9e04f7fcfd6fea0c66b18dc037c34a608ba73459e890baf315b6d8905e804f5",
+        "createdAt": "2026-10-20T17:08:41.739Z",
+        "updatedAt": "2026-10-20T17:08:41.739Z",
+        "hash": "eba37cf87a128dfa21f9dd877863dfc51edf086349b55f6d6cdbcf646420caaa",
+        "__v": 0
+      },
+      {
+        "_id": "6ad7a0193411a3837f9fa71b",
+        "ngoId": "6ad7a0193411a3837f9fa710",
+        "userId": "6ad7a0193411a3837f9fa712",
+        "action": "BLOCKCHAIN_ANCHOR_CREATED",
+        "resource": "BlockchainAnchor",
+        "resourceId": "6ad7a0193411a3837f9fa718",
+        "details": {
+          "merkleRoot": "0x996965112c0b91449adc462b220a4e28eebc3f6bc5ceef46de82384fd8a7aa0b",
+          "batchType": "audit_logs",
+          "leafCount": 2,
+          "transactionHash": "0x968e478e11378cd0d32406a8e3a73546c62e211554e330ec576387ab570355c5",
+          "blockNumber": 58495321
+        },
+        "previousHash": "eba37cf87a128dfa21f9dd877863dfc51edf086349b55f6d6cdbcf646420caaa",
+        "createdAt": "2026-10-20T17:08:41.783Z",
+        "updatedAt": "2026-10-20T17:08:41.783Z",
+        "hash": "9702f223968b1f122baadddee9e235c6dc0d4caf6b26a2852620c8bd72970483",
+        "__v": 0
+      },
+      {
+        "_id": "6ad7a245b0ecc1a1f3ccd23b",
+        "ngoId": "6ad7a2030ae1ae2a64bd0b59",
+        "userId": "6ad7a2030ae1ae2a64bd0b5a",
+        "action": "BLOCKCHAIN_ANCHOR_CREATED",
+        "resource": "BlockchainAnchor",
+        "resourceId": "6ad7a245b0ecc1a1f3ccd231",
+        "details": {
+          "merkleRoot": "0xf4287ec36dccddde69b7d0ed3db2317acd091184ec1af8ec7b84ec302883300b",
+          "batchType": "records",
+          "leafCount": 9,
+          "transactionHash": "0x2c3d617adfbb2ab0655e9d86df2bf1525ffb2abc69eb7f727bb2236d53ad93e0",
+          "blockNumber": 58499404
+        },
+        "previousHash": "0000000000000000000000000000000000000000000000000000000000000000",
+        "createdAt": "2026-10-20T17:17:57.148Z",
+        "updatedAt": "2026-10-20T17:17:57.148Z",
+        "hash": "86ca0adc17fdbd0d6f27cb5c46b787cd0770da1462b802e1b7d696c000d5bae1",
+        "__v": 0
+      },
+      {
+        "_id": "6ad7a30a1862c3da80342fdb",
+        "ngoId": "6ad7a30a1862c3da80342fd2",
+        "userId": "6ad7a30a1862c3da80342fd4",
+        "action": "CREATE_RECORD",
+        "resource": "records",
+        "resourceId": "6ad7a30a1862c3da80342fda",
+        "details": {
+          "recordNumber": "BEN-2026-00001",
+          "recordType": "Beneficiary",
+          "encryptedFieldsCount": 2
+        },
+        "ip": null,
+        "userAgent": null,
+        "previousHash": "0000000000000000000000000000000000000000000000000000000000000000",
+        "createdAt": "2026-10-20T17:21:14.667Z",
+        "updatedAt": "2026-10-20T17:21:14.667Z",
+        "hash": "4bf0135626e06abbeab8e4df789a85c390f10c811463898931303b11d6ba6060",
+        "__v": 0
+      },
+      {
+        "_id": "6ad7a30a1862c3da80342fdd",
+        "ngoId": "6ad7a30a1862c3da80342fd2",
+        "userId": "6ad7a30a1862c3da80342fd4",
+        "action": "CREATE_RECORD",
+        "resource": "records",
+        "resourceId": "6ad7a30a1862c3da80342fdc",
+        "details": {
+          "recordNumber": "BEN-2026-00002",
+          "recordType": "Beneficiary",
+          "encryptedFieldsCount": 2
+        },
+        "ip": null,
+        "userAgent": null,
+        "previousHash": "4bf0135626e06abbeab8e4df789a85c390f10c811463898931303b11d6ba6060",
+        "createdAt": "2026-10-20T17:21:14.703Z",
+        "updatedAt": "2026-10-20T17:21:14.703Z",
+        "hash": "ae7fc25edfe97a0130e3ca4a43be41afabf208df1298a34c1d470bf17e5ad402",
+        "__v": 0
+      },
+      {
+        "_id": "6ad7a30a1862c3da80342fdf",
+        "ngoId": "6ad7a30a1862c3da80342fd2",
+        "userId": "6ad7a30a1862c3da80342fd4",
+        "action": "RECORD_MERGED",
+        "resource": "Record",
+        "resourceId": "6ad7a30a1862c3da80342fda",
+        "details": {
+          "masterRecordNumber": "BEN-2026-00001",
+          "mergedDuplicateId": "6ad7a30a1862c3da80342fdc",
+          "mergedDuplicateNumber": "BEN-2026-00002",
+          "mergedFields": [
+            "verificationStatus"
+          ]
+        },
+        "previousHash": "ae7fc25edfe97a0130e3ca4a43be41afabf208df1298a34c1d470bf17e5ad402",
+        "createdAt": "2026-10-20T17:21:14.764Z",
+        "updatedAt": "2026-10-20T17:21:14.764Z",
+        "hash": "8d6f67b6915dbd38566a42bd8a774f54d34892818b85d01f8c35e71096aa7ce3",
+        "__v": 0
+      },
+      {
+        "_id": "6ad7a30a1862c3da80342fe2",
+        "ngoId": "6ad7a30a1862c3da80342fd2",
+        "userId": "6ad7a30a1862c3da80342fd4",
+        "action": "BLOCKCHAIN_ANCHOR_CREATED",
+        "resource": "BlockchainAnchor",
+        "resourceId": "6ad7a30a1862c3da80342fe0",
+        "details": {
+          "merkleRoot": "0xfa5b0c5b0871743c8ecedda096b94a3e6dbadd20b076e750ed54a33286d3c9c8",
+          "batchType": "records",
+          "leafCount": 1,
+          "transactionHash": "0xad1232f09d9c7eb135153fc92aabce9bb58235309a5a54273742772d4845d6dc",
+          "blockNumber": 58493010
+        },
+        "previousHash": "8d6f67b6915dbd38566a42bd8a774f54d34892818b85d01f8c35e71096aa7ce3",
+        "createdAt": "2026-10-20T17:21:14.787Z",
+        "updatedAt": "2026-10-20T17:21:14.787Z",
+        "hash": "a3be2c17d67ad6a5d9238e5045a383fa27455fbeefbfd89601384aafae73e384",
+        "__v": 0
+      },
+      {
+        "_id": "6ad7a32cc88b1107417fb16b",
+        "ngoId": "6ad7a32cc88b1107417fb162",
+        "userId": "6ad7a32cc88b1107417fb164",
+        "action": "CREATE_RECORD",
+        "resource": "records",
+        "resourceId": "6ad7a32cc88b1107417fb16a",
+        "details": {
+          "recordNumber": "BEN-2026-00001",
+          "recordType": "Beneficiary",
+          "encryptedFieldsCount": 2
+        },
+        "ip": null,
+        "userAgent": null,
+        "previousHash": "0000000000000000000000000000000000000000000000000000000000000000",
+        "createdAt": "2026-10-20T17:21:48.439Z",
+        "updatedAt": "2026-10-20T17:21:48.439Z",
+        "hash": "dee2b83f877f5414efee6be64caab87e5ea4451d5d830a10832d4e16851b4f04",
+        "__v": 0
+      },
+      {
+        "_id": "6ad7a32cc88b1107417fb16d",
+        "ngoId": "6ad7a32cc88b1107417fb162",
+        "userId": "6ad7a32cc88b1107417fb164",
+        "action": "CREATE_RECORD",
+        "resource": "records",
+        "resourceId": "6ad7a32cc88b1107417fb16c",
+        "details": {
+          "recordNumber": "BEN-2026-00002",
+          "recordType": "Beneficiary",
+          "encryptedFieldsCount": 2
+        },
+        "ip": null,
+        "userAgent": null,
+        "previousHash": "dee2b83f877f5414efee6be64caab87e5ea4451d5d830a10832d4e16851b4f04",
+        "createdAt": "2026-10-20T17:21:48.477Z",
+        "updatedAt": "2026-10-20T17:21:48.477Z",
+        "hash": "c6588c67b271d533093767bcd6b27cc81b784a554f99c1356c3f63a166ad726d",
+        "__v": 0
+      },
+      {
+        "_id": "6ad7a32cc88b1107417fb16f",
+        "ngoId": "6ad7a32cc88b1107417fb162",
+        "userId": "6ad7a32cc88b1107417fb164",
+        "action": "RECORD_MERGED",
+        "resource": "Record",
+        "resourceId": "6ad7a32cc88b1107417fb16a",
+        "details": {
+          "masterRecordNumber": "BEN-2026-00001",
+          "mergedDuplicateId": "6ad7a32cc88b1107417fb16c",
+          "mergedDuplicateNumber": "BEN-2026-00002",
+          "mergedFields": [
+            "verificationStatus"
+          ]
+        },
+        "previousHash": "c6588c67b271d533093767bcd6b27cc81b784a554f99c1356c3f63a166ad726d",
+        "createdAt": "2026-10-20T17:21:48.539Z",
+        "updatedAt": "2026-10-20T17:21:48.539Z",
+        "hash": "fcad5b17e234dd92946ee55d7bee33bc899975a78e5e787bdf7560e7c19ab3f8",
+        "__v": 0
+      },
+      {
+        "_id": "6ad7a32cc88b1107417fb172",
+        "ngoId": "6ad7a32cc88b1107417fb162",
+        "userId": "6ad7a32cc88b1107417fb164",
+        "action": "BLOCKCHAIN_ANCHOR_CREATED",
+        "resource": "BlockchainAnchor",
+        "resourceId": "6ad7a32cc88b1107417fb170",
+        "details": {
+          "merkleRoot": "0x8d89ec73feef928dec4617c7362311e5bcbf45b48aaaefa146d4761c143c384c",
+          "batchType": "records",
+          "leafCount": 1,
+          "transactionHash": "0x91654bac9d14c0475ef7f0df8e910860d6ec93f0bec6bf103448ab211c460e18",
+          "blockNumber": 58494026
+        },
+        "previousHash": "fcad5b17e234dd92946ee55d7bee33bc899975a78e5e787bdf7560e7c19ab3f8",
+        "createdAt": "2026-10-20T17:21:48.558Z",
+        "updatedAt": "2026-10-20T17:21:48.558Z",
+        "hash": "c4e0885c52fce795bbfe8e10369418bbbf5c6098cc4fb60b8598fe9fb2c424f7",
+        "__v": 0
+      }
+    ],
+    "blockchainAnchors": [
+      {
+        "_id": "6ad7a0193411a3837f9fa718",
+        "ngoId": "6ad7a0193411a3837f9fa710",
+        "batchType": "audit_logs",
+        "merkleRoot": "0x996965112c0b91449adc462b220a4e28eebc3f6bc5ceef46de82384fd8a7aa0b",
+        "leafCount": 2,
+        "leaves": [
+          {
+            "hash": "0xeba37cf87a128dfa21f9dd877863dfc51edf086349b55f6d6cdbcf646420caaa",
+            "entityId": "6ad7a0193411a3837f9fa717",
+            "entityType": "audit_logs",
+            "_id": "6ad7a0193411a3837f9fa719"
+          },
+          {
+            "hash": "0xe9e04f7fcfd6fea0c66b18dc037c34a608ba73459e890baf315b6d8905e804f5",
+            "entityId": "6ad7a0193411a3837f9fa716",
+            "entityType": "audit_logs",
+            "_id": "6ad7a0193411a3837f9fa71a"
+          }
+        ],
+        "network": "polygon-amoy",
+        "contractAddress": "0x71C35B91a09D80fD4F72D0fFc29EaAb83b4b84A2",
+        "transactionHash": "0x968e478e11378cd0d32406a8e3a73546c62e211554e330ec576387ab570355c5",
+        "blockNumber": 58495321,
+        "gasUsed": 48500,
+        "status": "confirmed",
+        "anchoredAt": "2026-10-20T17:08:41.771Z",
+        "anchoredBy": "6ad7a0193411a3837f9fa712",
+        "verificationUrl": "https://amoy.polygonscan.com/tx/0x968e478e11378cd0d32406a8e3a73546c62e211554e330ec576387ab570355c5",
+        "createdAt": "2026-10-20T17:08:41.779Z",
+        "updatedAt": "2026-10-20T17:08:41.779Z",
+        "__v": 0
+      },
+      {
+        "_id": "6ad7a245b0ecc1a1f3ccd231",
+        "ngoId": "6ad7a2030ae1ae2a64bd0b59",
+        "batchType": "records",
+        "merkleRoot": "0xf4287ec36dccddde69b7d0ed3db2317acd091184ec1af8ec7b84ec302883300b",
+        "leafCount": 9,
+        "leaves": [
+          {
+            "hash": "0xd43a765c22b2f210ebf1613b9e65eb8dbd7e26e47496e5b0732f363f4de07eb0",
+            "entityId": "6ad7a2030ae1ae2a64bd0b65",
+            "entityType": "records",
+            "_id": "6ad7a245b0ecc1a1f3ccd232"
+          },
+          {
+            "hash": "0x897d6bb3a5d4015217d5122db60974c4005d97c8e1431a8d321bcb474fef087c",
+            "entityId": "6ad7a2030ae1ae2a64bd0b64",
+            "entityType": "records",
+            "_id": "6ad7a245b0ecc1a1f3ccd233"
+          },
+          {
+            "hash": "0x4995d0088ea30a931e3c9e0a3a8ecc6939d9bb905c41cfd2ea032479a34d6710",
+            "entityId": "6ad7a2030ae1ae2a64bd0b63",
+            "entityType": "records",
+            "_id": "6ad7a245b0ecc1a1f3ccd234"
+          },
+          {
+            "hash": "0xa8b0833b591434bf1eea1d8caceb1f095854c3c384918d564677466727b531cb",
+            "entityId": "6ad7a2030ae1ae2a64bd0b62",
+            "entityType": "records",
+            "_id": "6ad7a245b0ecc1a1f3ccd235"
+          },
+          {
+            "hash": "0x8f1103c3e38998bed2db9b3d3e5ad65eb3caa42014532a9be2a22fdc4052f429",
+            "entityId": "6ad7a2030ae1ae2a64bd0b61",
+            "entityType": "records",
+            "_id": "6ad7a245b0ecc1a1f3ccd236"
+          },
+          {
+            "hash": "0x325eef7b5e7961b7d15f814b07adc2a8a12eeea241f1222ba9cbb89e52d0bd3a",
+            "entityId": "6ad7a2030ae1ae2a64bd0b60",
+            "entityType": "records",
+            "_id": "6ad7a245b0ecc1a1f3ccd237"
+          },
+          {
+            "hash": "0x50d1bc05659858793027c7a2521dd9585950e00f77fe6de62de404638fffa950",
+            "entityId": "6ad7a2030ae1ae2a64bd0b5f",
+            "entityType": "records",
+            "_id": "6ad7a245b0ecc1a1f3ccd238"
+          },
+          {
+            "hash": "0xe66c2faa0d2536464031ecb99f70ba2f3327c57289f75f00062894c50ad46155",
+            "entityId": "6ad7a2030ae1ae2a64bd0b5e",
+            "entityType": "records",
+            "_id": "6ad7a245b0ecc1a1f3ccd239"
+          },
+          {
+            "hash": "0xacbe095f0f8b465f99291329083dace3676f0b16687d65073b57d4ba52c00b7d",
+            "entityId": "6ad7a2030ae1ae2a64bd0b5d",
+            "entityType": "records",
+            "_id": "6ad7a245b0ecc1a1f3ccd23a"
+          }
+        ],
+        "network": "polygon-amoy",
+        "contractAddress": "0x71C35B91a09D80fD4F72D0fFc29EaAb83b4b84A2",
+        "transactionHash": "0x2c3d617adfbb2ab0655e9d86df2bf1525ffb2abc69eb7f727bb2236d53ad93e0",
+        "blockNumber": 58499404,
+        "gasUsed": 48500,
+        "status": "confirmed",
+        "anchoredAt": "2026-10-20T17:17:57.141Z",
+        "anchoredBy": "6ad7a2030ae1ae2a64bd0b5a",
+        "verificationUrl": "https://amoy.polygonscan.com/tx/0x2c3d617adfbb2ab0655e9d86df2bf1525ffb2abc69eb7f727bb2236d53ad93e0",
+        "createdAt": "2026-10-20T17:17:57.145Z",
+        "updatedAt": "2026-10-20T17:17:57.145Z",
+        "__v": 0
+      },
+      {
+        "_id": "6ad7a30a1862c3da80342fe0",
+        "ngoId": "6ad7a30a1862c3da80342fd2",
+        "batchType": "records",
+        "merkleRoot": "0xfa5b0c5b0871743c8ecedda096b94a3e6dbadd20b076e750ed54a33286d3c9c8",
+        "leafCount": 1,
+        "leaves": [
+          {
+            "hash": "0xfa5b0c5b0871743c8ecedda096b94a3e6dbadd20b076e750ed54a33286d3c9c8",
+            "entityId": "6ad7a30a1862c3da80342fda",
+            "entityType": "records",
+            "_id": "6ad7a30a1862c3da80342fe1"
+          }
+        ],
+        "network": "polygon-amoy",
+        "contractAddress": "0x71C35B91a09D80fD4F72D0fFc29EaAb83b4b84A2",
+        "transactionHash": "0xad1232f09d9c7eb135153fc92aabce9bb58235309a5a54273742772d4845d6dc",
+        "blockNumber": 58493010,
+        "gasUsed": 48500,
+        "status": "confirmed",
+        "anchoredAt": "2026-10-20T17:21:14.782Z",
+        "anchoredBy": "6ad7a30a1862c3da80342fd4",
+        "verificationUrl": "https://amoy.polygonscan.com/tx/0xad1232f09d9c7eb135153fc92aabce9bb58235309a5a54273742772d4845d6dc",
+        "createdAt": "2026-10-20T17:21:14.785Z",
+        "updatedAt": "2026-10-20T17:21:14.785Z",
+        "__v": 0
+      },
+      {
+        "_id": "6ad7a32cc88b1107417fb170",
+        "ngoId": "6ad7a32cc88b1107417fb162",
+        "batchType": "records",
+        "merkleRoot": "0x8d89ec73feef928dec4617c7362311e5bcbf45b48aaaefa146d4761c143c384c",
+        "leafCount": 1,
+        "leaves": [
+          {
+            "hash": "0x8d89ec73feef928dec4617c7362311e5bcbf45b48aaaefa146d4761c143c384c",
+            "entityId": "6ad7a32cc88b1107417fb16a",
+            "entityType": "records",
+            "_id": "6ad7a32cc88b1107417fb171"
+          }
+        ],
+        "network": "polygon-amoy",
+        "contractAddress": "0x71C35B91a09D80fD4F72D0fFc29EaAb83b4b84A2",
+        "transactionHash": "0x91654bac9d14c0475ef7f0df8e910860d6ec93f0bec6bf103448ab211c460e18",
+        "blockNumber": 58494026,
+        "gasUsed": 48500,
+        "status": "confirmed",
+        "anchoredAt": "2026-10-20T17:21:48.554Z",
+        "anchoredBy": "6ad7a32cc88b1107417fb164",
+        "verificationUrl": "https://amoy.polygonscan.com/tx/0x91654bac9d14c0475ef7f0df8e910860d6ec93f0bec6bf103448ab211c460e18",
+        "createdAt": "2026-10-20T17:21:48.556Z",
+        "updatedAt": "2026-10-20T17:21:48.556Z",
+        "__v": 0
+      }
+    ],
+    "aiResults": [
+      {
+        "_id": "6ad79df16820b39d71cc78f8",
+        "ngoId": "6ad79df16820b39d71cc78ef",
+        "type": "deduplication",
+        "summary": "Deduplication scan found 1 candidate pairs among 2 records.",
+        "insights": {
+          "scannedCount": 2,
+          "duplicatesFound": 1
+        },
+        "data": [
+          {
+            "record1": {
+              "_id": "6ad79df16820b39d71cc78f6",
+              "recordNumber": "BEN-1001",
+              "recordTypeId": "6ad79df16820b39d71cc78f5",
+              "recordTypeName": "Beneficiary Profile",
+              "data": {
+                "fullName": "Rahul Verma",
+                "phone": "9876543210",
+                "aadhaarNumber": "1122-3344-5566",
+                "district": "Indore",
+                "annualIncome": 18000,
+                "familySize": 4
+              },
+              "createdAt": "2026-10-20T16:59:29.165Z"
+            },
+            "record2": {
+              "_id": "6ad79df16820b39d71cc78f7",
+              "recordNumber": "BEN-1002",
+              "recordTypeId": "6ad79df16820b39d71cc78f5",
+              "recordTypeName": "Beneficiary Profile",
+              "data": {
+                "fullName": "Rahool Varma",
+                "phone": "9876543210",
+                "district": "Indore",
+                "annualIncome": 18000,
+                "familySize": 4
+              },
+              "createdAt": "2026-10-20T16:59:29.168Z"
+            },
+            "confidence": 0.9,
+            "confidencePercentage": 90,
+            "matchReasons": [
+              "Exact phone number match",
+              "Phonetic name match (R416)"
+            ]
+          }
+        ],
+        "createdAt": "2026-10-20T16:59:29.243Z",
+        "updatedAt": "2026-10-20T16:59:29.243Z",
+        "__v": 0
+      },
+      {
+        "_id": "6ad79df16820b39d71cc78fa",
+        "ngoId": "6ad79df16820b39d71cc78ef",
+        "type": "anomalies",
+        "summary": "Anomaly scan flagged 1 records with data quality issues.",
+        "insights": {
+          "scannedCount": 3,
+          "anomaliesFound": 1
+        },
+        "data": [
+          {
+            "recordId": "6ad79df16820b39d71cc78f9",
+            "recordNumber": "BEN-1003",
+            "recordTypeName": "Beneficiary Profile",
+            "severity": "high",
+            "issues": [
+              "Missing or empty beneficiary name",
+              "Malformed phone number (1234) - less than 10 digits",
+              "Impossible date of birth: set in the future"
+            ],
+            "data": {
+              "fullName": "",
+              "phone": "1234",
+              "dateOfBirth": "2031-10-20T16:59:29.247Z",
+              "annualIncome": -500
+            }
+          }
+        ],
+        "createdAt": "2026-10-20T16:59:29.262Z",
+        "updatedAt": "2026-10-20T16:59:29.262Z",
+        "__v": 0
+      },
+      {
+        "_id": "6ad79df16820b39d71cc78fc",
+        "ngoId": "6ad79df16820b39d71cc78ef",
+        "type": "vulnerability",
+        "summary": "Vulnerability analysis calculated tiers for 2 records.",
+        "insights": {
+          "totalAnalyzed": 2,
+          "vulnerabilityTiers": {
+            "high": {
+              "count": 1,
+              "percentage": 50
+            },
+            "medium": {
+              "count": 1,
+              "percentage": 50
+            },
+            "low": {
+              "count": 0,
+              "percentage": 0
+            }
+          },
+          "categoryDistribution": {
+            "Beneficiary Profile": 2
+          },
+          "geographicHotspots": {
+            "Indore": 1,
+            "Unspecified": 1
+          }
+        },
+        "data": {
+          "totalAnalyzed": 2,
+          "vulnerabilityTiers": {
+            "high": {
+              "count": 1,
+              "percentage": 50
+            },
+            "medium": {
+              "count": 1,
+              "percentage": 50
+            },
+            "low": {
+              "count": 0,
+              "percentage": 0
+            }
+          },
+          "categoryDistribution": {
+            "Beneficiary Profile": 2
+          },
+          "geographicHotspots": {
+            "Indore": 1,
+            "Unspecified": 1
+          }
+        },
+        "createdAt": "2026-10-20T16:59:29.310Z",
+        "updatedAt": "2026-10-20T16:59:29.310Z",
+        "__v": 0
+      },
+      {
+        "_id": "6ad79df16820b39d71cc78fd",
+        "ngoId": "6ad79df16820b39d71cc78ef",
+        "type": "demand_forecast",
+        "summary": "Demand forecast generated for next 3 periods. Trend: increasing.",
+        "insights": {
+          "historicalTrend": [
+            4,
+            5,
+            5
+          ],
+          "slope": 0.5,
+          "trend_direction": "increasing",
+          "growthRatePercent": 25,
+          "projections": [
+            {
+              "period": "Month +1",
+              "projectedDemand": 6,
+              "recommendedSafetyStock": 7
+            },
+            {
+              "period": "Month +2",
+              "projectedDemand": 6,
+              "recommendedSafetyStock": 7
+            },
+            {
+              "period": "Month +3",
+              "projectedDemand": 7,
+              "recommendedSafetyStock": 8
+            }
+          ]
+        },
+        "data": {
+          "historicalTrend": [
+            4,
+            5,
+            5
+          ],
+          "slope": 0.5,
+          "trend_direction": "increasing",
+          "growthRatePercent": 25,
+          "projections": [
+            {
+              "period": "Month +1",
+              "projectedDemand": 6,
+              "recommendedSafetyStock": 7
+            },
+            {
+              "period": "Month +2",
+              "projectedDemand": 6,
+              "recommendedSafetyStock": 7
+            },
+            {
+              "period": "Month +3",
+              "projectedDemand": 7,
+              "recommendedSafetyStock": 8
+            }
+          ]
+        },
+        "createdAt": "2026-10-20T16:59:29.339Z",
+        "updatedAt": "2026-10-20T16:59:29.339Z",
+        "__v": 0
+      },
+      {
+        "_id": "6ad79df16820b39d71cc78ff",
+        "ngoId": "6ad79df16820b39d71cc78ef",
+        "type": "deduplication",
+        "summary": "Deduplication scan found 0 candidate pairs among 2 records.",
+        "insights": {
+          "scannedCount": 2,
+          "duplicatesFound": 0
+        },
+        "data": [],
+        "createdAt": "2026-10-20T16:59:29.360Z",
+        "updatedAt": "2026-10-20T16:59:29.360Z",
+        "__v": 0
+      },
+      {
+        "_id": "6ad7a30a1862c3da80342fde",
+        "ngoId": "6ad7a30a1862c3da80342fd2",
+        "type": "deduplication",
+        "summary": "Deduplication scan found 1 candidate pairs among 2 records.",
+        "insights": {
+          "scannedCount": 2,
+          "duplicatesFound": 1
+        },
+        "data": [
+          {
+            "record1": {
+              "_id": "6ad7a30a1862c3da80342fda",
+              "recordNumber": "BEN-2026-00001",
+              "recordTypeId": "6ad7a30af9a233ac1f542884",
+              "recordTypeName": "Beneficiary",
+              "data": {
+                "full_name": "Tariq Mansoor",
+                "gender": "Male",
+                "national_id": "1122-3344-9988",
+                "phone": "9811223344",
+                "assistance_category": "Healthcare & Medical"
+              },
+              "createdAt": "2026-10-20T17:21:14.665Z"
+            },
+            "record2": {
+              "_id": "6ad7a30a1862c3da80342fdc",
+              "recordNumber": "BEN-2026-00002",
+              "recordTypeId": "6ad7a30af9a233ac1f542884",
+              "recordTypeName": "Beneficiary",
+              "data": {
+                "full_name": "Tareeq Mansoor",
+                "gender": "Male",
+                "national_id": "1122-3344-9988",
+                "phone": "9811223344",
+                "assistance_category": "Healthcare & Medical"
+              },
+              "createdAt": "2026-10-20T17:21:14.701Z"
+            },
+            "confidence": 0.9,
+            "confidencePercentage": 90,
+            "matchReasons": [
+              "Exact phone number match"
+            ]
+          }
+        ],
+        "createdAt": "2026-10-20T17:21:14.744Z",
+        "updatedAt": "2026-10-20T17:21:14.744Z",
+        "__v": 0
+      },
+      {
+        "_id": "6ad7a32cc88b1107417fb16e",
+        "ngoId": "6ad7a32cc88b1107417fb162",
+        "type": "deduplication",
+        "summary": "Deduplication scan found 1 candidate pairs among 2 records.",
+        "insights": {
+          "scannedCount": 2,
+          "duplicatesFound": 1
+        },
+        "data": [
+          {
+            "record1": {
+              "_id": "6ad7a32cc88b1107417fb16a",
+              "recordNumber": "BEN-2026-00001",
+              "recordTypeId": "6ad7a32cf9a233ac1f54288c",
+              "recordTypeName": "Beneficiary",
+              "data": {
+                "full_name": "Tariq Mansoor",
+                "gender": "Male",
+                "national_id": "1122-3344-9988",
+                "phone": "9811223344",
+                "assistance_category": "Healthcare & Medical"
+              },
+              "createdAt": "2026-10-20T17:21:48.436Z"
+            },
+            "record2": {
+              "_id": "6ad7a32cc88b1107417fb16c",
+              "recordNumber": "BEN-2026-00002",
+              "recordTypeId": "6ad7a32cf9a233ac1f54288c",
+              "recordTypeName": "Beneficiary",
+              "data": {
+                "full_name": "Tareeq Mansoor",
+                "gender": "Male",
+                "national_id": "1122-3344-9988",
+                "phone": "9811223344",
+                "assistance_category": "Healthcare & Medical"
+              },
+              "createdAt": "2026-10-20T17:21:48.475Z"
+            },
+            "confidence": 0.9,
+            "confidencePercentage": 90,
+            "matchReasons": [
+              "Exact phone number match"
+            ]
+          }
+        ],
+        "createdAt": "2026-10-20T17:21:48.522Z",
+        "updatedAt": "2026-10-20T17:21:48.522Z",
+        "__v": 0
+      }
+    ]
+  }
+}

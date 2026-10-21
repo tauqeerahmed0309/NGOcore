@@ -1,0 +1,14 @@
+{
+  "backupFile": "ngoconnect_backup_2026-10-20T17-22-51-603Z.json",
+  "checksum": "b8d6fe739824ff511b0645defff0f06d00167b2faef4811601c5e6fdb1228450",
+  "createdAt": "2026-10-20T17:22:51.676Z",
+  "status": "VERIFIED_COMPLETE",
+  "counts": {
+    "totalCollections": 10,
+    "ngoCount": 7,
+    "userCount": 7,
+    "recordCount": 20,
+    "auditLogCount": 28,
+    "blockchainAnchorCount": 4
+  }
+}

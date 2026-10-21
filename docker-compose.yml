@@ -1,0 +1,86 @@
+version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:7.0
+    container_name: ngoconnect_mongo
+    restart: always
+    environment:
+      MONGO_INITDB_DATABASE: ngo_management
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - ngoconnect_net
+
+  # Python FastAPI AI Microservice
+  ai-service:
+    build:
+      context: ./ai-service
+      dockerfile: Dockerfile
+    container_name: ngoconnect_ai
+    restart: always
+    environment:
+      - PORT=8000
+      - HOST=0.0.0.0
+      - SERVICE_SECRET=secure_shared_secret_between_node_and_fastapi
+      - ENVIRONMENT=production
+    ports:
+      - "8000:8000"
+    networks:
+      - ngoconnect_net
+
+  # Node.js Express API Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: ngoconnect_server
+    restart: always
+    depends_on:
+      - mongodb
+      - ai-service
+    environment:
+      - NODE_ENV=production
+      - PORT=5000
+      - MONGODB_URI=mongodb://mongodb:27017/ngo_management
+      - CLIENT_URL=http://localhost:3000
+      - JWT_ACCESS_SECRET=production_jwt_access_secret_key_2026_xyz
+      - JWT_REFRESH_SECRET=production_jwt_refresh_secret_key_2026_xyz
+      - AI_SERVICE_URL=http://ai-service:8000
+      - AI_SERVICE_SECRET=secure_shared_secret_between_node_and_fastapi
+      - BLOCKCHAIN_NETWORK=polygon-amoy
+      - BLOCKCHAIN_RPC_URL=https://rpc-amoy.polygon.technology
+      - BLOCKCHAIN_CONTRACT_ADDRESS=0x71C35B91a09D80fD4F72D0fFc29EaAb83b4b84A2
+    ports:
+      - "5000:5000"
+    volumes:
+      - server_uploads:/app/uploads
+      - server_backups:/app/backups
+    networks:
+      - ngoconnect_net
+
+  # React Frontend Client (Nginx)
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: ngoconnect_client
+    restart: always
+    depends_on:
+      - server
+    ports:
+      - "3000:80"
+    networks:
+      - ngoconnect_net
+
+networks:
+  ngoconnect_net:
+    driver: bridge
+
+volumes:
+  mongo_data:
+  server_uploads:
+  server_backups:
