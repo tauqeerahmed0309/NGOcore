@@ -8,7 +8,9 @@ import {
   School, 
   FileText, 
   AlertCircle,
-  ShieldCheck
+  ShieldCheck,
+  MapPin,
+  Loader2
 } from 'lucide-react';
 import studentService from './studentService';
 import userService from '../users/userService';
@@ -20,31 +22,34 @@ export default function StudentForm({
   onClose, 
   onSuccess 
 }) {
-  // Personal Information
+  // 1. Personal Information
   const [registrationNumber, setRegistrationNumber] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [dateOfBirth, setDateOfBirth] = useState('');
   const [gender, setGender] = useState('');
 
-  // Contact Information
+  // 2. Contact Information
   const [email, setEmail] = useState('');
-  const [address, setAddress] = useState('');
+  const [phone, setPhone] = useState('');
 
-  // Guardian Information
+  // 3. Address Information
+  const [address, setAddress] = useState('');
+  const [pinCode, setPinCode] = useState('');
+  const [state, setState] = useState('');
+
+  // 4. Guardian & Education Information
+  const [educationLevel, setEducationLevel] = useState('');
+  const [schoolName, setSchoolName] = useState('');
   const [guardianName, setGuardianName] = useState('');
   const [guardianRelationship, setGuardianRelationship] = useState('');
 
-  // Education Information
-  const [educationLevel, setEducationLevel] = useState('');
-  const [schoolName, setSchoolName] = useState('');
-
-  // Additional Information
+  // 5. Additional Information & Account Linking
   const [status, setStatus] = useState('active');
-  const [notes, setNotes] = useState('');
   const [userId, setUserId] = useState('');
+  const [notes, setNotes] = useState('');
 
-  // Form State
+  // Component State
   const [studentUsers, setStudentUsers] = useState([]);
   const [loadingUsers, setLoadingUsers] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -54,24 +59,30 @@ export default function StudentForm({
   // Fetch student-role users for account linking
   useEffect(() => {
     if (isOpen) {
+      let isMounted = true;
       const fetchStudentAccounts = async () => {
         setLoadingUsers(true);
         try {
           const res = await userService.getUsers({ role: 'student', limit: 100 });
-          if (res.success && res.data?.users) {
+          if (isMounted && res.success && res.data?.users) {
             setStudentUsers(res.data.users);
           }
         } catch (err) {
-          setError(err.message || 'Could not load student accounts.');
+          if (isMounted) {
+            setError(err.message || 'Could not load student accounts.');
+          }
         } finally {
-          setLoadingUsers(false);
+          if (isMounted) setLoadingUsers(false);
         }
       };
       fetchStudentAccounts();
+      return () => {
+        isMounted = false;
+      };
     }
   }, [isOpen]);
 
-  // Populate form on open or switch mode
+  // Populate or reset form on open or switch mode
   useEffect(() => {
     if (isOpen) {
       setError('');
@@ -89,21 +100,22 @@ export default function StudentForm({
         setGender(studentToEdit.gender || '');
 
         setEmail(studentToEdit.email || '');
+        setPhone(studentToEdit.phone || '');
         setAddress(studentToEdit.address || '');
-
-        setGuardianName(studentToEdit.guardianName || '');
-        setGuardianRelationship(studentToEdit.guardianRelationship || '');
+        setPinCode(studentToEdit.pinCode || '');
+        setState(studentToEdit.state || '');
 
         setEducationLevel(studentToEdit.educationLevel || '');
         setSchoolName(studentToEdit.schoolName || '');
+        setGuardianName(studentToEdit.guardianName || '');
+        setGuardianRelationship(studentToEdit.guardianRelationship || '');
 
         setStatus(studentToEdit.status || 'active');
-        setNotes(studentToEdit.notes || '');
-
         const existingUserId = studentToEdit.userId?._id || studentToEdit.userId || '';
         setUserId(existingUserId);
+        setNotes(studentToEdit.notes || '');
       } else {
-        // Reset form for create
+        // Reset form for fresh creation
         setRegistrationNumber('');
         setFirstName('');
         setLastName('');
@@ -111,17 +123,19 @@ export default function StudentForm({
         setGender('');
 
         setEmail('');
+        setPhone('');
         setAddress('');
-
-        setGuardianName('');
-        setGuardianRelationship('');
+        setPinCode('');
+        setState('');
 
         setEducationLevel('');
         setSchoolName('');
+        setGuardianName('');
+        setGuardianRelationship('');
 
         setStatus('active');
-        setNotes('');
         setUserId('');
+        setNotes('');
       }
     }
   }, [isOpen, mode, studentToEdit]);
@@ -151,12 +165,31 @@ export default function StudentForm({
       }
     }
 
+    if (phone && phone.trim()) {
+      const cleanedPhone = phone.trim().replace(/[\s\-\(\)\.]/g, '');
+      let digits = cleanedPhone;
+      if (digits.startsWith('+91')) digits = digits.slice(3);
+      else if (digits.startsWith('91') && digits.length === 12) digits = digits.slice(2);
+      else if (digits.startsWith('0') && digits.length === 11) digits = digits.slice(1);
+      if (!/^[6-9]\d{9}$/.test(digits)) {
+        errors.phone = 'Phone must be a valid 10-digit Indian mobile number (starting with 6-9)';
+      }
+    }
+
+    if (pinCode && pinCode.trim()) {
+      const cleanedPin = pinCode.trim().replace(/\s+/g, '');
+      if (!/^[1-8][0-9]{5}$/.test(cleanedPin)) {
+        errors.pinCode = 'PIN code must be a valid 6-digit Indian postal code starting with 1-8';
+      }
+    }
+
     setValidationErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (loading) return; // Prevent double-clicking
     setError('');
 
     if (!validateForm()) {
@@ -165,20 +198,24 @@ export default function StudentForm({
 
     setLoading(true);
     try {
+      // Build clean payload matching backend Zod schemas
       const payload = {
         registrationNumber: registrationNumber.trim().toUpperCase(),
         firstName: firstName.trim(),
         lastName: lastName.trim(),
-        dateOfBirth: dateOfBirth || null,
-        gender: gender || null,
-        email: email.trim().toLowerCase() || null,
-        address: address.trim() || null,
-        guardianName: guardianName.trim() || null,
-        guardianRelationship: guardianRelationship.trim() || null,
-        educationLevel: educationLevel.trim() || null,
-        schoolName: schoolName.trim() || null,
+        dateOfBirth: dateOfBirth ? dateOfBirth : null,
+        gender: gender || '',
+        email: email.trim().toLowerCase(),
+        phone: phone.trim(),
+        address: address.trim(),
+        pinCode: pinCode.trim(),
+        state: state.trim(),
+        guardianName: guardianName.trim(),
+        guardianRelationship: guardianRelationship.trim(),
+        educationLevel: educationLevel.trim(),
+        schoolName: schoolName.trim(),
         status: status || 'active',
-        notes: notes.trim() || null,
+        notes: notes.trim(),
         userId: userId ? userId : null
       };
 
@@ -216,15 +253,18 @@ export default function StudentForm({
         className="modal-container student-form-modal" 
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Modal Header */}
         <div className="modal-header">
           <div className="modal-header-title">
-            <GraduationCap size={22} className="text-primary" />
+            <div className="student-avatar-modal">
+              <GraduationCap size={24} className="text-primary" />
+            </div>
             <div>
-              <h3>{mode === 'create' ? 'Add New Student' : 'Edit Student Profile'}</h3>
+              <h3>{mode === 'create' ? 'Add New Beneficiary / Student' : 'Edit Student Profile'}</h3>
               <p className="modal-header-desc">
                 {mode === 'create' 
-                  ? 'Enroll a new beneficiary into the digital record system' 
-                  : `Update profile for ${studentToEdit?.firstName} ${studentToEdit?.lastName}`
+                  ? 'Enroll a new beneficiary into the digital record management system' 
+                  : `Update enrollment profile for ${studentToEdit?.firstName || ''} ${studentToEdit?.lastName || ''}`
                 }
               </p>
             </div>
@@ -234,30 +274,40 @@ export default function StudentForm({
             onClick={onClose} 
             className="modal-close-btn"
             aria-label="Close dialog"
+            disabled={loading}
           >
             <X size={18} />
           </button>
         </div>
 
+        {/* Modal Form */}
         <form onSubmit={handleSubmit} className="modal-form student-form">
-          {error && (
-            <div className="alert alert-error">
-              <AlertCircle size={16} className="flex-shrink-0" />
-              <span>{error}</span>
-            </div>
-          )}
+          <div className="form-scrollable student-form-scrollable">
+            {/* Global API Error Alert */}
+            {error && (
+              <div className="alert alert-error">
+                <AlertCircle size={16} className="flex-shrink-0" />
+                <span>{error}</span>
+              </div>
+            )}
 
-          <div className="student-form-scrollable">
-            {/* 1. PERSONAL INFORMATION */}
-            <div className="form-section-group">
-              <h4 className="form-section-title">
-                <User size={16} />
-                <span>1. Personal Information</span>
-              </h4>
+            {/* SECTION 1: Personal Information */}
+            <div className="form-section-card">
+              <div className="form-section-header">
+                <div className="form-section-header-left">
+                  <span className="section-icon"><User size={18} /></span>
+                  <div>
+                    <h4 className="form-section-title">1. Personal Information</h4>
+                    <span className="form-section-desc">Primary beneficiary identity and basic demographics</span>
+                  </div>
+                </div>
+              </div>
 
-              <div className="form-row-3">
+              <div className="form-grid-3">
                 <div className="form-group">
-                  <label htmlFor="student-regNum">Registration Number *</label>
+                  <label htmlFor="student-regNum">
+                    Registration Number <span className="required-star">*</span>
+                  </label>
                   <input
                     id="student-regNum"
                     type="text"
@@ -266,14 +316,20 @@ export default function StudentForm({
                     placeholder="e.g. STU-2026-001"
                     disabled={loading}
                     className="input-uppercase"
+                    required
                   />
                   {validationErrors.registrationNumber && (
-                    <span className="field-error-text">{validationErrors.registrationNumber}</span>
+                    <span className="field-error-text">
+                      <AlertCircle size={13} />
+                      {validationErrors.registrationNumber}
+                    </span>
                   )}
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="student-firstName">First Name *</label>
+                  <label htmlFor="student-firstName">
+                    First Name <span className="required-star">*</span>
+                  </label>
                   <input
                     id="student-firstName"
                     type="text"
@@ -281,14 +337,20 @@ export default function StudentForm({
                     onChange={(e) => setFirstName(e.target.value)}
                     placeholder="e.g. Rahul"
                     disabled={loading}
+                    required
                   />
                   {validationErrors.firstName && (
-                    <span className="field-error-text">{validationErrors.firstName}</span>
+                    <span className="field-error-text">
+                      <AlertCircle size={13} />
+                      {validationErrors.firstName}
+                    </span>
                   )}
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="student-lastName">Last Name *</label>
+                  <label htmlFor="student-lastName">
+                    Last Name <span className="required-star">*</span>
+                  </label>
                   <input
                     id="student-lastName"
                     type="text"
@@ -296,14 +358,18 @@ export default function StudentForm({
                     onChange={(e) => setLastName(e.target.value)}
                     placeholder="e.g. Sharma"
                     disabled={loading}
+                    required
                   />
                   {validationErrors.lastName && (
-                    <span className="field-error-text">{validationErrors.lastName}</span>
+                    <span className="field-error-text">
+                      <AlertCircle size={13} />
+                      {validationErrors.lastName}
+                    </span>
                   )}
                 </div>
               </div>
 
-              <div className="form-row-2">
+              <div className="form-grid-2" style={{ marginTop: '12px' }}>
                 <div className="form-group">
                   <label htmlFor="student-dob">Date of Birth</label>
                   <input
@@ -314,7 +380,10 @@ export default function StudentForm({
                     disabled={loading}
                   />
                   {validationErrors.dateOfBirth && (
-                    <span className="field-error-text">{validationErrors.dateOfBirth}</span>
+                    <span className="field-error-text">
+                      <AlertCircle size={13} />
+                      {validationErrors.dateOfBirth}
+                    </span>
                   )}
                 </div>
 
@@ -327,23 +396,35 @@ export default function StudentForm({
                     className="select-dropdown"
                     disabled={loading}
                   >
-                    <option value="">Select Gender</option>
+                    <option value="">Select Gender (Optional)</option>
                     <option value="male">Male</option>
                     <option value="female">Female</option>
                     <option value="other">Other</option>
+                    <option value="prefer_not_to_say">Prefer not to say</option>
                   </select>
+                  {validationErrors.gender && (
+                    <span className="field-error-text">
+                      <AlertCircle size={13} />
+                      {validationErrors.gender}
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
 
-            {/* 2. CONTACT INFORMATION */}
-            <div className="form-section-group">
-              <h4 className="form-section-title">
-                <Mail size={16} />
-                <span>2. Contact Information</span>
-              </h4>
+            {/* SECTION 2: Contact Information */}
+            <div className="form-section-card">
+              <div className="form-section-header">
+                <div className="form-section-header-left">
+                  <span className="section-icon"><Mail size={18} /></span>
+                  <div>
+                    <h4 className="form-section-title">2. Contact Information</h4>
+                    <span className="form-section-desc">Email and telephone coordinates for alerts and outreach</span>
+                  </div>
+                </div>
+              </div>
 
-              <div className="form-row-2">
+              <div className="form-grid-2">
                 <div className="form-group">
                   <label htmlFor="student-email">Email Address</label>
                   <input
@@ -355,66 +436,118 @@ export default function StudentForm({
                     disabled={loading}
                   />
                   {validationErrors.email && (
-                    <span className="field-error-text">{validationErrors.email}</span>
+                    <span className="field-error-text">
+                      <AlertCircle size={13} />
+                      {validationErrors.email}
+                    </span>
+                  )}
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="student-phone">Phone Number (Indian Mobile)</label>
+                  <input
+                    id="student-phone"
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="+91 98765 43210 or 10-digit mobile"
+                    disabled={loading}
+                  />
+                  {validationErrors.phone && (
+                    <span className="field-error-text">
+                      <AlertCircle size={13} />
+                      {validationErrors.phone}
+                    </span>
+                  )}
+                  <span className="form-help-text">Standard 10-digit Indian mobile starting with 6-9</span>
+                </div>
+              </div>
+            </div>
+
+            {/* SECTION 3: Address Information */}
+            <div className="form-section-card">
+              <div className="form-section-header">
+                <div className="form-section-header-left">
+                  <span className="section-icon"><MapPin size={18} /></span>
+                  <div>
+                    <h4 className="form-section-title">3. Address Information</h4>
+                    <span className="form-section-desc">Residential location, regional territory and postal code</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="form-grid-2">
+                <div className="form-group col-span-2">
+                  <label htmlFor="student-address">Residential Address</label>
+                  <textarea
+                    id="student-address"
+                    rows={2}
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
+                    placeholder="Street address, house/flat number, community or landmark..."
+                    disabled={loading}
+                  />
+                  {validationErrors.address && (
+                    <span className="field-error-text">
+                      <AlertCircle size={13} />
+                      {validationErrors.address}
+                    </span>
+                  )}
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="student-pinCode">PIN Code (6 digits)</label>
+                  <input
+                    id="student-pinCode"
+                    type="text"
+                    maxLength={6}
+                    value={pinCode}
+                    onChange={(e) => setPinCode(e.target.value)}
+                    placeholder="e.g. 560001"
+                    disabled={loading}
+                  />
+                  {validationErrors.pinCode && (
+                    <span className="field-error-text">
+                      <AlertCircle size={13} />
+                      {validationErrors.pinCode}
+                    </span>
+                  )}
+                  <span className="form-help-text">Indian postal code (digits 1-8 followed by 5 digits)</span>
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="student-state">State / Region</label>
+                  <input
+                    id="student-state"
+                    type="text"
+                    value={state}
+                    onChange={(e) => setState(e.target.value)}
+                    placeholder="e.g. Karnataka, Maharashtra"
+                    disabled={loading}
+                  />
+                  {validationErrors.state && (
+                    <span className="field-error-text">
+                      <AlertCircle size={13} />
+                      {validationErrors.state}
+                    </span>
                   )}
                 </div>
               </div>
-
-              <div className="form-group">
-                <label htmlFor="student-address">Residential Address</label>
-                <textarea
-                  id="student-address"
-                  rows={2}
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                  placeholder="Street, Community, City, District, PIN..."
-                  disabled={loading}
-                />
-              </div>
             </div>
 
-            {/* 3. GUARDIAN INFORMATION */}
-            <div className="form-section-group">
-              <h4 className="form-section-title">
-                <Heart size={16} />
-                <span>3. Guardian Information</span>
-              </h4>
-
-              <div className="form-row-3">
-                <div className="form-group">
-                  <label htmlFor="student-guardianName">Guardian Name</label>
-                  <input
-                    id="student-guardianName"
-                    type="text"
-                    value={guardianName}
-                    onChange={(e) => setGuardianName(e.target.value)}
-                    placeholder="e.g. Suresh Sharma"
-                    disabled={loading}
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="student-guardianRel">Relationship</label>
-                  <input
-                    id="student-guardianRel"
-                    type="text"
-                    value={guardianRelationship}
-                    onChange={(e) => setGuardianRelationship(e.target.value)}
-                    placeholder="e.g. Father, Mother, Guardian"
-                    disabled={loading}
-                  />
+            {/* SECTION 4: Educational / Beneficiary Details */}
+            <div className="form-section-card">
+              <div className="form-section-header">
+                <div className="form-section-header-left">
+                  <span className="section-icon"><School size={18} /></span>
+                  <div>
+                    <h4 className="form-section-title">4. Educational & Beneficiary Details</h4>
+                    <span className="form-section-desc">Current academic level, institutional background, and guardian</span>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* 4. EDUCATION INFORMATION */}
-            <div className="form-section-group">
-              <h4 className="form-section-title">
-                <School size={16} />
-                <span>4. Education Information</span>
-              </h4>
-
-              <div className="form-row-2">
+              <div className="form-grid-2">
                 <div className="form-group">
                   <label htmlFor="student-eduLevel">Education Level</label>
                   <input
@@ -422,7 +555,7 @@ export default function StudentForm({
                     type="text"
                     value={educationLevel}
                     onChange={(e) => setEducationLevel(e.target.value)}
-                    placeholder="e.g. Class 10, Secondary, Diploma"
+                    placeholder="e.g. Class 10, Secondary, Diploma, Undergraduate"
                     disabled={loading}
                   />
                 </div>
@@ -438,51 +571,50 @@ export default function StudentForm({
                     disabled={loading}
                   />
                 </div>
-              </div>
-            </div>
 
-            {/* 5. USER ACCOUNT LINKING (OPTIONAL) */}
-            <div className="form-section-group">
-              <h4 className="form-section-title">
-                <ShieldCheck size={16} />
-                <span>5. User Login Account (Optional)</span>
-              </h4>
-
-              <div className="form-group">
-                <label htmlFor="student-userId">Linked User Account</label>
-                <select
-                  id="student-userId"
-                  value={userId}
-                  onChange={(e) => setUserId(e.target.value)}
-                  className="select-dropdown"
-                  disabled={loading || loadingUsers}
-                >
-                  <option value="">None (Beneficiary Profile Only - No Web Login)</option>
-                  {studentUsers.map((u) => {
-                    const uId = u._id || u.id;
-                    return (
-                      <option key={uId} value={uId}>
-                        {u.firstName} {u.lastName} ({u.email})
-                      </option>
-                    );
-                  })}
-                </select>
-                <span className="form-help-text">
-                  Link an existing student login account so the student can access their profile directly.
-                </span>
-              </div>
-            </div>
-
-            {/* 6. STATUS & NOTES */}
-            <div className="form-section-group">
-              <h4 className="form-section-title">
-                <FileText size={16} />
-                <span>6. Status & Additional Notes</span>
-              </h4>
-
-              <div className="form-row-2">
                 <div className="form-group">
-                  <label htmlFor="student-status">Enrollment Status *</label>
+                  <label htmlFor="student-guardianName">Guardian / Parent Name</label>
+                  <input
+                    id="student-guardianName"
+                    type="text"
+                    value={guardianName}
+                    onChange={(e) => setGuardianName(e.target.value)}
+                    placeholder="e.g. Suresh Sharma"
+                    disabled={loading}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="student-guardianRel">Guardian Relationship</label>
+                  <input
+                    id="student-guardianRel"
+                    type="text"
+                    value={guardianRelationship}
+                    onChange={(e) => setGuardianRelationship(e.target.value)}
+                    placeholder="e.g. Father, Mother, Legal Guardian, Sister"
+                    disabled={loading}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* SECTION 5: Additional Information & Account Linking */}
+            <div className="form-section-card">
+              <div className="form-section-header">
+                <div className="form-section-header-left">
+                  <span className="section-icon"><FileText size={18} /></span>
+                  <div>
+                    <h4 className="form-section-title">5. Status, System Account & Notes</h4>
+                    <span className="form-section-desc">Lifecycle enrollment status, optional web login link, and counselor notes</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="form-grid-2">
+                <div className="form-group">
+                  <label htmlFor="student-status">
+                    Enrollment Status <span className="required-star">*</span>
+                  </label>
                   <select
                     id="student-status"
                     value={status}
@@ -490,28 +622,53 @@ export default function StudentForm({
                     className="select-dropdown"
                     disabled={loading}
                   >
-                    <option value="active">Active (Currently Enrolled)</option>
-                    <option value="graduated">Graduated (Completed Program)</option>
+                    <option value="active">Active (Enrolled in Programs)</option>
+                    <option value="graduated">Graduated (Completed Programs)</option>
                     <option value="transferred">Transferred (Moved to Another Center)</option>
                     <option value="inactive">Inactive (Suspended / On Leave)</option>
                   </select>
                 </div>
-              </div>
 
-              <div className="form-group">
-                <label htmlFor="student-notes">Notes & Observations</label>
-                <textarea
-                  id="student-notes"
-                  rows={2}
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  placeholder="Special needs, achievements, background context..."
-                  disabled={loading}
-                />
+                <div className="form-group">
+                  <label htmlFor="student-userId">Linked User Login (Optional)</label>
+                  <select
+                    id="student-userId"
+                    value={userId}
+                    onChange={(e) => setUserId(e.target.value)}
+                    className="select-dropdown"
+                    disabled={loading || loadingUsers}
+                  >
+                    <option value="">None (Beneficiary Profile Only - No Web Login)</option>
+                    {studentUsers.map((u) => {
+                      const uId = u._id || u.id;
+                      return (
+                        <option key={uId} value={uId}>
+                          {u.firstName} {u.lastName} ({u.email})
+                        </option>
+                      );
+                    })}
+                  </select>
+                  <span className="form-help-text">
+                    Link an existing user account so this beneficiary can sign in to view their profile.
+                  </span>
+                </div>
+
+                <div className="form-group col-span-2">
+                  <label htmlFor="student-notes">Notes & Observations</label>
+                  <textarea
+                    id="student-notes"
+                    rows={2}
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    placeholder="Special requirements, strengths, counseling notes, or background context..."
+                    disabled={loading}
+                  />
+                </div>
               </div>
             </div>
           </div>
 
+          {/* Modal Actions */}
           <div className="modal-actions">
             <button 
               type="button" 
@@ -526,6 +683,7 @@ export default function StudentForm({
               className="btn-primary" 
               disabled={loading}
             >
+              {loading && <Loader2 size={16} className="animate-spin" style={{ marginRight: '6px' }} />}
               {loading 
                 ? (mode === 'create' ? 'Creating Student...' : 'Saving Changes...') 
                 : (mode === 'create' ? 'Create Student' : 'Save Changes')

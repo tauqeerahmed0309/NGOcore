@@ -33,7 +33,7 @@ const optionalObjectIdSchema = z
     return val;
   });
 
-// Helper for dateOfBirth
+// Helper for dateOfBirth with explicit Indian DD/MM/YYYY and ISO support, future check, and age plausibility
 const optionalDateSchema = z
   .union([
     z.string().trim(),
@@ -46,7 +46,153 @@ const optionalDateSchema = z
   .transform((val) => {
     if (val === undefined) return undefined;
     if (!val || val === '') return null;
-    return new Date(val);
+    if (val instanceof Date) return val;
+
+    const str = String(val).trim();
+    // Check DD/MM/YYYY or DD-MM-YYYY format
+    const dmyMatch = str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+    if (dmyMatch) {
+      const day = parseInt(dmyMatch[1], 10);
+      const month = parseInt(dmyMatch[2], 10);
+      const year = parseInt(dmyMatch[3], 10);
+      if (month < 1 || month > 12) throw new Error('Invalid month in date of birth');
+      const daysInMonth = new Date(year, month, 0).getDate();
+      if (day < 1 || day > daysInMonth) throw new Error('Invalid day in date of birth');
+      return new Date(Date.UTC(year, month - 1, day));
+    }
+
+    // Check ISO YYYY-MM-DD
+    const isoMatch = str.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (isoMatch) {
+      const year = parseInt(isoMatch[1], 10);
+      const month = parseInt(isoMatch[2], 10);
+      const day = parseInt(isoMatch[3], 10);
+      if (month < 1 || month > 12) throw new Error('Invalid month in date of birth');
+      const daysInMonth = new Date(year, month, 0).getDate();
+      if (day < 1 || day > daysInMonth) throw new Error('Invalid day in date of birth');
+      return new Date(Date.UTC(year, month - 1, day));
+    }
+
+    const d = new Date(str);
+    if (Number.isNaN(d.getTime())) throw new Error('Invalid date format for date of birth');
+    return d;
+  })
+  .refine((date) => {
+    if (!date) return true;
+    return date <= new Date();
+  }, {
+    message: 'Date of birth cannot be in the future'
+  })
+  .refine((date) => {
+    if (!date) return true;
+    const age = (new Date() - date) / (365.25 * 24 * 3600 * 1000);
+    return age <= 120;
+  }, {
+    message: 'Date of birth indicates an implausible age (> 120 years)'
+  });
+
+// Helper for Indian Phone validation & normalization (+91 XXXXX XXXXX)
+const optionalPhoneSchema = z
+  .union([
+    z.string().trim(),
+    z.literal(''),
+    z.null(),
+    z.undefined()
+  ])
+  .optional()
+  .transform((val) => {
+    if (val === undefined) return undefined;
+    if (val === null || val === '') return '';
+    return String(val).trim();
+  })
+  .refine((val) => {
+    if (!val) return true;
+    const cleaned = val.replace(/[\s\-\(\)\.]/g, '');
+    if (!/^\+?[0-9]+$/.test(cleaned)) return false;
+    let digits = cleaned;
+    if (digits.startsWith('+91')) digits = digits.slice(3);
+    else if (digits.startsWith('91') && digits.length === 12) digits = digits.slice(2);
+    else if (digits.startsWith('0') && digits.length === 11) digits = digits.slice(1);
+    if (/^0+$/.test(digits)) return false;
+    if (digits.length !== 10) return false;
+    return /^[6-9]/.test(digits);
+  }, {
+    message: 'Phone number must be a valid 10-digit Indian mobile number starting with digits 6-9'
+  })
+  .transform((val) => {
+    if (!val) return '';
+    const cleaned = val.replace(/[\s\-\(\)\.]/g, '');
+    let digits = cleaned;
+    if (digits.startsWith('+91')) digits = digits.slice(3);
+    else if (digits.startsWith('91') && digits.length === 12) digits = digits.slice(2);
+    else if (digits.startsWith('0') && digits.length === 11) digits = digits.slice(1);
+    return `+91 ${digits.slice(0, 5)} ${digits.slice(5)}`;
+  });
+
+// Helper for Indian 6-digit PIN code validation
+const optionalPinCodeSchema = z
+  .union([
+    z.string().trim(),
+    z.literal(''),
+    z.null(),
+    z.undefined()
+  ])
+  .optional()
+  .transform((val) => {
+    if (val === undefined) return undefined;
+    if (val === null || val === '') return '';
+    return String(val).replace(/\s+/g, '');
+  })
+  .refine((val) => {
+    if (!val) return true;
+    return /^[1-8][0-9]{5}$/.test(val);
+  }, {
+    message: 'PIN code must be a valid 6-digit Indian postal code starting with digits 1-8'
+  });
+
+// Helper for Indian State
+const optionalStateSchema = z
+  .union([
+    z.string().trim().max(100, 'State name cannot exceed 100 characters'),
+    z.literal(''),
+    z.null(),
+    z.undefined()
+  ])
+  .optional()
+  .transform((val) => {
+    if (val === undefined) return undefined;
+    if (val === null || val === '') return '';
+    return String(val).trim();
+  });
+
+// Helper for optional strings (handles string, empty string, null, or undefined safely)
+const optionalStringSchema = z
+  .union([
+    z.string().trim(),
+    z.literal(''),
+    z.null(),
+    z.undefined()
+  ])
+  .optional()
+  .transform((val) => {
+    if (val === undefined || val === null) return '';
+    return String(val).trim();
+  });
+
+// Helper for optional gender (handles allowed genders, empty string, null, or undefined)
+const optionalGenderSchema = z
+  .union([
+    z.enum(allowedGenders, {
+      errorMap: () => ({ message: 'Gender must be male, female, other, or prefer_not_to_say' })
+    }),
+    z.literal(''),
+    z.null(),
+    z.undefined()
+  ])
+  .optional()
+  .transform((val) => {
+    if (val === undefined || val === null) return '';
+    return val;
   });
 
 const createStudentSchema = z
@@ -66,25 +212,23 @@ const createStudentSchema = z
       .min(1, 'Last name cannot be empty'),
     userId: optionalObjectIdSchema,
     dateOfBirth: optionalDateSchema,
-    gender: z
-      .enum(allowedGenders, {
-        errorMap: () => ({ message: 'Gender must be male, female, other, or prefer_not_to_say' })
-      })
-      .optional()
-      .default(''),
+    gender: optionalGenderSchema.default(''),
     email: optionalEmailSchema.default(''),
-    address: z.string().trim().optional().default(''),
-    guardianName: z.string().trim().optional().default(''),
-    guardianRelationship: z.string().trim().optional().default(''),
-    educationLevel: z.string().trim().optional().default(''),
-    schoolName: z.string().trim().optional().default(''),
+    phone: optionalPhoneSchema.default(''),
+    address: optionalStringSchema.default(''),
+    pinCode: optionalPinCodeSchema.default(''),
+    state: optionalStateSchema.default(''),
+    guardianName: optionalStringSchema.default(''),
+    guardianRelationship: optionalStringSchema.default(''),
+    educationLevel: optionalStringSchema.default(''),
+    schoolName: optionalStringSchema.default(''),
     status: z
       .enum(allowedStatuses, {
         errorMap: () => ({ message: 'Status must be active, graduated, transferred, or inactive' })
       })
       .optional()
       .default('active'),
-    notes: z.string().optional().default('')
+    notes: optionalStringSchema.default('')
   })
   .strict();
 
@@ -100,23 +244,22 @@ const updateStudentSchema = z
     lastName: z.string().trim().min(1, 'Last name cannot be empty').optional(),
     userId: optionalObjectIdSchema,
     dateOfBirth: optionalDateSchema,
-    gender: z
-      .enum(allowedGenders, {
-        errorMap: () => ({ message: 'Gender must be male, female, other, or prefer_not_to_say' })
-      })
-      .optional(),
+    gender: optionalGenderSchema,
     email: optionalEmailSchema,
-    address: z.string().trim().optional(),
-    guardianName: z.string().trim().optional(),
-    guardianRelationship: z.string().trim().optional(),
-    educationLevel: z.string().trim().optional(),
-    schoolName: z.string().trim().optional(),
+    phone: optionalPhoneSchema,
+    address: optionalStringSchema,
+    pinCode: optionalPinCodeSchema,
+    state: optionalStateSchema,
+    guardianName: optionalStringSchema,
+    guardianRelationship: optionalStringSchema,
+    educationLevel: optionalStringSchema,
+    schoolName: optionalStringSchema,
     status: z
       .enum(allowedStatuses, {
         errorMap: () => ({ message: 'Status must be active, graduated, transferred, or inactive' })
       })
       .optional(),
-    notes: z.string().optional()
+    notes: optionalStringSchema
   })
   .strict();
 

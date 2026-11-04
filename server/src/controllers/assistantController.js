@@ -3,7 +3,13 @@ const Program = require('../models/Program');
 const { successResponse, errorResponse } = require('../utils/apiResponse');
 const { writeAuditLog } = require('../services/auditService');
 const { analyzeRecords, applyReview } = require('../services/dataAssistantService');
-const { summarizeMetrics } = require('../services/aiSummaryService');
+const {
+  summarizeMetrics,
+  getProviderStatus,
+  explainFinding: explainFindingAi,
+  explainDuplicate: explainDuplicateAi,
+  suggestNormalization: suggestNormalizationAi
+} = require('../services/aiProviderService');
 
 const recordModels = {
   students: Student,
@@ -120,4 +126,84 @@ const insights = async (req, res, next) => {
   }
 };
 
-module.exports = { analyze, review, insights };
+const aiStatus = async (req, res, next) => {
+  try {
+    const status = getProviderStatus();
+    return successResponse(res, 200, 'AI provider status retrieved.', status);
+  } catch (error) {
+    return next(error);
+  }
+};
+
+const explainFinding = async (req, res, next) => {
+  try {
+    const { issueType, field, currentValue, suggestedValue } = req.body;
+    const result = await explainFindingAi({ issueType, field, currentValue, suggestedValue });
+    if (!result.success) {
+      return successResponse(res, 200, 'AI explanation is currently unavailable.', {
+        available: false,
+        reason: result.reason,
+        error: result.error
+      });
+    }
+    return successResponse(res, 200, 'AI finding explanation ready.', {
+      available: true,
+      ...result.data,
+      meta: result.meta
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+const explainDuplicate = async (req, res, next) => {
+  try {
+    const { score, reason, matchedFields, recordLabel, relatedRecordLabel } = req.body;
+    const result = await explainDuplicateAi({ score, reason, matchedFields, recordLabel, relatedRecordLabel });
+    if (!result.success) {
+      return successResponse(res, 200, 'AI explanation is currently unavailable.', {
+        available: false,
+        reason: result.reason,
+        error: result.error
+      });
+    }
+    return successResponse(res, 200, 'AI duplicate explanation ready.', {
+      available: true,
+      ...result.data,
+      meta: result.meta
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+const normalizeText = async (req, res, next) => {
+  try {
+    const { text, fieldType } = req.body;
+    const result = await suggestNormalizationAi({ text, fieldType });
+    if (!result.success) {
+      return successResponse(res, 200, 'AI text normalization is currently unavailable.', {
+        available: false,
+        reason: result.reason,
+        error: result.error
+      });
+    }
+    return successResponse(res, 200, 'AI text normalization suggestion ready.', {
+      available: true,
+      ...result.data,
+      meta: result.meta
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+module.exports = {
+  analyze,
+  review,
+  insights,
+  aiStatus,
+  explainFinding,
+  explainDuplicate,
+  normalizeText
+};

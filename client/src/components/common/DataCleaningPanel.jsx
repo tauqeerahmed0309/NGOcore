@@ -108,7 +108,15 @@ export default function DataCleaningPanel({ recordType, onApplied }) {
                         <strong>{flag.recordLabel}</strong>
                         {flag.relatedRecordLabel && <small>Matches: {flag.relatedRecordLabel}</small>}
                       </td>
-                      <td><span className="data-issue-badge">{issueLabel(flag.type)}</span><small>{flag.description}</small></td>
+                      <td>
+                        <span className="data-issue-badge">{issueLabel(flag.type)}</span>
+                        {flag.severity && (
+                          <span className={`data-issue-badge severity-${flag.severity}`} style={{ marginLeft: 6, textTransform: 'uppercase', fontSize: '0.7rem' }}>
+                            {flag.severity}
+                          </span>
+                        )}
+                        <small>{flag.description}</small>
+                      </td>
                       <td>{formatValue(flag.currentValue)}</td>
                       <td>
                         {flag.type === 'possible_duplicate'

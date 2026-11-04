@@ -34,6 +34,7 @@ const listStudents = async (
       { firstName: searchRegex },
       { lastName: searchRegex },
       { email: searchRegex },
+      { phone: searchRegex },
       { schoolName: searchRegex }
     ];
   }
@@ -101,8 +102,37 @@ const createStudent = async (data, createdById, ngoId, ngoFilter) => {
     }
   }
 
+  const parseFlexibleDate = (val) => {
+    if (!val) return val;
+    if (val instanceof Date) return val;
+    const str = String(val).trim();
+    const dmyMatch = str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+    if (dmyMatch) {
+      const day = parseInt(dmyMatch[1], 10);
+      const month = parseInt(dmyMatch[2], 10);
+      const year = parseInt(dmyMatch[3], 10);
+      return new Date(Date.UTC(year, month - 1, day));
+    }
+    return val;
+  };
+
+  const normalizePhone = (val) => {
+    if (!val) return val;
+    const cleaned = String(val).replace(/[\s\-\(\)\.]/g, '');
+    let digits = cleaned;
+    if (digits.startsWith('+91')) digits = digits.slice(3);
+    else if (digits.startsWith('91') && digits.length === 12) digits = digits.slice(2);
+    else if (digits.startsWith('0') && digits.length === 11) digits = digits.slice(1);
+    if (/^[6-9]\d{9}$/.test(digits)) {
+      return `+91 ${digits.slice(0, 5)} ${digits.slice(5)}`;
+    }
+    return val;
+  };
+
   const newStudent = await Student.create({
     ...data,
+    phone: normalizePhone(data.phone),
+    dateOfBirth: parseFlexibleDate(data.dateOfBirth),
     ngoId,
     registrationNumber: cleanRegNo,
     createdBy: createdById
@@ -210,7 +240,10 @@ const updateStudent = async (id, data, ngoFilter) => {
     'dateOfBirth',
     'gender',
     'email',
+    'phone',
     'address',
+    'pinCode',
+    'state',
     'guardianName',
     'guardianRelationship',
     'educationLevel',
@@ -221,6 +254,30 @@ const updateStudent = async (id, data, ngoFilter) => {
 
   updatableFields.forEach((field) => {
     if (data[field] !== undefined) {
+      if (field === 'phone' && data[field]) {
+        const cleaned = String(data[field]).replace(/[\s\-\(\)\.]/g, '');
+        let digits = cleaned;
+        if (digits.startsWith('+91')) digits = digits.slice(3);
+        else if (digits.startsWith('91') && digits.length === 12) digits = digits.slice(2);
+        else if (digits.startsWith('0') && digits.length === 11) digits = digits.slice(1);
+        if (/^[6-9]\d{9}$/.test(digits)) {
+          student[field] = `+91 ${digits.slice(0, 5)} ${digits.slice(5)}`;
+          return;
+        }
+      }
+      if (field === 'dateOfBirth') {
+        const val = data[field];
+        if (val && typeof val === 'string') {
+          const dmyMatch = val.trim().match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+          if (dmyMatch) {
+            const day = parseInt(dmyMatch[1], 10);
+            const month = parseInt(dmyMatch[2], 10);
+            const year = parseInt(dmyMatch[3], 10);
+            student[field] = new Date(Date.UTC(year, month - 1, day));
+            return;
+          }
+        }
+      }
       student[field] = data[field];
     }
   });

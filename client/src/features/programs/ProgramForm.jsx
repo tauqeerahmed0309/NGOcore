@@ -10,14 +10,16 @@ import {
   AlertCircle, 
   Layers, 
   Award,
+  Loader2,
+  FileText
 } from 'lucide-react';
 import programService from './programService';
 import userService from '../users/userService';
 
 const PRESET_TYPES = [
+  { value: 'workshop', label: 'Workshop' },
   { value: 'class', label: 'School Class' },
   { value: 'course', label: 'Course' },
-  { value: 'workshop', label: 'Workshop' },
   { value: 'training', label: 'Vocational / Skill Training' },
   { value: 'awareness', label: 'Awareness Campaign' },
   { value: 'event', label: 'Community Event' },
@@ -54,28 +56,29 @@ export default function ProgramForm({
   onClose,
   onSuccess
 }) {
-  // Basic Info
+  // 1. Program Information
   const [name, setName] = useState('');
   const [code, setCode] = useState('');
   const [selectedType, setSelectedType] = useState('workshop');
   const [customType, setCustomType] = useState('');
   const [category, setCategory] = useState('Education');
-  const [description, setDescription] = useState('');
 
-  // Schedule
+  // 2. Description & Custom Attributes
+  const [description, setDescription] = useState('');
+  const [customAttributesList, setCustomAttributesList] = useState([]);
+
+  // 3. Schedule, Timing & Location
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [frequency, setFrequency] = useState('weekly');
   const [selectedDays, setSelectedDays] = useState(['saturday', 'sunday']);
   const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
-
-  // Location & Capacity
   const [location, setLocation] = useState('');
-  const [capacity, setCapacity] = useState('');
-  const [status, setStatus] = useState('active');
 
-  // People & Assignments
+  // 4. Status & Assignments
+  const [status, setStatus] = useState('active');
+  const [capacity, setCapacity] = useState('');
   const [coordinator, setCoordinator] = useState('');
   const [assignedStaff, setAssignedStaff] = useState([]);
   const [assignedVolunteers, setAssignedVolunteers] = useState([]);
@@ -83,9 +86,6 @@ export default function ProgramForm({
   // Available users list
   const [usersList, setUsersList] = useState([]);
   const [loadingUsers, setLoadingUsers] = useState(false);
-
-  // Dynamic Custom Attributes: [{ key: '', value: '' }]
-  const [customAttributesList, setCustomAttributesList] = useState([]);
 
   // Form State
   const [loading, setLoading] = useState(false);
@@ -95,22 +95,27 @@ export default function ProgramForm({
   // Fetch available users for coordinator, staff, and volunteers
   useEffect(() => {
     if (isOpen) {
+      let isMounted = true;
       const fetchUsers = async () => {
         setLoadingUsers(true);
         try {
           const res = await userService.getUsers({ limit: 100 });
-          if (res.success && res.data?.users) {
-            // Only active users
+          if (isMounted && res.success && res.data?.users) {
             const activeUsers = res.data.users.filter((u) => u.isActive);
             setUsersList(activeUsers);
           }
         } catch (err) {
-          setError(err.message || 'Could not load users for program assignments.');
+          if (isMounted) {
+            setError(err.message || 'Could not load users for program assignments.');
+          }
         } finally {
-          setLoadingUsers(false);
+          if (isMounted) setLoadingUsers(false);
         }
       };
       fetchUsers();
+      return () => {
+        isMounted = false;
+      };
     }
   }, [isOpen]);
 
@@ -124,14 +129,14 @@ export default function ProgramForm({
         setName(programToEdit.name || '');
         setCode(programToEdit.code || '');
 
-        const existingType = programToEdit.type || '';
-        const isPreset = PRESET_TYPES.some((pt) => pt.value === existingType);
+        const existingType = (programToEdit.type || '').toLowerCase();
+        const isPreset = PRESET_TYPES.some((pt) => pt.value === existingType && pt.value !== 'custom');
         if (isPreset) {
           setSelectedType(existingType);
           setCustomType('');
         } else {
           setSelectedType('custom');
-          setCustomType(existingType);
+          setCustomType(programToEdit.type || '');
         }
 
         setCategory(programToEdit.category || 'Education');
@@ -256,10 +261,16 @@ export default function ProgramForm({
   };
 
   const handleRemoveAttribute = (index) => {
-    setCustomAttributesList(customAttributesList.filter((_, i) => i !== index));
+    setCustomAttributesList(customAttributesList.filter((_, idx) => idx !== index));
   };
 
-  // Validation
+  // Filter candidates by role
+  const coordinatorCandidates = usersList.filter(
+    (u) => u.role === 'admin' || u.role === 'ngo_admin' || u.role === 'staff'
+  );
+  const staffCandidates = usersList.filter((u) => u.role === 'staff');
+  const volunteerCandidates = usersList.filter((u) => u.role === 'volunteer');
+
   const validateForm = () => {
     const errors = {};
 
@@ -269,13 +280,15 @@ export default function ProgramForm({
 
     if (!code.trim()) {
       errors.code = 'Program Code is required';
-    } else if (code.trim().length < 3) {
-      errors.code = 'Program Code must be at least 3 characters';
+    } else if (code.trim().length < 2) {
+      errors.code = 'Program Code must be at least 2 characters';
     }
 
-    const effectiveType = selectedType === 'custom' ? customType.trim() : selectedType;
+    const effectiveType = (
+      selectedType === 'custom' ? customType.trim() : selectedType
+    );
     if (!effectiveType) {
-      errors.type = 'Program Type is required. Enter a custom type name.';
+      errors.type = 'Program Type is required';
     }
 
     if (startDate && endDate) {
@@ -284,7 +297,7 @@ export default function ProgramForm({
       }
     }
 
-    if (capacity && capacity.trim() !== '') {
+    if (capacity && String(capacity).trim() !== '') {
       const capNum = parseInt(capacity, 10);
       if (isNaN(capNum) || capNum <= 0) {
         errors.capacity = 'Capacity must be a positive integer greater than zero';
@@ -297,6 +310,7 @@ export default function ProgramForm({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (loading) return; // Prevent double-clicking
     setError('');
 
     if (!validateForm()) return;
@@ -331,11 +345,11 @@ export default function ProgramForm({
           frequency: frequency.trim()
         },
         location: location.trim(),
-        capacity: capacity ? parseInt(capacity, 10) : null,
-        status,
+        capacity: capacity && String(capacity).trim() !== '' ? parseInt(capacity, 10) : null,
+        status: status || 'active',
         coordinator: coordinator || null,
-        assignedStaff,
-        assignedVolunteers,
+        assignedStaff: Array.isArray(assignedStaff) ? assignedStaff : [],
+        assignedVolunteers: Array.isArray(assignedVolunteers) ? assignedVolunteers : [],
         customAttributes: customAttributesObj
       };
 
@@ -367,28 +381,25 @@ export default function ProgramForm({
     }
   };
 
-  // Grouped active users for assignments
-  const coordinatorCandidates = usersList.filter(
-    (u) => u.role === 'admin' || u.role === 'ngo_admin' || u.role === 'staff'
-  );
-  const staffCandidates = usersList.filter((u) => u.role === 'staff');
-  const volunteerCandidates = usersList.filter((u) => u.role === 'volunteer');
-
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div 
         className="modal-container program-form-modal" 
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Modal Header */}
         <div className="modal-header">
           <div className="modal-header-title">
-            <Calendar size={22} className="text-primary" />
+            <div className="program-avatar-modal">
+              <Calendar size={24} className="text-primary" />
+            </div>
             <div>
-              <h3>{mode === 'create' ? 'Create New Program' : 'Edit Program Details'}</h3>
+              <h3>{mode === 'create' ? 'Create New Program / Event' : 'Edit Program Details'}</h3>
               <p className="modal-header-desc">
-                {mode === 'create'
-                  ? 'Define a dynamic NGO course, class, workshop, or community activity'
-                  : `Update specifications for ${programToEdit?.name}`}
+                {mode === 'create' 
+                  ? 'Define educational curricula, community workshops, or field initiatives' 
+                  : `Update specifications for ${programToEdit?.name || ''}`
+                }
               </p>
             </div>
           </div>
@@ -397,63 +408,83 @@ export default function ProgramForm({
             onClick={onClose} 
             className="modal-close-btn"
             aria-label="Close dialog"
+            disabled={loading}
           >
             <X size={18} />
           </button>
         </div>
 
+        {/* Modal Form */}
         <form onSubmit={handleSubmit} className="modal-form program-form">
-          {error && (
-            <div className="alert alert-error">
-              <AlertCircle size={16} className="flex-shrink-0" />
-              <span>{error}</span>
-            </div>
-          )}
+          <div className="form-scrollable program-form-scrollable">
+            {/* Global API Error Alert */}
+            {error && (
+              <div className="alert alert-error">
+                <AlertCircle size={16} className="flex-shrink-0" />
+                <span>{error}</span>
+              </div>
+            )}
 
-          <div className="program-form-scrollable">
-            {/* Section 1: Basic Information */}
-            <div className="form-section-group">
-              <h4 className="form-section-title">
-                <Layers size={16} />
-                <span>1. Basic Information</span>
-              </h4>
+            {/* SECTION 1: Program Information */}
+            <div className="form-section-card">
+              <div className="form-section-header">
+                <div className="form-section-header-left">
+                  <span className="section-icon"><Layers size={18} /></span>
+                  <div>
+                    <h4 className="form-section-title">1. Program Information</h4>
+                    <span className="form-section-desc">Core identifiers, activity classification, and domain category</span>
+                  </div>
+                </div>
+              </div>
 
-              <div className="form-row-2">
+              <div className="form-grid-2">
                 <div className="form-group">
-                  <label htmlFor="program-name">Program Name *</label>
+                  <label htmlFor="program-name">
+                    Program Name <span className="required-star">*</span>
+                  </label>
                   <input
                     id="program-name"
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    placeholder="e.g. Weekend Python Training"
+                    placeholder="e.g. Basic Digital Literacy Workshop"
                     disabled={loading}
+                    required
                   />
                   {validationErrors.name && (
-                    <span className="field-error-text">{validationErrors.name}</span>
+                    <span className="field-error-text">
+                      <AlertCircle size={13} />
+                      {validationErrors.name}
+                    </span>
                   )}
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="program-code">Program Code (Unique) *</label>
+                  <label htmlFor="program-code">
+                    Program Code <span className="required-star">*</span>
+                  </label>
                   <input
                     id="program-code"
                     type="text"
                     value={code}
                     onChange={(e) => setCode(e.target.value.toUpperCase())}
-                    placeholder="e.g. PY-WEEKEND-2026"
+                    placeholder="e.g. PRG-2026-DIG"
                     disabled={loading}
                     className="input-uppercase"
+                    required
                   />
                   {validationErrors.code && (
-                    <span className="field-error-text">{validationErrors.code}</span>
+                    <span className="field-error-text">
+                      <AlertCircle size={13} />
+                      {validationErrors.code}
+                    </span>
                   )}
                 </div>
-              </div>
 
-              <div className="form-row-2">
                 <div className="form-group">
-                  <label htmlFor="program-type">Program Type *</label>
+                  <label htmlFor="program-type">
+                    Program Type <span className="required-star">*</span>
+                  </label>
                   <select
                     id="program-type"
                     value={selectedType}
@@ -467,10 +498,16 @@ export default function ProgramForm({
                       </option>
                     ))}
                   </select>
+                  {validationErrors.type && (
+                    <span className="field-error-text">
+                      <AlertCircle size={13} />
+                      {validationErrors.type}
+                    </span>
+                  )}
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="program-category">Category</label>
+                  <label htmlFor="program-category">Focus Category</label>
                   <select
                     id="program-category"
                     value={category}
@@ -485,49 +522,126 @@ export default function ProgramForm({
                     ))}
                   </select>
                 </div>
-              </div>
 
-              {selectedType === 'custom' && (
-                <div className="form-group">
-                  <label htmlFor="program-custom-type">Enter Custom Program Type *</label>
-                  <input
-                    id="program-custom-type"
-                    type="text"
-                    value={customType}
-                    onChange={(e) => setCustomType(e.target.value)}
-                    placeholder="e.g. Health Awareness, Drone Coding, Community Solar, etc."
-                    disabled={loading}
-                  />
-                  {validationErrors.type && (
-                    <span className="field-error-text">{validationErrors.type}</span>
-                  )}
-                  <span className="form-help-text">
-                    * Define any new program type dynamically without database restrictions.
-                  </span>
-                </div>
-              )}
-
-              <div className="form-group">
-                <label htmlFor="program-description">Description & Objectives</label>
-                <textarea
-                  id="program-description"
-                  rows={2}
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Goals, target beneficiaries, curriculum overview..."
-                  disabled={loading}
-                />
+                {selectedType === 'custom' && (
+                  <div className="form-group col-span-2">
+                    <label htmlFor="program-customType">
+                      Specify Custom Program Type <span className="required-star">*</span>
+                    </label>
+                    <input
+                      id="program-customType"
+                      type="text"
+                      value={customType}
+                      onChange={(e) => setCustomType(e.target.value)}
+                      placeholder="e.g. Robotics Bootcamp, Evening Coaching, Mobile Health Van"
+                      disabled={loading}
+                      required
+                    />
+                  </div>
+                )}
               </div>
             </div>
 
-            {/* Section 2: Schedule & Timeline */}
-            <div className="form-section-group">
-              <h4 className="form-section-title">
-                <Clock size={16} />
-                <span>2. Schedule & Timeline</span>
-              </h4>
+            {/* SECTION 2: Description and Objectives */}
+            <div className="form-section-card">
+              <div className="form-section-header">
+                <div className="form-section-header-left">
+                  <span className="section-icon"><FileText size={18} /></span>
+                  <div>
+                    <h4 className="form-section-title">2. Description and Objectives</h4>
+                    <span className="form-section-desc">Program goals, intended learning outcomes, and custom attributes</span>
+                  </div>
+                </div>
+              </div>
 
-              <div className="form-row-2">
+              <div className="form-grid-2">
+                <div className="form-group col-span-2">
+                  <label htmlFor="program-description">Detailed Description</label>
+                  <textarea
+                    id="program-description"
+                    rows={3}
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    placeholder="Curriculum summary, target age group, prerequisites, and milestone objectives..."
+                    disabled={loading}
+                  />
+                  {validationErrors.description && (
+                    <span className="field-error-text">
+                      <AlertCircle size={13} />
+                      {validationErrors.description}
+                    </span>
+                  )}
+                </div>
+
+                {/* Custom Attributes */}
+                <div className="form-group col-span-2">
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                    <label style={{ margin: 0 }}>Target Attributes & Parameters</label>
+                    <button
+                      type="button"
+                      onClick={handleAddAttribute}
+                      className="btn-add-attr"
+                      disabled={loading}
+                    >
+                      <Plus size={14} />
+                      <span>Add Attribute</span>
+                    </button>
+                  </div>
+                  <span className="form-help-text" style={{ marginBottom: '8px' }}>
+                    Flexible parameters such as Target Age, Language, Certificate Available, Equipment, or Sponsor.
+                  </span>
+
+                  <div className="custom-attrs-list">
+                    {customAttributesList.map((attr, idx) => (
+                      <div key={idx} className="custom-attr-row">
+                        <input
+                          type="text"
+                          value={attr.key}
+                          onChange={(e) => handleUpdateAttribute(idx, 'key', e.target.value)}
+                          placeholder="Attribute Name (e.g. Target Age)"
+                          disabled={loading}
+                        />
+                        <input
+                          type="text"
+                          value={attr.value}
+                          onChange={(e) => handleUpdateAttribute(idx, 'value', e.target.value)}
+                          placeholder="Value (e.g. 15-18 or English)"
+                          disabled={loading}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveAttribute(idx)}
+                          className="btn-icon-danger"
+                          title="Delete attribute"
+                          disabled={loading}
+                        >
+                          <Trash2 size={15} />
+                        </button>
+                      </div>
+                    ))}
+                    {customAttributesList.length === 0 && (
+                      <span className="form-help-text" style={{ fontStyle: 'italic' }}>
+                        No custom attributes defined. Click &quot;Add Attribute&quot; to configure custom parameters.
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* SECTION 3: Schedule, Timing & Location */}
+            <div className="form-section-card">
+              <div className="form-section-header">
+                <div className="form-section-header-left">
+                  <span className="section-icon"><Clock size={18} /></span>
+                  <div>
+                    <h4 className="form-section-title">3. Schedule, Dates and Venue</h4>
+                    <span className="form-section-desc">Date boundaries, weekly calendar days, operating hours, and location</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="form-grid-2">
                 <div className="form-group">
                   <label htmlFor="program-startDate">Start Date</label>
                   <input
@@ -537,6 +651,12 @@ export default function ProgramForm({
                     onChange={(e) => setStartDate(e.target.value)}
                     disabled={loading}
                   />
+                  {validationErrors.startDate && (
+                    <span className="field-error-text">
+                      <AlertCircle size={13} />
+                      {validationErrors.startDate}
+                    </span>
+                  )}
                 </div>
 
                 <div className="form-group">
@@ -549,14 +669,15 @@ export default function ProgramForm({
                     disabled={loading}
                   />
                   {validationErrors.endDate && (
-                    <span className="field-error-text">{validationErrors.endDate}</span>
+                    <span className="field-error-text">
+                      <AlertCircle size={13} />
+                      {validationErrors.endDate}
+                    </span>
                   )}
                 </div>
-              </div>
 
-              <div className="form-row-3">
                 <div className="form-group">
-                  <label htmlFor="program-frequency">Frequency</label>
+                  <label htmlFor="program-frequency">Schedule Frequency</label>
                   <select
                     id="program-frequency"
                     value={frequency}
@@ -565,15 +686,48 @@ export default function ProgramForm({
                     disabled={loading}
                   >
                     <option value="weekly">Weekly</option>
-                    <option value="daily">Daily</option>
+                    <option value="biweekly">Bi-weekly (Fortnightly)</option>
                     <option value="monthly">Monthly</option>
-                    <option value="once">Once (One-time event)</option>
-                    <option value="custom">Custom Schedule</option>
+                    <option value="daily">Daily</option>
+                    <option value="one-time">One-time Event</option>
                   </select>
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="program-startTime">Start Time</label>
+                  <label htmlFor="program-location">Location / Venue</label>
+                  <input
+                    id="program-location"
+                    type="text"
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                    placeholder="e.g. Center Room 2A, Main Hall, or Zoom"
+                    disabled={loading}
+                  />
+                </div>
+
+                <div className="form-group col-span-2">
+                  <label>Scheduled Days of the Week</label>
+                  <div className="days-selector-grid">
+                    {DAYS_OF_WEEK.map((day) => {
+                      const isActive = selectedDays.includes(day);
+                      return (
+                        <button
+                          key={day}
+                          type="button"
+                          onClick={() => handleToggleDay(day)}
+                          className={`day-pill-btn ${isActive ? 'active' : ''}`}
+                          disabled={loading}
+                        >
+                          {day.slice(0, 3)}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <span className="form-help-text">Click to toggle the operating days for this program</span>
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="program-startTime">Daily Start Time</label>
                   <input
                     id="program-startTime"
                     type="time"
@@ -584,7 +738,7 @@ export default function ProgramForm({
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="program-endTime">End Time</label>
+                  <label htmlFor="program-endTime">Daily End Time</label>
                   <input
                     id="program-endTime"
                     type="time"
@@ -594,249 +748,160 @@ export default function ProgramForm({
                   />
                 </div>
               </div>
-
-              <div className="form-group">
-                <label>Recurring Days of Week</label>
-                <div className="days-picker-group">
-                  {DAYS_OF_WEEK.map((day) => {
-                    const isSelected = selectedDays.includes(day);
-                    return (
-                      <button
-                        type="button"
-                        key={day}
-                        onClick={() => handleToggleDay(day)}
-                        className={`day-toggle-btn ${isSelected ? 'selected' : ''}`}
-                      >
-                        {day.slice(0, 3).toUpperCase()}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
             </div>
 
-            {/* Section 3: Location & Capacity */}
-            <div className="form-section-group">
-              <h4 className="form-section-title">
-                <MapPin size={16} />
-                <span>3. Location & Capacity</span>
-              </h4>
+            {/* SECTION 4: Status and Additional Details */}
+            <div className="form-section-card">
+              <div className="form-section-header">
+                <div className="form-section-header-left">
+                  <span className="section-icon"><Users size={18} /></span>
+                  <div>
+                    <h4 className="form-section-title">4. Status, Capacity & Team Assignments</h4>
+                    <span className="form-section-desc">Enrollment capacity, lifecycle state, coordinator, and personnel</span>
+                  </div>
+                </div>
+              </div>
 
-              <div className="form-row-2">
+              <div className="form-grid-2">
                 <div className="form-group">
-                  <label htmlFor="program-location">Location / Classroom / Center</label>
-                  <input
-                    id="program-location"
-                    type="text"
-                    value={location}
-                    onChange={(e) => setLocation(e.target.value)}
-                    placeholder="e.g. Atria Community Center Room 204"
+                  <label htmlFor="program-status">
+                    Program Lifecycle Status <span className="required-star">*</span>
+                  </label>
+                  <select
+                    id="program-status"
+                    value={status}
+                    onChange={(e) => setStatus(e.target.value)}
+                    className="select-dropdown"
                     disabled={loading}
-                  />
+                  >
+                    <option value="active">Active (Enrolling & Conducting Sessions)</option>
+                    <option value="draft">Draft (Planning Phase)</option>
+                    <option value="paused">Paused (Temporarily on Hold)</option>
+                    <option value="completed">Completed (Successfully Concluded)</option>
+                    <option value="cancelled">Cancelled (Terminated)</option>
+                  </select>
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="program-capacity">Capacity (Max Students)</label>
+                  <label htmlFor="program-capacity">Maximum Beneficiary Capacity</label>
                   <input
                     id="program-capacity"
                     type="number"
                     min="1"
                     value={capacity}
                     onChange={(e) => setCapacity(e.target.value)}
-                    placeholder="e.g. 25 (Leave blank if flexible)"
+                    placeholder="e.g. 25 (leave blank for unlimited)"
                     disabled={loading}
                   />
                   {validationErrors.capacity && (
-                    <span className="field-error-text">{validationErrors.capacity}</span>
+                    <span className="field-error-text">
+                      <AlertCircle size={13} />
+                      {validationErrors.capacity}
+                    </span>
                   )}
+                  <span className="form-help-text">Leave blank or empty for unlimited / flexible capacity</span>
                 </div>
-              </div>
 
-              <div className="form-group">
-                <label htmlFor="program-status">Status</label>
-                <select
-                  id="program-status"
-                  value={status}
-                  onChange={(e) => setStatus(e.target.value)}
-                  className="select-dropdown"
-                  disabled={loading}
-                >
-                  <option value="active">Active (Ongoing / Enrolling)</option>
-                  <option value="draft">Draft (Planning stage)</option>
-                  <option value="paused">Paused (Temporarily on hold)</option>
-                  <option value="completed">Completed (Finished activity)</option>
-                  <option value="cancelled">Cancelled (Terminated)</option>
-                </select>
-              </div>
-            </div>
-
-            {/* Section 4: Leadership & Personnel Assignments */}
-            <div className="form-section-group">
-              <h4 className="form-section-title">
-                <Users size={16} />
-                <span>4. Team & Personnel Assignments</span>
-              </h4>
-
-              {/* Coordinator */}
-              <div className="form-group">
-                <label htmlFor="program-coordinator">Lead Coordinator (Staff or Admin)</label>
-                <select
-                  id="program-coordinator"
-                  value={coordinator}
-                  onChange={(e) => setCoordinator(e.target.value)}
-                  className="select-dropdown"
-                  disabled={loading || loadingUsers}
-                >
-                  <option value="">Unassigned (None)</option>
-                  {coordinatorCandidates.map((u) => {
-                    const uId = u._id || u.id;
-                    return (
-                      <option key={uId} value={uId}>
-                        {u.firstName} {u.lastName} ({u.email}) — [{u.role.toUpperCase()}]
-                      </option>
-                    );
-                  })}
-                </select>
-              </div>
-
-              {/* Assigned Staff Multi-check */}
-              <div className="form-group">
-                <label>Assigned Staff (Staff Role Only)</label>
-                <div className="assignments-checklist">
-                  {staffCandidates.length > 0 ? (
-                    staffCandidates.map((staff) => {
-                      const sId = staff._id || staff.id;
-                      const isChecked = assignedStaff.includes(sId);
+                <div className="form-group col-span-2">
+                  <label htmlFor="program-coordinator">Lead Coordinator (Admin or Staff)</label>
+                  <select
+                    id="program-coordinator"
+                    value={coordinator}
+                    onChange={(e) => setCoordinator(e.target.value)}
+                    className="select-dropdown"
+                    disabled={loading || loadingUsers}
+                  >
+                    <option value="">Unassigned (No designated coordinator)</option>
+                    {coordinatorCandidates.map((u) => {
+                      const uId = u._id || u.id;
                       return (
-                        <label key={sId} className="assignment-check-row">
-                          <input
-                            type="checkbox"
-                            checked={isChecked}
-                            onChange={() => handleToggleStaff(sId)}
-                            disabled={loading}
-                          />
-                          <span>
-                            <strong>{staff.firstName} {staff.lastName}</strong> ({staff.email})
-                          </span>
-                        </label>
+                        <option key={uId} value={uId}>
+                          {u.firstName} {u.lastName} ({u.email}) — [{u.role.toUpperCase()}]
+                        </option>
                       );
-                    })
-                  ) : (
-                    <span className="text-dim">No active staff members registered.</span>
-                  )}
+                    })}
+                  </select>
                 </div>
-              </div>
 
-              {/* Assigned Volunteers Multi-check */}
-              <div className="form-group">
-                <label>Assigned Volunteers (Volunteer Role Only)</label>
-                <div className="assignments-checklist">
-                  {volunteerCandidates.length > 0 ? (
-                    volunteerCandidates.map((vol) => {
-                      const vId = vol._id || vol.id;
-                      const isChecked = assignedVolunteers.includes(vId);
-                      return (
-                        <label key={vId} className="assignment-check-row">
-                          <input
-                            type="checkbox"
-                            checked={isChecked}
-                            onChange={() => handleToggleVolunteer(vId)}
-                            disabled={loading}
-                          />
-                          <span>
-                            <strong>{vol.firstName} {vol.lastName}</strong> ({vol.email})
-                          </span>
-                        </label>
-                      );
-                    })
-                  ) : (
-                    <span className="text-dim">No active volunteers registered.</span>
-                  )}
+                {/* Assigned Staff */}
+                <div className="form-group">
+                  <label>Assigned Staff Members (Staff Role)</label>
+                  <div className="user-select-list">
+                    {staffCandidates.length > 0 ? (
+                      staffCandidates.map((staff) => {
+                        const sId = staff._id || staff.id;
+                        const isChecked = assignedStaff.includes(sId);
+                        return (
+                          <label key={sId} className="user-checkbox-item">
+                            <input
+                              type="checkbox"
+                              checked={isChecked}
+                              onChange={() => handleToggleStaff(sId)}
+                              disabled={loading}
+                            />
+                            <span>
+                              <strong>{staff.firstName} {staff.lastName}</strong> ({staff.email})
+                            </span>
+                          </label>
+                        );
+                      })
+                    ) : (
+                      <span className="form-help-text" style={{ padding: '6px' }}>No active staff members registered.</span>
+                    )}
+                  </div>
                 </div>
-              </div>
-            </div>
 
-            {/* Section 5: Dynamic Custom Attributes */}
-            <div className="form-section-group">
-              <div className="section-title-with-btn">
-                <h4 className="form-section-title" style={{ borderBottom: 'none', margin: 0, paddingBottom: 0 }}>
-                  <Award size={16} />
-                  <span>5. Dynamic Custom Attributes</span>
-                </h4>
-                <button
-                  type="button"
-                  onClick={handleAddAttribute}
-                  className="btn-add-attr"
-                >
-                  <Plus size={14} />
-                  <span>Add Attribute</span>
-                </button>
-              </div>
-              <p className="form-help-text">
-                Store custom NGO requirements (e.g. Funding Source, Language, Target Age, Equipment, etc.) without altering code.
-              </p>
-
-              <div className="custom-attr-table">
-                {customAttributesList.map((attr, idx) => (
-                  <div key={idx} className="custom-attr-row">
-                    <input
-                      type="text"
-                      placeholder="Field Name (e.g. Funded By)"
-                      value={attr.key}
-                      onChange={(e) => handleUpdateAttribute(idx, 'key', e.target.value)}
-                      className="attr-key-input"
-                      disabled={loading}
-                    />
-                    <input
-                      type="text"
-                      placeholder="Value (e.g. ABC Foundation)"
-                      value={attr.value}
-                      onChange={(e) => handleUpdateAttribute(idx, 'value', e.target.value)}
-                      className="attr-val-input"
-                      disabled={loading}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveAttribute(idx)}
-                      className="btn-remove-attr"
-                      title="Remove field"
-                      disabled={loading}
-                    >
-                      <Trash2 size={16} />
-                    </button>
+                {/* Assigned Volunteers */}
+                <div className="form-group">
+                  <label>Assigned Volunteers (Volunteer Role)</label>
+                  <div className="user-select-list">
+                    {volunteerCandidates.length > 0 ? (
+                      volunteerCandidates.map((vol) => {
+                        const vId = vol._id || vol.id;
+                        const isChecked = assignedVolunteers.includes(vId);
+                        return (
+                          <label key={vId} className="user-checkbox-item">
+                            <input
+                              type="checkbox"
+                              checked={isChecked}
+                              onChange={() => handleToggleVolunteer(vId)}
+                              disabled={loading}
+                            />
+                            <span>
+                              <strong>{vol.firstName} {vol.lastName}</strong> ({vol.email})
+                            </span>
+                          </label>
+                        );
+                      })
+                    ) : (
+                      <span className="form-help-text" style={{ padding: '6px' }}>No active volunteers registered.</span>
+                    )}
                   </div>
-                ))}
-                {customAttributesList.length === 0 && (
-                  <div className="text-dim" style={{ fontSize: '0.8125rem' }}>
-                    No custom attributes added. Click "+ Add Attribute" to define custom NGO properties.
-                  </div>
-                )}
+                </div>
               </div>
             </div>
           </div>
 
           {/* Modal Actions */}
           <div className="modal-actions">
-            <button
-              type="button"
-              onClick={onClose}
-              className="btn-secondary"
+            <button 
+              type="button" 
+              onClick={onClose} 
+              className="btn-secondary" 
               disabled={loading}
             >
               Cancel
             </button>
-            <button
-              type="submit"
-              className="btn-primary"
+            <button 
+              type="submit" 
+              className="btn-primary" 
               disabled={loading}
             >
-              {loading
-                ? mode === 'create'
-                  ? 'Creating Program...'
-                  : 'Saving Changes...'
-                : mode === 'create'
-                ? 'Create Program'
-                : 'Save Changes'}
+              {loading && <Loader2 size={16} className="animate-spin" style={{ marginRight: '6px' }} />}
+              {loading 
+                ? (mode === 'create' ? 'Creating Program...' : 'Saving Changes...') 
+                : (mode === 'create' ? 'Create Program' : 'Save Changes')
+              }
             </button>
           </div>
         </form>

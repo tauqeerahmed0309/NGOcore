@@ -119,12 +119,24 @@ export default function StudentDetails({ student, isOpen, onClose }) {
             </h4>
             <div className="details-info-grid">
               <div className="info-cell">
+                <div className="info-cell-label">Phone Number</div>
+                <div className="info-cell-value">{student.phone || 'Not provided'}</div>
+              </div>
+              <div className="info-cell">
                 <div className="info-cell-label">Student Email</div>
                 <div className="info-cell-value">{student.email || 'Not provided'}</div>
               </div>
               <div className="info-cell full-width">
                 <div className="info-cell-label">Address</div>
                 <div className="info-cell-value">{student.address || 'Not provided'}</div>
+              </div>
+              <div className="info-cell">
+                <div className="info-cell-label">State / Region</div>
+                <div className="info-cell-value">{student.state || 'Not provided'}</div>
+              </div>
+              <div className="info-cell">
+                <div className="info-cell-label">PIN Code</div>
+                <div className="info-cell-value">{student.pinCode || 'Not provided'}</div>
               </div>
             </div>
           </div>

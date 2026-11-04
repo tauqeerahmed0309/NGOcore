@@ -52,7 +52,22 @@ const studentSchema = new mongoose.Schema(
       default: '',
       index: true
     },
+    phone: {
+      type: String,
+      trim: true,
+      default: ''
+    },
     address: {
+      type: String,
+      trim: true,
+      default: ''
+    },
+    pinCode: {
+      type: String,
+      trim: true,
+      default: ''
+    },
+    state: {
       type: String,
       trim: true,
       default: ''
@@ -120,6 +135,7 @@ const studentSchema = new mongoose.Schema(
 studentSchema.index({ ngoId: 1, status: 1, createdAt: -1 });
 studentSchema.index({ firstName: 1, lastName: 1 });
 studentSchema.index({ schoolName: 1 });
+studentSchema.index({ ngoId: 1, phone: 1 });
 studentSchema.index({ ngoId: 1, registrationNumber: 1 }, { unique: true });
 
 const Student = mongoose.model('Student', studentSchema);

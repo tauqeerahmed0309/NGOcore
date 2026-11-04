@@ -4,8 +4,13 @@ const { connectDB } = require('./config/db');
 const logger = require('./utils/logger');
 
 const startServer = async () => {
-  // Connect to Database
-  await connectDB();
+  try {
+    // Connect to Database (Local or MongoDB Atlas)
+    await connectDB();
+  } catch (error) {
+    logger.error(`FATAL: Database connection failed during server startup. Exiting process: ${error.message}`);
+    process.exit(1);
+  }
 
   // Start HTTP Listener on 0.0.0.0 (required for Render / cloud containers)
   const server = app.listen(config.PORT, '0.0.0.0', () => {

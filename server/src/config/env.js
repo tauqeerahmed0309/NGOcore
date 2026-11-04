@@ -27,11 +27,13 @@ if (!/^\d+d$/.test(refreshExpiresIn) || Number.parseInt(refreshExpiresIn, 10) < 
   throw new Error('FATAL: JWT_REFRESH_EXPIRES_IN must be between 1d and 30d.');
 }
 
+const rawMongoUri = process.env.MONGODB_URI ? process.env.MONGODB_URI.trim() : '';
+
 const config = {
   PORT: parseIntegerEnv('PORT', 5000, 1, 65535),
   NODE_ENV: process.env.NODE_ENV || 'development',
   CLIENT_URL: process.env.CLIENT_URL || 'http://localhost:5173',
-  MONGODB_URI: process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/ngocore_db',
+  MONGODB_URI: rawMongoUri || 'mongodb://127.0.0.1:27017/ngocore_db',
   JWT_SECRET: process.env.JWT_SECRET,
   JWT_EXPIRES_IN: jwtExpiresIn,
   JWT_REFRESH_EXPIRES_IN: refreshExpiresIn,
@@ -46,8 +48,17 @@ const config = {
   MAIL_FROM: process.env.MAIL_FROM || '',
   GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID || '',
   ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY || '',
-  ANTHROPIC_MODEL: process.env.ANTHROPIC_MODEL || 'claude-haiku-4-5-20251001'
+  ANTHROPIC_MODEL: process.env.ANTHROPIC_MODEL || 'claude-haiku-4-5-20251001',
+  GEMINI_ENABLED: process.env.GEMINI_ENABLED === 'true',
+  GEMINI_API_KEY: process.env.GEMINI_API_KEY || '',
+  GEMINI_MODEL: process.env.GEMINI_MODEL || 'gemini-2.5-flash',
+  GEMINI_PII_MODE: process.env.GEMINI_PII_MODE || 'disabled',
+  AI_PROVIDER: process.env.AI_PROVIDER || 'auto'
 };
+
+if (config.GEMINI_PII_MODE && !['disabled', 'anonymized'].includes(config.GEMINI_PII_MODE)) {
+  throw new Error("FATAL: GEMINI_PII_MODE must be either 'disabled' or 'anonymized'.");
+}
 
 if (!config.JWT_SECRET || config.JWT_SECRET.length < 32) {
   throw new Error('FATAL: Set JWT_SECRET to a random value of at least 32 characters.');
@@ -70,10 +81,10 @@ if (process.env.SMTP_SECURE !== undefined && !['true', 'false'].includes(process
 }
 
 if (config.NODE_ENV === 'production') {
-  if (!process.env.MONGODB_URI) {
+  if (!process.env.MONGODB_URI || !process.env.MONGODB_URI.trim()) {
     throw new Error('FATAL: MONGODB_URI must be provided in production.');
   }
-  if (process.env.MONGODB_URI.includes('127.0.0.1') || process.env.MONGODB_URI.includes('localhost')) {
+  if (config.MONGODB_URI.includes('127.0.0.1') || config.MONGODB_URI.includes('localhost')) {
     throw new Error('FATAL: Production MONGODB_URI cannot point to localhost or 127.0.0.1. Please configure your remote MongoDB Atlas connection string.');
   }
 }

@@ -58,6 +58,20 @@ const capacitySchema = z
     return typeof val === 'string' ? parseInt(val, 10) : val;
   });
 
+// Helper for optional strings (handles string, empty string, null, or undefined safely)
+const optionalStringSchema = z
+  .union([
+    z.string().trim(),
+    z.literal(''),
+    z.null(),
+    z.undefined()
+  ])
+  .optional()
+  .transform((val) => {
+    if (val === undefined || val === null) return '';
+    return String(val).trim();
+  });
+
 // Schedule schema
 const scheduleSchema = z
   .object({
@@ -93,12 +107,12 @@ const createProgramSchema = z
       .trim()
       .min(1, 'Program type cannot be empty')
       .toLowerCase(),
-    category: z.string().trim().optional().default(''),
-    description: z.string().trim().optional().default(''),
+    category: optionalStringSchema.default(''),
+    description: optionalStringSchema.default(''),
     startDate: optionalDateSchema,
     endDate: optionalDateSchema,
     schedule: scheduleSchema,
-    location: z.string().trim().optional().default(''),
+    location: optionalStringSchema.default(''),
     coordinator: optionalObjectIdSchema,
     assignedStaff: objectIdArraySchema,
     assignedVolunteers: objectIdArraySchema,
@@ -132,12 +146,12 @@ const updateProgramSchema = z
     name: z.string().trim().min(1, 'Program name cannot be empty').optional(),
     code: z.string().trim().min(1, 'Program code cannot be empty').toUpperCase().optional(),
     type: z.string().trim().min(1, 'Program type cannot be empty').toLowerCase().optional(),
-    category: z.string().trim().optional(),
-    description: z.string().trim().optional(),
+    category: optionalStringSchema,
+    description: optionalStringSchema,
     startDate: optionalDateSchema,
     endDate: optionalDateSchema,
     schedule: scheduleSchema.optional(),
-    location: z.string().trim().optional(),
+    location: optionalStringSchema,
     coordinator: optionalObjectIdSchema,
     assignedStaff: z.array(z.string().trim().regex(/^[0-9a-fA-F]{24}$/, 'Invalid User ID format')).optional(),
     assignedVolunteers: z.array(z.string().trim().regex(/^[0-9a-fA-F]{24}$/, 'Invalid User ID format')).optional(),
