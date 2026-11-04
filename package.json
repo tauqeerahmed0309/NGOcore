@@ -1,0 +1,26 @@
+{
+  "name": "ngocore",
+  "version": "1.0.0",
+  "description": "NGOcore digital record management system",
+  "scripts": {
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev",
+    "start:server": "cd server && npm start",
+    "build:client": "cd client && npm run build",
+    "seed:admin": "cd server && npm run seed:admin",
+    "migrate:ngo": "cd server && npm run migrate:ngo",
+    "test:ngo-isolation": "cd server && npm run test:ngo-isolation",
+    "test:ngo-approval": "cd server && npm run test:ngo-approval",
+    "test:signup": "cd server && npm run test:signup",
+    "test:assistant": "cd server && npm run test:assistant",
+    "test:auth": "cd server && npm run test:auth",
+    "test:users": "cd server && npm run test:users",
+    "test:students": "cd server && npm run test:students",
+    "test:programs": "cd server && npm run test:programs",
+    "test": "cd server && npm test",
+    "test:all": "cd server && npm test"
+  },
+  "keywords": ["ngo", "digital-records", "mongodb", "express", "react", "nodejs"],
+  "author": "",
+  "license": "ISC"
+}
