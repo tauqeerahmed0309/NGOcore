@@ -1,0 +1,1029 @@
+/* ==========================================================================
+   Organization Analytics Dashboard — Stage 2 Styles
+   Professional NGOcore Light Theme System
+   ========================================================================== */
+
+.analytics-dashboard-page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding-bottom: 48px;
+}
+
+/* Page Header & Controls Bar */
+.analytics-header-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 20px;
+  box-shadow: var(--shadow-xs);
+}
+
+.analytics-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.analytics-header-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  background: var(--brand-green-subtle);
+  color: var(--brand-green-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.analytics-header-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.analytics-header-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-top: 3px;
+}
+
+.analytics-controls-right {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Timeframe Filter Buttons */
+.analytics-timeframe-group {
+  display: inline-flex;
+  background: var(--bg-page);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 3px;
+  gap: 2px;
+}
+
+.analytics-timeframe-btn {
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: transparent;
+  transition: all var(--transition-fast);
+}
+
+.analytics-timeframe-btn:hover {
+  color: var(--text-primary);
+}
+
+.analytics-timeframe-btn.active {
+  background: var(--bg-surface);
+  color: var(--brand-green-dark);
+  box-shadow: var(--shadow-xs);
+  border: 1px solid var(--brand-green-border);
+}
+
+.analytics-refresh-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  font-size: 0.825rem;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  transition: all var(--transition-fast);
+}
+
+.analytics-refresh-btn:hover:not(:disabled) {
+  background: var(--bg-hover);
+  border-color: var(--border-strong);
+  color: var(--text-primary);
+}
+
+.analytics-refresh-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Generated At Meta */
+.analytics-meta-badge {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Top KPI Ribbon */
+.analytics-kpi-ribbon {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+}
+
+.analytics-kpi-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: var(--shadow-xs);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.analytics-kpi-card:hover {
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-sm);
+}
+
+.analytics-kpi-icon-box {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.analytics-kpi-icon-box.green {
+  background: var(--brand-green-subtle);
+  color: var(--brand-green-dark);
+}
+
+.analytics-kpi-icon-box.blue {
+  background: var(--status-info-bg);
+  color: var(--status-info);
+}
+
+.analytics-kpi-icon-box.amber {
+  background: var(--status-warning-bg);
+  color: var(--status-warning);
+}
+
+.analytics-kpi-icon-box.purple {
+  background: #f5f3ff;
+  color: #7c3aed;
+}
+
+.analytics-kpi-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.analytics-kpi-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.analytics-kpi-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.2;
+  margin-top: 2px;
+}
+
+.analytics-kpi-subtext {
+  font-size: 0.76rem;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+/* Section Containers & Headers */
+.analytics-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.analytics-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 8px;
+}
+
+.analytics-section-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.analytics-section-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.analytics-section-desc {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* Grid Layouts for Cards */
+.analytics-grid-2col {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+}
+
+.analytics-grid-3col {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.analytics-grid-status-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.analytics-status-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.analytics-status-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.analytics-status-count {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.analytics-status-pct {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* Reusable Analytics Card */
+.analytics-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xs);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.analytics-card-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.analytics-card-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.analytics-card-body {
+  padding: 20px;
+  flex: 1;
+}
+
+/* Trend Area Bar Chart Styles */
+.trend-chart-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.trend-svg-container {
+  width: 100%;
+  position: relative;
+}
+
+.trend-svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.trend-point-group {
+  cursor: pointer;
+  outline: none;
+  transition: transform var(--transition-fast);
+}
+
+.trend-point-group:hover circle,
+.trend-point-group:focus circle {
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+}
+
+.trend-tooltip-bar {
+  min-height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 12px;
+  background: var(--bg-hover);
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+}
+
+.trend-tooltip-content {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.trend-tooltip-badge {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.trend-tooltip-month {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.trend-tooltip-count {
+  color: var(--text-secondary);
+}
+
+.trend-tooltip-placeholder {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+.trend-x-axis {
+  display: flex;
+  justify-content: space-between;
+  gap: 4px;
+  padding: 4px 0;
+  overflow-x: auto;
+}
+
+.trend-x-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-align: center;
+  flex: 1;
+  white-space: nowrap;
+  transition: color var(--transition-fast);
+}
+
+.trend-x-label-active {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* Gender Distribution Chart */
+.gender-chart-container {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.gender-stacked-bar {
+  height: 22px;
+  border-radius: 11px;
+  overflow: hidden;
+  display: flex;
+  background: var(--bg-hover);
+}
+
+.gender-bar-segment {
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.gender-legend-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 12px;
+}
+
+.gender-legend-item {
+  background: var(--bg-page);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.gender-legend-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.gender-legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.gender-legend-name {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.gender-legend-values {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 2px;
+}
+
+.gender-legend-count {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.gender-legend-pct {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 99px;
+}
+
+/* Age Cohort Distribution & DOB Warning */
+.age-cohort-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.analytics-dob-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: #f0f9ff;
+  border: 1px solid #bae6fd;
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  color: #0369a1;
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+.analytics-warning-icon {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: #0284c7;
+}
+
+.analytics-dob-note {
+  display: block;
+  font-size: 0.75rem;
+  color: #075985;
+  margin-top: 2px;
+}
+
+.age-cohort-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.age-cohort-item {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.age-cohort-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.825rem;
+}
+
+.age-cohort-label {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.age-cohort-numbers {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.age-cohort-count {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.age-cohort-pct {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+}
+
+.age-cohort-track {
+  height: 9px;
+  border-radius: 5px;
+  background: var(--bg-hover);
+  overflow: hidden;
+}
+
+.age-cohort-fill {
+  height: 100%;
+  border-radius: 5px;
+  transition: width 0.4s ease;
+}
+
+/* Top States Ranked List */
+.top-states-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.top-state-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.top-state-header {
+  display: flex;
+  align-items: center;
+  font-size: 0.825rem;
+}
+
+.top-state-rank {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  width: 24px;
+}
+
+.top-state-name {
+  font-weight: 600;
+  color: var(--text-primary);
+  flex: 1;
+}
+
+.top-state-metrics {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.top-state-count {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.top-state-pct {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.top-state-bar-track {
+  height: 7px;
+  border-radius: 4px;
+  background: var(--bg-hover);
+  overflow: hidden;
+}
+
+.top-state-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  background: var(--brand-green);
+  transition: width 0.4s ease;
+}
+
+/* Capacity Utilization Gauge Card */
+.capacity-gauge-card {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.capacity-gauge-main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px;
+  background: var(--bg-page);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+}
+
+.capacity-rate-display {
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.capacity-rate-number {
+  font-size: 2.25rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.capacity-rate-subtitle {
+  font-size: 0.825rem;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+.capacity-track {
+  width: 100%;
+  max-width: 320px;
+  height: 12px;
+  border-radius: 6px;
+  background: var(--border);
+  overflow: hidden;
+}
+
+.capacity-fill {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.5s ease;
+}
+
+.capacity-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.capacity-meta-item {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.capacity-meta-label {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+}
+
+.capacity-meta-value {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* Program Roster Table */
+.analytics-roster-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.825rem;
+}
+
+.analytics-roster-table th {
+  padding: 10px 12px;
+  text-align: left;
+  background: var(--bg-page);
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border);
+}
+
+.analytics-roster-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+
+.analytics-roster-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* Attendance Presence Meter Card */
+.attendance-meter-card {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.attendance-rate-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.attendance-rate-label {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.attendance-rate-desc {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.attendance-rate-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--brand-green-subtle);
+  border: 1px solid var(--brand-green-border);
+  border-radius: var(--radius-lg);
+  padding: 8px 16px;
+  color: var(--brand-green-dark);
+}
+
+.attendance-rate-val {
+  font-size: 1.5rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.attendance-stacked-bar {
+  height: 20px;
+  border-radius: 10px;
+  background: var(--bg-hover);
+  overflow: hidden;
+  display: flex;
+}
+
+.attendance-bar-segment {
+  height: 100%;
+  transition: width 0.4s ease;
+}
+
+.attendance-bar-segment.present {
+  background: #16a34a;
+}
+
+.attendance-bar-segment.absent {
+  background: #dc2626;
+}
+
+.attendance-bar-segment.excused {
+  background: #0284c7;
+}
+
+.attendance-legend-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.attendance-legend-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.attendance-legend-card.present {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+  color: #15803d;
+}
+
+.attendance-legend-card.absent {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #b91c1c;
+}
+
+.attendance-legend-card.excused {
+  background: #f0f9ff;
+  border-color: #bae6fd;
+  color: #0369a1;
+}
+
+.attendance-legend-card-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.attendance-legend-card-count {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.attendance-legend-card-pct {
+  font-size: 0.72rem;
+  opacity: 0.85;
+}
+
+/* Recent Activity Stream */
+.analytics-activity-stream {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.analytics-activity-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--bg-page);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  transition: background var(--transition-fast);
+}
+
+.analytics-activity-item:hover {
+  background: var(--bg-hover);
+}
+
+.analytics-activity-main {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.analytics-activity-icon-badge {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.action-create {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.action-update {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.action-delete {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.action-other {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.analytics-activity-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.analytics-activity-actor-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.825rem;
+}
+
+.analytics-activity-actor-name {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.analytics-activity-desc {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.analytics-activity-time {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Empty Chart / State Callouts */
+.analytics-empty-chart {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 36px 16px;
+  text-align: center;
+  color: var(--text-muted);
+  gap: 8px;
+}
+
+.analytics-empty-icon {
+  opacity: 0.6;
+}
+
+.analytics-empty-text {
+  font-size: 0.85rem;
+}
+
+/* Skeleton Loading State Styles */
+.analytics-skeleton-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.analytics-skeleton-bar {
+  height: 14px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, var(--bg-hover) 0%, var(--border) 50%, var(--bg-hover) 100%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s infinite;
+}
+
+/* Responsive Breakpoints */
+@media (max-width: 1024px) {
+  .analytics-grid-2col,
+  .analytics-grid-3col {
+    grid-template-columns: 1fr;
+  }
+
+  .attendance-legend-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .analytics-header-controls {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .analytics-controls-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .analytics-timeframe-group {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .capacity-meta-grid {
+    grid-template-columns: 1fr;
+  }
+}
+

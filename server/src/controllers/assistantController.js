@@ -2,13 +2,14 @@ const Student = require('../models/Student');
 const Program = require('../models/Program');
 const { successResponse, errorResponse } = require('../utils/apiResponse');
 const { writeAuditLog } = require('../services/auditService');
-const { analyzeRecords, applyReview } = require('../services/dataAssistantService');
+const { analyzeRecords, applyReview, buildRecordFlags, CORRECTION_ALLOWED_FIELDS } = require('../services/dataAssistantService');
 const {
   summarizeMetrics,
   getProviderStatus,
   explainFinding: explainFindingAi,
   explainDuplicate: explainDuplicateAi,
-  suggestNormalization: suggestNormalizationAi
+  suggestNormalization: suggestNormalizationAi,
+  proposeCorrection: proposeCorrectionAi
 } = require('../services/aiProviderService');
 
 const recordModels = {
@@ -198,6 +199,61 @@ const normalizeText = async (req, res, next) => {
   }
 };
 
+const proposeCorrection = async (req, res, next) => {
+  try {
+    const { recordType, recordId, field, issueType } = req.body;
+    const Model = recordModels[recordType];
+    if (!Model) {
+      return errorResponse(res, 400, 'Record type must be students or programs.');
+    }
+
+    const allowed = CORRECTION_ALLOWED_FIELDS[recordType] || [];
+    if (!allowed.includes(field)) {
+      return errorResponse(res, 400, `Field "${field}" does not support automated correction proposals.`);
+    }
+
+    const record = await Model.findOne(req.ngoFilter({ _id: recordId }));
+    if (!record) {
+      return errorResponse(res, 404, 'Record not found or access denied.');
+    }
+
+    const flags = buildRecordFlags(recordType, record.toObject());
+    const matchingFlag = flags.find((f) => f.field === field && f.type === issueType);
+    if (!matchingFlag) {
+      return errorResponse(res, 400, 'No active deterministic data-quality issue found for this record and field.');
+    }
+
+    const result = await proposeCorrectionAi({
+      recordType,
+      field,
+      currentValue: matchingFlag.currentValue || '',
+      issueType,
+      recordLabel: matchingFlag.recordLabel,
+      description: matchingFlag.description
+    });
+
+    if (!result.success) {
+      return successResponse(res, 200, 'AI correction proposal is currently unavailable.', {
+        available: false,
+        reason: result.reason,
+        error: result.error
+      });
+    }
+
+    return successResponse(res, 200, 'AI correction proposal ready.', {
+      available: true,
+      recordId,
+      field,
+      issueType,
+      ...result.data,
+      meta: result.meta,
+      notice: 'This is an advisory AI proposal. Human review and explicit confirmation are required to apply any change.'
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
 module.exports = {
   analyze,
   review,
@@ -205,5 +261,6 @@ module.exports = {
   aiStatus,
   explainFinding,
   explainDuplicate,
-  normalizeText
+  normalizeText,
+  proposeCorrection
 };

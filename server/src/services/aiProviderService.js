@@ -71,6 +71,7 @@ module.exports = {
   summarizeMetrics,
   explainFinding: geminiService.explainFinding,
   explainDuplicate: geminiService.explainDuplicate,
-  suggestNormalization: geminiService.suggestNormalization
+  suggestNormalization: geminiService.suggestNormalization,
+  proposeCorrection: geminiService.proposeCorrection
 };
 

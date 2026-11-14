@@ -29,9 +29,17 @@ const normalizeTextRequestSchema = z.object({
   fieldType: z.enum(['city', 'state', 'course_category', 'organization_name', 'department', 'general_text']).optional().default('general_text')
 }).strict();
 
+const proposeCorrectionRequestSchema = z.object({
+  recordType: z.enum(['students', 'programs']),
+  recordId: z.string().regex(/^[0-9a-fA-F]{24}$/, 'Invalid record ID format'),
+  field: z.string().trim().min(1, 'Field name is required').max(50),
+  issueType: z.enum(['missing_required', 'inconsistent_format', 'invalid_value'])
+}).strict();
+
 module.exports = {
   cleanReviewSchema,
   explainFindingRequestSchema,
   explainDuplicateRequestSchema,
-  normalizeTextRequestSchema
+  normalizeTextRequestSchema,
+  proposeCorrectionRequestSchema
 };

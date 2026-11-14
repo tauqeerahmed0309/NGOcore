@@ -8,7 +8,8 @@ const {
   cleanReviewSchema,
   explainFindingRequestSchema,
   explainDuplicateRequestSchema,
-  normalizeTextRequestSchema
+  normalizeTextRequestSchema,
+  proposeCorrectionRequestSchema
 } = require('../validations/assistantValidation');
 const assistantController = require('../controllers/assistantController');
 
@@ -53,5 +54,6 @@ router.get('/ai/status', roleMiddleware('admin', 'staff'), assistantController.a
 router.post('/ai/explain-finding', aiLimiter, roleMiddleware('admin', 'staff'), validateBody(explainFindingRequestSchema), assistantController.explainFinding);
 router.post('/ai/explain-duplicate', aiLimiter, roleMiddleware('admin', 'staff'), validateBody(explainDuplicateRequestSchema), assistantController.explainDuplicate);
 router.post('/ai/normalize-text', aiLimiter, roleMiddleware('admin', 'staff'), validateBody(normalizeTextRequestSchema), assistantController.normalizeText);
+router.post('/ai/propose-correction', aiLimiter, roleMiddleware('admin', 'staff'), validateBody(proposeCorrectionRequestSchema), assistantController.proposeCorrection);
 
 module.exports = router;

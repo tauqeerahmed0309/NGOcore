@@ -13,6 +13,7 @@ const UserManagement = lazy(() => import('../features/users/UserManagement'));
 const StudentManagement = lazy(() => import('../features/students/StudentManagement'));
 const ProgramManagement = lazy(() => import('../features/programs/ProgramManagement'));
 const ReportsPage = lazy(() => import('../features/reports/ReportsPage'));
+const OrganizationAnalytics = lazy(() => import('../features/analytics/OrganizationAnalytics'));
 import ProtectedRoute from './ProtectedRoute';
 import RoleGuard from './RoleGuard';
 import AccessDenied from '../components/common/AccessDenied';
@@ -164,6 +165,16 @@ export default function AppRoutes() {
           <ProtectedRoute>
             <RoleGuard allowedRoles={['admin', 'staff']}>
               <ReportsPage />
+            </RoleGuard>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/analytics"
+        element={
+          <ProtectedRoute>
+            <RoleGuard allowedRoles={['admin', 'staff']}>
+              <OrganizationAnalytics />
             </RoleGuard>
           </ProtectedRoute>
         }

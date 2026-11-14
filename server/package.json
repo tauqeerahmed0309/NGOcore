@@ -21,6 +21,9 @@
     "test:assistant": "node src/scripts/testDataAssistant.js",
     "test:stage3a": "node src/scripts/testStage3AValidation.js",
     "test:stage3b": "node src/scripts/testStage3BGemini.js",
+    "test:stage3c-phase1": "node src/scripts/testStage3CPhase1.js",
+    "test:reports": "node src/scripts/testReportsModule.js",
+    "test:analytics": "node src/scripts/testAnalyticsModule.js",
     "test:db": "node src/scripts/testDatabaseConnection.js",
     "test": "node src/scripts/runAllTests.js"
   },
@@ -35,6 +38,7 @@
     "compression": "^1.8.2",
     "cors": "^2.8.6",
     "dotenv": "^18.0.5",
+    "exceljs": "^4.4.0",
     "express": "^5.2.1",
     "express-rate-limit": "^8.7.0",
     "google-auth-library": "^11.2.0",
@@ -43,6 +47,7 @@
     "mongoose": "^9.10.3",
     "multer": "^2.4.0",
     "nodemailer": "^6.10.1",
+    "pdfkit": "^0.20.2",
     "zod": "^4.6.5"
   },
   "devDependencies": {

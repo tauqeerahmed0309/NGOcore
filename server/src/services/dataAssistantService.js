@@ -12,6 +12,11 @@ const REQUIRED_FIELDS = {
   programs: ['name', 'code', 'type']
 };
 
+const CORRECTION_ALLOWED_FIELDS = {
+  students: ['registrationNumber', 'firstName', 'lastName', 'email', 'dateOfBirth', 'phone', 'pinCode', 'state', 'address'],
+  programs: ['name', 'code', 'type', 'category', 'startDate', 'endDate']
+};
+
 const getModel = (recordType) => MODELS[recordType];
 const hasValue = (value) => value !== null && value !== undefined && String(value).trim() !== '';
 
@@ -904,9 +909,7 @@ const sanitizeProposedValue = (recordType, field, proposedValue, record) => {
     throw Object.assign(new Error('Enter a non-empty corrected value before accepting this fix.'), { statusCode: 400 });
   }
   const value = proposedValue.trim();
-  const allowedFields = recordType === 'students'
-    ? new Set(['registrationNumber', 'firstName', 'lastName', 'email', 'dateOfBirth', 'phone', 'pinCode', 'state', 'address'])
-    : new Set(['name', 'code', 'type', 'category', 'startDate', 'endDate']);
+  const allowedFields = new Set(CORRECTION_ALLOWED_FIELDS[recordType] || []);
   if (!allowedFields.has(field)) {
     throw Object.assign(new Error('This field cannot be changed by the data cleaning assistant.'), { statusCode: 400 });
   }
@@ -1002,5 +1005,7 @@ module.exports = {
   applyReview,
   areLikelyDuplicates,
   scorePair,
-  generateCandidatePairs
+  generateCandidatePairs,
+  buildRecordFlags,
+  CORRECTION_ALLOWED_FIELDS
 };
