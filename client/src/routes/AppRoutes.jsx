@@ -66,6 +66,10 @@ export default function AppRoutes() {
         }
       />
       <Route
+        path="/admin/analytics"
+        element={<Navigate to="/analytics" replace />}
+      />
+      <Route
         path="/admin/*"
         element={
           <ProtectedRoute>
@@ -86,6 +90,10 @@ export default function AppRoutes() {
             </RoleGuard>
           </ProtectedRoute>
         }
+      />
+      <Route
+        path="/staff/analytics"
+        element={<Navigate to="/analytics" replace />}
       />
       <Route
         path="/staff/*"

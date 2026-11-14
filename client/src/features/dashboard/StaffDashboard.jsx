@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { KeyRound, GraduationCap, Calendar, FileBarChart } from 'lucide-react';
+import { KeyRound, GraduationCap, Calendar, FileBarChart, TrendingUp } from 'lucide-react';
 import ChangePasswordModal from '../auth/ChangePasswordModal';
 import OperationalReminders from './OperationalReminders';
+import AnalyticsSummaryCard from './AnalyticsSummaryCard';
 
 function getInitials(firstName, lastName) {
   return ((firstName || '').charAt(0) + (lastName || '').charAt(0)).toUpperCase() || '?';
@@ -60,9 +61,20 @@ export default function StaffDashboard() {
           </div>
           <Link to="/reports" className="quick-stat-link">View →</Link>
         </div>
+        <div className="quick-stat-card">
+          <div className="quick-stat-icon icon-purple">
+            <TrendingUp size={20} />
+          </div>
+          <div className="quick-stat-body">
+            <span className="quick-stat-label">Organization Analytics</span>
+            <span className="quick-stat-desc">View program capacity &amp; attendance metrics</span>
+          </div>
+          <Link to="/analytics" className="quick-stat-link" id="staff-analytics-quick-link">View →</Link>
+        </div>
       </div>
 
       <OperationalReminders />
+      <AnalyticsSummaryCard role="staff" />
 
       {/* Profile card */}
       <div className="profile-card">

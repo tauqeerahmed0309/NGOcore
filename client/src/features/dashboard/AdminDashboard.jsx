@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { KeyRound, Users, GraduationCap, Calendar, FileBarChart } from 'lucide-react';
+import { KeyRound, Users, GraduationCap, Calendar, FileBarChart, TrendingUp } from 'lucide-react';
 import ChangePasswordModal from '../auth/ChangePasswordModal';
 import AIInsightsCard from './AIInsightsCard';
 import OperationalReminders from './OperationalReminders';
+import AnalyticsSummaryCard from './AnalyticsSummaryCard';
 
 function getInitials(firstName, lastName) {
   return ((firstName || '').charAt(0) + (lastName || '').charAt(0)).toUpperCase() || '?';
@@ -73,6 +74,16 @@ export default function AdminDashboard() {
           </div>
           <Link to="/reports" className="quick-stat-link">View →</Link>
         </div>
+        <div className="quick-stat-card">
+          <div className="quick-stat-icon icon-purple">
+            <TrendingUp size={20} />
+          </div>
+          <div className="quick-stat-body">
+            <span className="quick-stat-label">Organization Analytics</span>
+            <span className="quick-stat-desc">Demographics, capacity &amp; performance</span>
+          </div>
+          <Link to="/analytics" className="quick-stat-link" id="admin-analytics-quick-link">View →</Link>
+        </div>
       </div>
 
       {/* Profile card */}
@@ -111,6 +122,7 @@ export default function AdminDashboard() {
         </div>
       </div>
 
+      <AnalyticsSummaryCard role={isNgoAdmin ? 'ngo_admin' : 'admin'} />
       <AIInsightsCard />
       <OperationalReminders />
 

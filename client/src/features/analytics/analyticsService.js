@@ -11,9 +11,10 @@ export const analyticsService = {
    * @param {Object} params - Query parameters
    * @param {number} [params.months=6] - Timeframe window in months (1-24)
    * @param {string} [params.timezone='UTC'] - Desired timezone string
+   * @param {Object} [config={}] - Additional request configuration (e.g. AbortSignal)
    * @returns {Promise<Object>} API response payload
    */
-  getDashboardAnalytics: (params = {}) => api.get('/analytics/dashboard', { params })
+  getDashboardAnalytics: (params = {}, config = {}) => api.get('/analytics/dashboard', { params, ...config })
 };
 
 export default analyticsService;

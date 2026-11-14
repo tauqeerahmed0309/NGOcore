@@ -33,6 +33,25 @@
   gap: 12px;
 }
 
+.analytics-breadcrumb-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.analytics-back-link {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--brand-green);
+  transition: color var(--transition-fast);
+}
+
+.analytics-back-link:hover {
+  color: var(--brand-green-dark);
+  text-decoration: underline;
+}
+
 .analytics-header-icon {
   width: 44px;
   height: 44px;

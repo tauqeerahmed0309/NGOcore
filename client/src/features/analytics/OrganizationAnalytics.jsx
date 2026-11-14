@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { Link } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 import {
   Users,
   GraduationCap,
@@ -70,6 +72,10 @@ function formatRelativeTime(isoString) {
 }
 
 export default function OrganizationAnalytics() {
+  const { currentUser } = useAuth();
+  const isStaff = currentUser?.role === 'staff';
+  const dashPath = isStaff ? '/staff/dashboard' : '/admin/dashboard';
+
   // Query parameters
   const [timeframeMonths, setTimeframeMonths] = useState(6);
 
@@ -79,29 +85,49 @@ export default function OrganizationAnalytics() {
   const [error, setError] = useState('');
 
   const containerRef = useRef(null);
+  const abortControllerRef = useRef(null);
 
-  // Fetch Dashboard Analytics from API
-  const fetchAnalytics = useCallback(async (months = timeframeMonths) => {
+  // Fetch Dashboard Analytics from API with duplicate in-flight request protection
+  const fetchAnalytics = useCallback(async (months = 6) => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
     setLoading(true);
     setError('');
 
     try {
-      const response = await analyticsService.getDashboardAnalytics({ months });
+      const response = await analyticsService.getDashboardAnalytics(
+        { months },
+        { signal: controller.signal }
+      );
       // api.js response interceptor unwraps response.data, so response is { success, statusCode, message, data }
       const payload = response?.data || response;
       setAnalyticsData(payload);
     } catch (err) {
+      if (err?.message === 'canceled' || err?.name === 'CanceledError' || err?.code === 'ERR_CANCELED') {
+        return;
+      }
       console.error('Failed to load organization analytics:', err);
       const msg = err?.message || err?.errors?.[0]?.message || 'Could not load organization analytics dashboard.';
       setError(msg);
     } finally {
-      setLoading(false);
+      if (!controller.signal.aborted) {
+        setLoading(false);
+      }
     }
-  }, [timeframeMonths]);
+  }, []);
 
-  // Initial load and timeframe change
+  // Initial load and timeframe change with effect cleanup
   useEffect(() => {
     fetchAnalytics(timeframeMonths);
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
   }, [fetchAnalytics, timeframeMonths]);
 
   // GSAP animation trigger on data load
@@ -156,10 +182,18 @@ export default function OrganizationAnalytics() {
       {/* 1. Header & Controls Bar */}
       <div className="analytics-header-controls">
         <div className="analytics-header-left">
-          <div className="analytics-header-icon">
+          <div className="analytics-header-icon" aria-hidden="true">
             <TrendingUp size={24} />
           </div>
           <div>
+            <div className="analytics-breadcrumb-bar">
+              <Link to={dashPath} className="analytics-back-link">
+                ← Back to Dashboard
+              </Link>
+              <span className={`badge ${isStaff ? 'badge-staff' : 'badge-admin'}`}>
+                {isStaff ? 'Staff View' : 'Admin View'}
+              </span>
+            </div>
             <h1 className="analytics-header-title">Organization Analytics</h1>
             <p className="analytics-header-subtitle">
               Demographic distribution, capacity utilization, attendance trends, and operational activity.
@@ -177,6 +211,7 @@ export default function OrganizationAnalytics() {
                 className={`analytics-timeframe-btn ${timeframeMonths === m ? 'active' : ''}`}
                 onClick={() => setTimeframeMonths(m)}
                 disabled={loading}
+                aria-pressed={timeframeMonths === m}
               >
                 {m}M
               </button>
@@ -190,8 +225,9 @@ export default function OrganizationAnalytics() {
             onClick={() => fetchAnalytics(timeframeMonths)}
             disabled={loading}
             title="Refresh dashboard data"
+            aria-label="Refresh organization analytics data"
           >
-            <RefreshCw size={15} className={loading ? 'spinner' : ''} />
+            <RefreshCw size={15} className={loading ? 'animate-spin' : ''} />
             <span>Refresh</span>
           </button>
 

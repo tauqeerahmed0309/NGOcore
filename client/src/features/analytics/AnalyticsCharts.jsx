@@ -105,6 +105,8 @@ export function TrendAreaBarChart({
                 className="trend-point-group"
                 onMouseEnter={() => setHoveredIdx(idx)}
                 onMouseLeave={() => setHoveredIdx(null)}
+                onFocus={() => setHoveredIdx(idx)}
+                onBlur={() => setHoveredIdx(null)}
                 tabIndex={0}
                 role="img"
                 aria-label={`${p.month}: ${p.count} ${label}`}
