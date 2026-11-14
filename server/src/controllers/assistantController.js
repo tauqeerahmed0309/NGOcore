@@ -1,8 +1,20 @@
+const crypto = require('crypto');
+const config = require('../config/env');
 const Student = require('../models/Student');
 const Program = require('../models/Program');
+const AuditLog = require('../models/AuditLog');
 const { successResponse, errorResponse } = require('../utils/apiResponse');
 const { writeAuditLog } = require('../services/auditService');
-const { analyzeRecords, applyReview, buildRecordFlags, CORRECTION_ALLOWED_FIELDS } = require('../services/dataAssistantService');
+const {
+  analyzeRecords,
+  applyReview,
+  buildRecordFlags,
+  CORRECTION_ALLOWED_FIELDS,
+  validateCorrectionProposal,
+  calculateRecordDQI,
+  calculateDatasetDQI
+} = require('../services/dataAssistantService');
+const geminiService = require('../services/geminiService');
 const {
   summarizeMetrics,
   getProviderStatus,
@@ -18,6 +30,69 @@ const recordModels = {
 };
 
 const validateRecordType = (recordType) => Boolean(recordModels[recordType]);
+
+const sanitizeAuditValue = (val) => {
+  if (val === null || val === undefined) return null;
+  const str = String(val).trim();
+  const masked = geminiService.sanitizeText(str);
+  return masked.length > 150 ? `${masked.slice(0, 150)}...` : masked;
+};
+
+// Cryptographic proposal tokens to eliminate client metadata tampering in audit logs
+const createProposalToken = ({
+  recordId,
+  recordType,
+  field,
+  issueType,
+  proposedValue,
+  provider,
+  model,
+  ngoId
+}) => {
+  const secret = config.JWT_SECRET;
+  const tokenId = crypto.randomUUID();
+  const payload = {
+    tokenId,
+    recordId: String(recordId),
+    recordType: String(recordType || ''),
+    field: String(field || ''),
+    issueType: String(issueType),
+    proposedValue: String(proposedValue || '').trim(),
+    provider: String(provider),
+    model: String(model),
+    ngoId: String(ngoId || ''),
+    createdAt: Date.now()
+  };
+  const serialized = Buffer.from(JSON.stringify(payload)).toString('base64url');
+  const signature = crypto.createHmac('sha256', secret).update(serialized).digest('base64url');
+  return `${serialized}.${signature}`;
+};
+
+const verifyProposalToken = (token) => {
+  if (!token || typeof token !== 'string' || !token.includes('.')) return null;
+  const parts = token.split('.');
+  if (parts.length !== 2) return null;
+  const [serialized, signature] = parts;
+  if (!serialized || !signature) return null;
+
+  try {
+    const secret = config.JWT_SECRET;
+    const expectedSigBuffer = crypto.createHmac('sha256', secret).update(serialized).digest();
+    const sigBuffer = Buffer.from(signature, 'base64url');
+
+    if (sigBuffer.length !== expectedSigBuffer.length) return null;
+    if (!crypto.timingSafeEqual(sigBuffer, expectedSigBuffer)) return null;
+
+    const payload = JSON.parse(Buffer.from(serialized, 'base64url').toString('utf8'));
+    // Valid for 24 hours
+    if (typeof payload.createdAt !== 'number' || Date.now() - payload.createdAt > 24 * 60 * 60 * 1000) {
+      return null;
+    }
+    return payload;
+  } catch {
+    return null;
+  }
+};
 
 const analyze = async (req, res, next) => {
   try {
@@ -43,7 +118,16 @@ const review = async (req, res, next) => {
       return errorResponse(res, 400, 'Record type must be students or programs.');
     }
 
-    const { recordId, issueType, field, relatedRecordId, decision, proposedValue } = req.body;
+    const {
+      recordId,
+      issueType,
+      field,
+      relatedRecordId,
+      decision,
+      proposedValue,
+      proposalToken
+    } = req.body;
+
     const result = await applyReview({
       recordType,
       recordId,
@@ -54,17 +138,85 @@ const review = async (req, res, next) => {
       proposedValue,
       ngoFilter: req.ngoFilter
     });
+
+    // Derive AI provider and model ONLY from verified cryptographic proposal token
+    let trustedAiProvider = null;
+    let trustedAiModel = null;
+    let trustedTokenId = null;
+
+    if (proposalToken) {
+      const verified = verifyProposalToken(proposalToken);
+      const tenantNgoId = String(req.ngoFilter?.ngoId || '');
+      const recordNgoId = String(result.record?.ngoId || '');
+      const matchesTenant = verified && (!verified.ngoId || verified.ngoId === tenantNgoId || verified.ngoId === recordNgoId);
+      const matchesProposedValue = decision !== 'accept' || verified?.proposedValue === String(proposedValue || '').trim();
+
+      if (
+        verified &&
+        verified.recordId === String(recordId) &&
+        verified.recordType === String(recordType) &&
+        verified.field === String(field || '') &&
+        verified.issueType === String(issueType) &&
+        matchesTenant &&
+        matchesProposedValue
+      ) {
+        // Prevent token reuse from creating misleading duplicate approval audit records
+        const isReused = verified.tokenId
+          ? await AuditLog.exists({
+              action: 'update',
+              entityType: 'data_cleaning_review',
+              'metadata.proposalTokenId': verified.tokenId
+            })
+          : false;
+
+        if (!isReused) {
+          trustedAiProvider = verified.provider;
+          trustedAiModel = verified.model;
+          trustedTokenId = verified.tokenId || null;
+        }
+      }
+    }
+
+    // findingId is strictly derived by the server from deterministic evaluation
+    const trustedFindingId = result.findingId || (field ? `${recordId}:${issueType}:${field}` : `${recordId}:${issueType}`);
+
     await writeAuditLog({
       req,
       actor: req.user,
       action: 'update',
       entityType: 'data_cleaning_review',
       entityId: recordId,
-      metadata: { recordType, issueType, field: field || null, relatedRecordId: relatedRecordId || null, decision, applied: result.applied }
+      metadata: {
+        recordType,
+        issueType,
+        targetField: field || null,
+        field: field || null,
+        relatedRecordId: relatedRecordId || null,
+        originalValue: result.originalValue !== undefined && result.originalValue !== null
+          ? sanitizeAuditValue(result.originalValue)
+          : null,
+        proposedValue: result.proposedValue !== undefined && result.proposedValue !== null
+          ? sanitizeAuditValue(result.proposedValue)
+          : null,
+        associatedFinding: issueType,
+        findingId: trustedFindingId,
+        aiProvider: trustedAiProvider,
+        aiModel: trustedAiModel,
+        proposalTokenId: trustedTokenId,
+        decision,
+        applied: result.applied,
+        reviewerId: req.user?._id ? String(req.user._id) : null,
+        reviewerRole: req.user?.role || null,
+        reviewedAt: new Date().toISOString()
+      }
     });
+
     return successResponse(res, 200, result.applied ? 'The confirmed fix was applied.' : 'Review decision recorded; the record was not changed.', {
       applied: result.applied,
-      recordId
+      recordId,
+      targetField: field || null,
+      decision,
+      auditLogged: true
     });
   } catch (error) {
     return next(error);
@@ -240,14 +392,99 @@ const proposeCorrection = async (req, res, next) => {
       });
     }
 
+    // STAGE 3C PHASE 2: Deterministic validation of AI proposed value using existing field rules
+    const validationCheck = validateCorrectionProposal(
+      recordType,
+      field,
+      result.data.proposedValue,
+      record.toObject()
+    );
+
+    if (!validationCheck.valid) {
+      return successResponse(res, 200, 'AI correction proposal could not be validated against field rules.', {
+        available: false,
+        reason: 'invalid_ai_proposal',
+        error: `AI proposed value failed field-level validation rules: ${validationCheck.error}`
+      });
+    }
+
+    const modelUsed = result.meta?.model || config.GEMINI_MODEL || 'gemini-2.5-flash';
+    const proposalToken = createProposalToken({
+      recordId,
+      recordType,
+      field,
+      issueType,
+      proposedValue: validationCheck.sanitizedValue,
+      provider: 'gemini',
+      model: modelUsed,
+      ngoId: req.ngoFilter?.ngoId || record.ngoId
+    });
+
     return successResponse(res, 200, 'AI correction proposal ready.', {
       available: true,
       recordId,
       field,
       issueType,
-      ...result.data,
+      proposedValue: validationCheck.sanitizedValue,
+      rawProposedValue: result.data.proposedValue,
+      reasoning: result.data.reasoning,
+      confidenceCategory: result.data.confidenceCategory,
+      validated: true,
+      proposalToken,
       meta: result.meta,
       notice: 'This is an advisory AI proposal. Human review and explicit confirmation are required to apply any change.'
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+const getDqi = async (req, res, next) => {
+  try {
+    const { recordType } = req.params;
+    const Model = recordModels[recordType];
+    if (!Model) {
+      return errorResponse(res, 400, 'Record type must be students or programs.');
+    }
+
+    const records = await Model.find(req.ngoFilter({})).select(
+      recordType === 'students'
+        ? 'firstName lastName registrationNumber email dateOfBirth phone pinCode state address createdAt'
+        : 'name code type category startDate endDate createdAt'
+    ).lean();
+
+    const flags = records.flatMap((record) => buildRecordFlags(recordType, record));
+    const dqi = calculateDatasetDQI(recordType, records, flags);
+
+    return successResponse(res, 200, 'Data Quality Index calculated.', {
+      recordType,
+      dqi
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+const getRecordDqi = async (req, res, next) => {
+  try {
+    const { recordType, recordId } = req.params;
+    const Model = recordModels[recordType];
+    if (!Model) {
+      return errorResponse(res, 400, 'Record type must be students or programs.');
+    }
+
+    const record = await Model.findOne(req.ngoFilter({ _id: recordId })).lean();
+    if (!record) {
+      return errorResponse(res, 404, 'Record not found or access denied.');
+    }
+
+    const flags = buildRecordFlags(recordType, record);
+    const dqi = calculateRecordDQI(recordType, record, flags);
+
+    return successResponse(res, 200, 'Record Data Quality Index calculated.', {
+      recordType,
+      recordId,
+      dqi
     });
   } catch (error) {
     return next(error);
@@ -262,5 +499,9 @@ module.exports = {
   explainFinding,
   explainDuplicate,
   normalizeText,
-  proposeCorrection
+  proposeCorrection,
+  getDqi,
+  getRecordDqi,
+  createProposalToken,
+  verifyProposalToken
 };
