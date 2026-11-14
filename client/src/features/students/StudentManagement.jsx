@@ -10,7 +10,9 @@ import {
   CheckCircle2, 
   X,
   BookOpen,
-  Sparkles
+  Sparkles,
+  Trash2,
+  RotateCcw
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import studentService from './studentService';
@@ -20,12 +22,19 @@ import StudentDetails from './StudentDetails';
 import DataCleaningPanel from '../../components/common/DataCleaningPanel';
 import { fadeUp } from '../../animations';
 
+const POPULAR_STATES = [
+  'Andhra Pradesh', 'Assam', 'Bihar', 'Delhi', 'Gujarat', 'Haryana', 
+  'Karnataka', 'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Odisha', 
+  'Punjab', 'Rajasthan', 'Tamil Nadu', 'Telangana', 'Uttar Pradesh', 'West Bengal'
+];
+
 export default function StudentManagement() {
   const { currentUser } = useAuth();
   const userRole = currentUser?.role || 'volunteer';
   const isStudent = userRole === 'student';
   const isVolunteer = userRole === 'volunteer';
   const canManage = userRole === 'admin' || userRole === 'ngo_admin' || userRole === 'staff';
+  const isAdmin = userRole === 'admin' || userRole === 'ngo_admin';
 
   // State for data
   const [students, setStudents] = useState([]);
@@ -42,11 +51,15 @@ export default function StudentManagement() {
   const [notification, setNotification] = useState(null);
   const [showDataCleaning, setShowDataCleaning] = useState(false);
 
-  // Search and filter state
+  // Search, filter and sorting state
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [genderFilter, setGenderFilter] = useState('all');
+  const [stateFilter, setStateFilter] = useState('all');
+  const [programFilter, setProgramFilter] = useState('all');
+  const [programsList, setProgramsList] = useState([]);
+  const [sortKey, setSortKey] = useState('createdAt:desc');
   const [page, setPage] = useState(1);
 
   // Modal states
@@ -67,10 +80,30 @@ export default function StudentManagement() {
   const [targetStatus, setTargetStatus] = useState('active');
   const [statusSubmitting, setStatusSubmitting] = useState(false);
 
+  // Safe Deletion Dialog State
+  const [deleteDialogStudent, setDeleteDialogStudent] = useState(null);
+  const [deleteSubmitting, setDeleteSubmitting] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
+
   // Student role specific profile state
   const [myProfile, setMyProfile] = useState(null);
   const [myProfileLoading, setMyProfileLoading] = useState(false);
   const [myProfileError, setMyProfileError] = useState('');
+
+  // Fetch programs list for filter dropdown
+  useEffect(() => {
+    let isMounted = true;
+    studentService.getPrograms({ limit: 100 })
+      .then((res) => {
+        if (isMounted && res.success && res.data?.programs) {
+          setProgramsList(res.data.programs);
+        }
+      })
+      .catch((err) => {
+        console.warn('Could not load programs for filter:', err.message);
+      });
+    return () => { isMounted = false; };
+  }, []);
 
   // Debounce search input
   useEffect(() => {
@@ -86,21 +119,34 @@ export default function StudentManagement() {
     setTimeout(() => setNotification(null), 4500);
   }, []);
 
+  // Parse sortKey
+  const [sortBy, sortOrder] = sortKey.split(':');
+
   // Fetch student records for Admin / Staff / Volunteer
   const fetchStudents = useCallback(async () => {
     if (isStudent) return; // Students use getMyProfile
 
     setLoading(true);
     try {
-      const res = await studentService.getStudents({
+      const params = {
         page,
         limit: 10,
         search: debouncedSearch,
         status: statusFilter,
         gender: genderFilter,
-        sortBy: 'createdAt',
-        sortOrder: 'desc'
-      });
+        sortBy,
+        sortOrder
+      };
+
+      if (stateFilter && stateFilter !== 'all') {
+        params.state = stateFilter;
+      }
+
+      if (programFilter && programFilter !== 'all') {
+        params.programId = programFilter;
+      }
+
+      const res = await studentService.getStudents(params);
 
       if (res.success && res.data) {
         setStudents(res.data.students || []);
@@ -113,7 +159,7 @@ export default function StudentManagement() {
     } finally {
       setLoading(false);
     }
-  }, [page, debouncedSearch, statusFilter, genderFilter, isStudent, showNotification]);
+  }, [page, debouncedSearch, statusFilter, genderFilter, stateFilter, programFilter, sortBy, sortOrder, isStudent, showNotification]);
 
   // Fetch single profile for Student role
   const fetchMyStudentProfile = useCallback(async () => {
@@ -141,6 +187,27 @@ export default function StudentManagement() {
       fetchStudents();
     }
   }, [isStudent, fetchStudents, fetchMyStudentProfile]);
+
+  // Reset all filters
+  const handleClearFilters = () => {
+    setSearch('');
+    setDebouncedSearch('');
+    setStatusFilter('all');
+    setGenderFilter('all');
+    setStateFilter('all');
+    setProgramFilter('all');
+    setSortKey('createdAt:desc');
+    setPage(1);
+  };
+
+  const hasActiveFilters = Boolean(
+    search ||
+    statusFilter !== 'all' ||
+    genderFilter !== 'all' ||
+    stateFilter !== 'all' ||
+    programFilter !== 'all' ||
+    sortKey !== 'createdAt:desc'
+  );
 
   // Handlers for Student Actions
   const handleOpenCreate = () => {
@@ -183,6 +250,31 @@ export default function StudentManagement() {
     } finally {
       setStatusSubmitting(false);
       setStatusDialogStudent(null);
+    }
+  };
+
+  // Safe Deletion Handlers
+  const handleOpenDeleteDialog = (student) => {
+    setDeleteDialogStudent(student);
+    setDeleteError('');
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteDialogStudent) return;
+    setDeleteSubmitting(true);
+    setDeleteError('');
+    try {
+      const studentId = deleteDialogStudent._id || deleteDialogStudent.id;
+      const res = await studentService.deleteStudent(studentId);
+      if (res.success) {
+        showNotification('success', `Beneficiary ${deleteDialogStudent.firstName} ${deleteDialogStudent.lastName} successfully deleted.`);
+        setDeleteDialogStudent(null);
+        fetchStudents();
+      }
+    } catch (err) {
+      setDeleteError(err.message || 'Failed to delete beneficiary record.');
+    } finally {
+      setDeleteSubmitting(false);
     }
   };
 
@@ -269,13 +361,13 @@ export default function StudentManagement() {
       <div className="page-header">
         <div>
           <div className="title-with-badge">
-            <h1 className="page-title">Student Management</h1>
+            <h1 className="page-title">Beneficiary Management</h1>
             <span className={`badge ${['admin', 'ngo_admin'].includes(userRole) ? 'badge-admin' : userRole === 'staff' ? 'badge-staff' : 'badge-volunteer'}`}>
               {['admin', 'ngo_admin'].includes(userRole) ? 'Organization Admin' : userRole === 'staff' ? 'Staff' : 'Volunteer View'}
             </span>
           </div>
           <p className="page-subtitle">
-            Manage NGO beneficiary profiles, educational records, and enrollment status
+            Manage NGO beneficiary profiles, programs, attendance, quality verification, and enrollment status
           </p>
         </div>
 
@@ -310,7 +402,7 @@ export default function StudentManagement() {
               className="btn-action btn-add-user"
             >
               <UserPlus size={16} />
-              <span>+ Add Student</span>
+              <span>+ Add Beneficiary</span>
             </button>
           )}
         </div>
@@ -321,22 +413,22 @@ export default function StudentManagement() {
         <div className="alert alert-info volunteer-banner">
           <BookOpen size={16} className="flex-shrink-0" />
           <span>
-            Volunteer View: You have read-only access to view student beneficiary records. Profile creation and editing are reserved for Staff and Admin coordinators.
+            Volunteer View: You have read-only access to view beneficiary records. Profile creation and editing are reserved for Staff and Admin coordinators.
           </span>
         </div>
       )}
 
-      {/* Control Bar: Search + Filters */}
+      {/* Control Bar: Search + Extended Filters */}
       <div className="card filters-control-card">
-        <div className="filters-grid">
+        <div className="filters-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))' }}>
           {/* Search Input */}
-          <div className="search-box-wrapper">
+          <div className="search-box-wrapper" style={{ minWidth: '220px' }}>
             <Search size={18} className="search-icon" />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by name, registration number, or email..."
+              placeholder="Search by name, reg number, phone, email..."
               className="search-input"
             />
             {search && (
@@ -363,11 +455,51 @@ export default function StudentManagement() {
               }}
               className="filter-select"
             >
-              <option value="all">All Status</option>
+              <option value="all">All Statuses</option>
               <option value="active">Active</option>
               <option value="graduated">Graduated</option>
               <option value="transferred">Transferred</option>
               <option value="inactive">Inactive</option>
+            </select>
+          </div>
+
+          {/* Program Filter */}
+          <div className="filter-select-group">
+            <label htmlFor="student-program-filter">Program:</label>
+            <select
+              id="student-program-filter"
+              value={programFilter}
+              onChange={(e) => {
+                setProgramFilter(e.target.value);
+                setPage(1);
+              }}
+              className="filter-select"
+            >
+              <option value="all">All Programs</option>
+              {programsList.map((prog) => (
+                <option key={prog._id} value={prog._id}>
+                  {prog.name} ({prog.code || 'Code'})
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* State Filter */}
+          <div className="filter-select-group">
+            <label htmlFor="student-state-filter">State:</label>
+            <select
+              id="student-state-filter"
+              value={stateFilter}
+              onChange={(e) => {
+                setStateFilter(e.target.value);
+                setPage(1);
+              }}
+              className="filter-select"
+            >
+              <option value="all">All States</option>
+              {POPULAR_STATES.map((st) => (
+                <option key={st} value={st}>{st}</option>
+              ))}
             </select>
           </div>
 
@@ -389,7 +521,43 @@ export default function StudentManagement() {
               <option value="other">Other</option>
             </select>
           </div>
+
+          {/* Sort By Dropdown */}
+          <div className="filter-select-group">
+            <label htmlFor="student-sort-filter">Sort By:</label>
+            <select
+              id="student-sort-filter"
+              value={sortKey}
+              onChange={(e) => {
+                setSortKey(e.target.value);
+                setPage(1);
+              }}
+              className="filter-select"
+            >
+              <option value="createdAt:desc">Newest (Registration Date)</option>
+              <option value="createdAt:asc">Oldest (Registration Date)</option>
+              <option value="updatedAt:desc">Recently Updated</option>
+              <option value="name:asc">Name (A – Z)</option>
+              <option value="name:desc">Name (Z – A)</option>
+              <option value="registrationNumber:asc">Registration Number</option>
+            </select>
+          </div>
         </div>
+
+        {/* Clear Filters Row */}
+        {hasActiveFilters && (
+          <div style={{ marginTop: '0.75rem', paddingTop: '0.75rem', borderTop: '1px solid var(--border-color, #e5e7eb)', display: 'flex', justifyContent: 'flex-end' }}>
+            <button
+              type="button"
+              onClick={handleClearFilters}
+              className="btn-secondary btn-sm"
+              style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.8rem' }}
+            >
+              <RotateCcw size={13} />
+              <span>Clear All Filters</span>
+            </button>
+          </div>
+        )}
       </div>
 
       {showDataCleaning && <DataCleaningPanel recordType="students" onApplied={fetchStudents} />}
@@ -399,8 +567,8 @@ export default function StudentManagement() {
         <div className="table-header-bar">
           <div className="table-header-info">
             <GraduationCap size={19} className="text-primary" />
-            <h3>Enrolled Students & Beneficiaries</h3>
-            <span className="count-pill">{pagination.totalStudents} students</span>
+            <h3>Enrolled Beneficiaries & Students</h3>
+            <span className="count-pill">{pagination.totalStudents} beneficiaries</span>
           </div>
         </div>
 
@@ -411,6 +579,7 @@ export default function StudentManagement() {
           onView={handleOpenView}
           onEdit={handleOpenEdit}
           onChangeStatus={handleOpenStatusDialog}
+          onDelete={isAdmin ? handleOpenDeleteDialog : undefined}
         />
 
         {/* Pagination Bar */}
@@ -483,7 +652,7 @@ export default function StudentManagement() {
             <div className="modal-header">
               <div className="modal-header-title">
                 <RefreshCw size={20} className="text-primary" />
-                <h3>Change Student Status</h3>
+                <h3>Change Enrollment Status</h3>
               </div>
               <button 
                 type="button" 
@@ -536,6 +705,71 @@ export default function StudentManagement() {
                 disabled={statusSubmitting}
               >
                 {statusSubmitting ? 'Updating...' : 'Update Status'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Safe Deletion Modal Dialog */}
+      {deleteDialogStudent && (
+        <div className="modal-overlay" onClick={() => setDeleteDialogStudent(null)}>
+          <div 
+            className="modal-container status-confirm-modal" 
+            onClick={(e) => e.stopPropagation()}
+            style={{ maxWidth: '500px' }}
+          >
+            <div className="modal-header">
+              <div className="modal-header-title">
+                <Trash2 size={20} style={{ color: '#ef4444' }} />
+                <h3>Delete Beneficiary Record</h3>
+              </div>
+              <button 
+                type="button" 
+                onClick={() => setDeleteDialogStudent(null)} 
+                className="modal-close-btn"
+                disabled={deleteSubmitting}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="modal-body-content">
+              <div className="status-student-meta">
+                <strong>{deleteDialogStudent.firstName} {deleteDialogStudent.lastName}</strong>
+                <span className="reg-badge">{deleteDialogStudent.registrationNumber}</span>
+              </div>
+
+              {deleteError ? (
+                <div className="alert alert-error" style={{ marginTop: '0.75rem', fontSize: '0.875rem' }}>
+                  <AlertCircle size={16} className="flex-shrink-0" />
+                  <span>{deleteError}</span>
+                </div>
+              ) : (
+                <p className="status-modal-desc" style={{ marginTop: '0.5rem' }}>
+                  NGOcore enforces a strict non-destructive policy. A beneficiary with associated program enrollments, attendance records, or audit history <strong>cannot be permanently deleted</strong>.
+                  If this beneficiary is no longer active, set their status to <strong>Inactive</strong> instead.
+                </p>
+              )}
+            </div>
+
+            <div className="modal-actions">
+              <button
+                type="button"
+                onClick={() => setDeleteDialogStudent(null)}
+                className="btn-secondary"
+                disabled={deleteSubmitting}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmDelete}
+                className="btn-primary"
+                disabled={deleteSubmitting}
+                style={{ background: '#ef4444', borderColor: '#dc2626' }}
+              >
+                {deleteSubmitting ? 'Checking & Deleting...' : 'Confirm Deletion'}
               </button>
             </div>
           </div>

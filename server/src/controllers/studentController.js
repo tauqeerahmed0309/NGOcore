@@ -25,6 +25,20 @@ const listStudents = async (req, res, next) => {
 };
 
 /**
+ * @desc    Pre-save duplicate candidate verification
+ * @route   POST /api/v1/students/check-duplicate
+ * @access  Admin, Staff
+ */
+const checkDuplicate = async (req, res, next) => {
+  try {
+    const result = await studentService.checkDuplicate(req.body, req.ngoFilter);
+    return successResponse(res, 200, 'Duplicate check completed successfully', result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
  * @desc    Create a new student profile
  * @route   POST /api/v1/students
  * @access  Admin, Staff
@@ -45,14 +59,21 @@ const createStudent = async (req, res, next) => {
 };
 
 /**
- * @desc    Get student profile by ID
+ * @desc    Get student profile by ID with enriched lifecycle data
  * @route   GET /api/v1/students/:id
  * @access  Admin, Staff, Volunteer (Student: self-only)
  */
 const getStudentById = async (req, res, next) => {
   try {
-    const student = await studentService.getStudentById(req.params.id, req.user, req.ngoFilter);
-    return successResponse(res, 200, 'Student profile retrieved successfully', { student });
+    const result = await studentService.getStudentById(req.params.id, req.user, req.ngoFilter);
+    return successResponse(res, 200, 'Student profile retrieved successfully', {
+      student: result.student,
+      enrollments: result.enrollments,
+      attendance: result.attendance,
+      dataQuality: result.dataQuality,
+      duplicates: result.duplicates,
+      auditLogs: result.auditLogs
+    });
   } catch (error) {
     next(error);
   }
@@ -65,8 +86,15 @@ const getStudentById = async (req, res, next) => {
  */
 const getMyProfile = async (req, res, next) => {
   try {
-    const student = await studentService.getMyStudentProfile(req.user._id, req.ngoFilter);
-    return successResponse(res, 200, 'Your student profile retrieved successfully', { student });
+    const result = await studentService.getMyStudentProfile(req.user._id, req.ngoFilter);
+    return successResponse(res, 200, 'Your student profile retrieved successfully', {
+      student: result.student,
+      enrollments: result.enrollments,
+      attendance: result.attendance,
+      dataQuality: result.dataQuality,
+      duplicates: result.duplicates,
+      auditLogs: result.auditLogs
+    });
   } catch (error) {
     next(error);
   }
@@ -79,12 +107,13 @@ const getMyProfile = async (req, res, next) => {
  */
 const updateStudent = async (req, res, next) => {
   try {
-    const student = await studentService.updateStudent(req.params.id, req.body, req.ngoFilter);
+    const { student, modifiedFields } = await studentService.updateStudent(req.params.id, req.body, req.ngoFilter);
     await writeAuditLog({
       req,
       action: 'update',
       entityType: 'student',
-      entityId: student._id
+      entityId: student._id,
+      metadata: { modifiedFields }
     });
     return successResponse(res, 200, 'Student profile updated successfully', { student });
   } catch (error) {
@@ -114,11 +143,33 @@ const updateStudentStatus = async (req, res, next) => {
   }
 };
 
+/**
+ * @desc    Safely delete student profile (only if no enrollments, attendance, or audit history exist)
+ * @route   DELETE /api/v1/students/:id
+ * @access  Admin
+ */
+const deleteStudent = async (req, res, next) => {
+  try {
+    const result = await studentService.deleteStudent(req.params.id, req.ngoFilter);
+    await writeAuditLog({
+      req,
+      action: 'delete',
+      entityType: 'student',
+      entityId: req.params.id
+    });
+    return successResponse(res, 200, result.message, { studentId: result.studentId });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   listStudents,
+  checkDuplicate,
   createStudent,
   getStudentById,
   getMyProfile,
   updateStudent,
-  updateStudentStatus
+  updateStudentStatus,
+  deleteStudent
 };

@@ -12,7 +12,7 @@ export const studentService = {
   },
 
   /**
-   * Fetch specific student details by ID
+   * Fetch specific student details by ID with rich lifecycle data
    */
   getStudentById: async (id) => {
     return await api.get(`/students/${id}`);
@@ -23,6 +23,13 @@ export const studentService = {
    */
   getMyProfile: async () => {
     return await api.get('/students/me');
+  },
+
+  /**
+   * Pre-save duplicate candidate verification
+   */
+  checkDuplicate: async (candidateData) => {
+    return await api.post('/students/check-duplicate', candidateData);
   },
 
   /**
@@ -44,6 +51,46 @@ export const studentService = {
    */
   updateStatus: async (id, status) => {
     return await api.patch(`/students/${id}/status`, { status });
+  },
+
+  /**
+   * Safely delete student profile (only if no enrollments, attendance or audit history exist)
+   */
+  deleteStudent: async (id) => {
+    return await api.delete(`/students/${id}`);
+  },
+
+  /**
+   * Fetch programs list for filtering
+   */
+  getPrograms: async (params = {}) => {
+    return await api.get('/programs', { params });
+  },
+
+  /**
+   * Request AI proposal for a deterministic data quality finding
+   */
+  proposeAiCorrection: async ({ recordId, field, issueType }) => {
+    return await api.post('/assistant/ai/propose-correction', {
+      recordType: 'students',
+      recordId,
+      field,
+      issueType: issueType || 'inconsistent_format'
+    });
+  },
+
+  /**
+   * Submit human review decision with signed proposal token
+   */
+  submitReview: async ({ recordId, field, issueType, decision, proposedValue, proposalToken }) => {
+    return await api.post('/assistant/clean/students/review', {
+      recordId,
+      field,
+      issueType: issueType || 'inconsistent_format',
+      decision,
+      proposedValue,
+      proposalToken
+    });
   }
 };
 

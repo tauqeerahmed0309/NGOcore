@@ -195,6 +195,11 @@ const optionalGenderSchema = z
     return val;
   });
 
+const cleanName = (val) => {
+  if (!val) return val;
+  return String(val).trim().replace(/\s+/g, ' ');
+};
+
 const createStudentSchema = z
   .object({
     registrationNumber: z
@@ -205,11 +210,13 @@ const createStudentSchema = z
     firstName: z
       .string({ required_error: 'First name is required' })
       .trim()
-      .min(1, 'First name cannot be empty'),
+      .min(1, 'First name cannot be empty')
+      .transform(cleanName),
     lastName: z
       .string({ required_error: 'Last name is required' })
       .trim()
-      .min(1, 'Last name cannot be empty'),
+      .min(1, 'Last name cannot be empty')
+      .transform(cleanName),
     userId: optionalObjectIdSchema,
     dateOfBirth: optionalDateSchema,
     gender: optionalGenderSchema.default(''),
@@ -240,8 +247,8 @@ const updateStudentSchema = z
       .min(1, 'Registration number cannot be empty')
       .toUpperCase()
       .optional(),
-    firstName: z.string().trim().min(1, 'First name cannot be empty').optional(),
-    lastName: z.string().trim().min(1, 'Last name cannot be empty').optional(),
+    firstName: z.string().trim().min(1, 'First name cannot be empty').transform(cleanName).optional(),
+    lastName: z.string().trim().min(1, 'Last name cannot be empty').transform(cleanName).optional(),
     userId: optionalObjectIdSchema,
     dateOfBirth: optionalDateSchema,
     gender: optionalGenderSchema,
@@ -260,6 +267,26 @@ const updateStudentSchema = z
       })
       .optional(),
     notes: optionalStringSchema
+  })
+  .strict();
+
+const checkDuplicateSchema = z
+  .object({
+    firstName: z
+      .string({ required_error: 'First name is required' })
+      .trim()
+      .min(1, 'First name cannot be empty')
+      .transform(cleanName),
+    lastName: z
+      .string({ required_error: 'Last name is required' })
+      .trim()
+      .min(1, 'Last name cannot be empty')
+      .transform(cleanName),
+    phone: optionalPhoneSchema.default(''),
+    email: optionalEmailSchema.default(''),
+    dateOfBirth: optionalDateSchema,
+    registrationNumber: z.string().trim().toUpperCase().optional(),
+    excludeId: optionalObjectIdSchema
   })
   .strict();
 
@@ -285,8 +312,23 @@ const listStudentsQuerySchema = z.object({
   search: z.string().trim().optional(),
   status: z.enum(['all', ...allowedStatuses]).optional().default('all'),
   gender: z.enum(['all', 'male', 'female', 'other', 'prefer_not_to_say']).optional().default('all'),
+  state: z.string().trim().optional(),
+  pinCode: z.string().trim().optional(),
+  programId: z.string().trim().regex(/^[0-9a-fA-F]{24}$/, 'Invalid program ID format').optional(),
   sortBy: z
-    .enum(['createdAt', 'registrationNumber', 'firstName', 'lastName', 'status', 'educationLevel', 'schoolName'])
+    .enum([
+      'createdAt',
+      'updatedAt',
+      'registrationDate',
+      'lastUpdatedDate',
+      'registrationNumber',
+      'firstName',
+      'lastName',
+      'name',
+      'status',
+      'educationLevel',
+      'schoolName'
+    ])
     .optional()
     .default('createdAt'),
   sortOrder: z.enum(['asc', 'desc']).optional().default('desc')
@@ -295,6 +337,7 @@ const listStudentsQuerySchema = z.object({
 module.exports = {
   createStudentSchema,
   updateStudentSchema,
+  checkDuplicateSchema,
   updateStudentStatusSchema,
   studentIdParamSchema,
   listStudentsQuerySchema,

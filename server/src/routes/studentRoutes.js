@@ -13,6 +13,7 @@ const {
 const {
   createStudentSchema,
   updateStudentSchema,
+  checkDuplicateSchema,
   updateStudentStatusSchema,
   studentIdParamSchema,
   listStudentsQuerySchema
@@ -25,7 +26,15 @@ router.use(ngoScope);
 // 1. Get logged in student's own linked profile
 router.get('/me', studentController.getMyProfile);
 
-// 2. List students with search, filters, pagination (Admin, Staff, Volunteer)
+// 2. Pre-save duplicate check (Admin, Staff)
+router.post(
+  '/check-duplicate',
+  roleMiddleware('admin', 'staff'),
+  validateBody(checkDuplicateSchema),
+  studentController.checkDuplicate
+);
+
+// 3. List students with search, filters, pagination (Admin, Staff, Volunteer)
 router.get(
   '/',
   roleMiddleware('admin', 'staff', 'volunteer'),
@@ -33,7 +42,7 @@ router.get(
   studentController.listStudents
 );
 
-// 3. Create student profile (Admin, Staff)
+// 4. Create student profile (Admin, Staff)
 router.post(
   '/',
   roleMiddleware('admin', 'staff'),
@@ -41,14 +50,14 @@ router.post(
   studentController.createStudent
 );
 
-// 4. Get student profile by ID (Admin, Staff, Volunteer, or Student if self)
+// 5. Get student profile by ID (Admin, Staff, Volunteer, or Student if self)
 router.get(
   '/:id',
   validateParams(studentIdParamSchema),
   studentController.getStudentById
 );
 
-// 5. Update student profile (Admin, Staff)
+// 6. Update student profile (Admin, Staff)
 router.put(
   '/:id',
   roleMiddleware('admin', 'staff'),
@@ -57,13 +66,21 @@ router.put(
   studentController.updateStudent
 );
 
-// 6. Update student status (Admin, Staff)
+// 7. Update student status (Admin, Staff)
 router.patch(
   '/:id/status',
   roleMiddleware('admin', 'staff'),
   validateParams(studentIdParamSchema),
   validateBody(updateStudentStatusSchema),
   studentController.updateStudentStatus
+);
+
+// 8. Safely delete student (Admin only, safety guard enforced in service)
+router.delete(
+  '/:id',
+  roleMiddleware('admin'),
+  validateParams(studentIdParamSchema),
+  studentController.deleteStudent
 );
 
 module.exports = router;

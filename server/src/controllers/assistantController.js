@@ -385,10 +385,14 @@ const proposeCorrection = async (req, res, next) => {
     });
 
     if (!result.success) {
-      return successResponse(res, 200, 'AI correction proposal is currently unavailable.', {
+      const unavailablePayload = {
         available: false,
         reason: result.reason,
         error: result.error
+      };
+      return successResponse(res, 200, 'AI correction proposal is currently unavailable.', {
+        ...unavailablePayload,
+        proposal: unavailablePayload
       });
     }
 
@@ -401,10 +405,14 @@ const proposeCorrection = async (req, res, next) => {
     );
 
     if (!validationCheck.valid) {
-      return successResponse(res, 200, 'AI correction proposal could not be validated against field rules.', {
+      const invalidPayload = {
         available: false,
         reason: 'invalid_ai_proposal',
         error: `AI proposed value failed field-level validation rules: ${validationCheck.error}`
+      };
+      return successResponse(res, 200, 'AI correction proposal could not be validated against field rules.', {
+        ...invalidPayload,
+        proposal: invalidPayload
       });
     }
 
@@ -420,7 +428,7 @@ const proposeCorrection = async (req, res, next) => {
       ngoId: req.ngoFilter?.ngoId || record.ngoId
     });
 
-    return successResponse(res, 200, 'AI correction proposal ready.', {
+    const proposalPayload = {
       available: true,
       recordId,
       field,
@@ -433,6 +441,11 @@ const proposeCorrection = async (req, res, next) => {
       proposalToken,
       meta: result.meta,
       notice: 'This is an advisory AI proposal. Human review and explicit confirmation are required to apply any change.'
+    };
+
+    return successResponse(res, 200, 'AI correction proposal ready.', {
+      ...proposalPayload,
+      proposal: proposalPayload
     });
   } catch (error) {
     return next(error);

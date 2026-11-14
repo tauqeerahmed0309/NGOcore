@@ -39,7 +39,7 @@ const assert = (condition, message) => {
 };
 
 const cookieValue = (setCookie, name) => (
-  setCookie.match(new RegExp(`(?:^|,\\s*)${name}=([^;,\\s]+)`))?.[1] || null
+  setCookie.match(new RegExp(`(?:^|[,;\\s]+)${name}=([^;,\\s]+)`))?.[1] || null
 );
 
 const runTests = async () => {

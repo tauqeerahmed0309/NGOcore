@@ -133,9 +133,12 @@ const studentSchema = new mongoose.Schema(
 
 // Compound indexes for searching and filtering
 studentSchema.index({ ngoId: 1, status: 1, createdAt: -1 });
-studentSchema.index({ firstName: 1, lastName: 1 });
-studentSchema.index({ schoolName: 1 });
+studentSchema.index({ ngoId: 1, firstName: 1, lastName: 1 });
+studentSchema.index({ ngoId: 1, schoolName: 1 });
 studentSchema.index({ ngoId: 1, phone: 1 });
+studentSchema.index({ ngoId: 1, state: 1 });
+studentSchema.index({ ngoId: 1, pinCode: 1 });
+studentSchema.index({ ngoId: 1, updatedAt: -1 });
 studentSchema.index({ ngoId: 1, registrationNumber: 1 }, { unique: true });
 
 const Student = mongoose.model('Student', studentSchema);

@@ -6,7 +6,8 @@ import {
   GraduationCap, 
   AlertTriangle,
   CheckCircle2,
-  XCircle
+  XCircle,
+  Trash2
 } from 'lucide-react';
 
 export default function StudentTable({
@@ -15,9 +16,11 @@ export default function StudentTable({
   currentUserRole = 'staff',
   onView,
   onEdit,
-  onChangeStatus
+  onChangeStatus,
+  onDelete
 }) {
-  const canManage = currentUserRole === 'admin' || currentUserRole === 'staff';
+  const canManage = currentUserRole === 'admin' || currentUserRole === 'ngo_admin' || currentUserRole === 'staff';
+  const isAdmin = currentUserRole === 'admin' || currentUserRole === 'ngo_admin';
 
   const getStatusBadge = (status) => {
     switch (status) {
@@ -195,6 +198,19 @@ export default function StudentTable({
                           <RefreshCw size={14} />
                           <span>Status</span>
                         </button>
+
+                        {isAdmin && onDelete && (
+                          <button
+                            type="button"
+                            onClick={() => onDelete(student)}
+                            className="btn-table-action btn-delete"
+                            title="Safely delete or archive beneficiary"
+                            style={{ color: '#ef4444' }}
+                          >
+                            <Trash2 size={14} />
+                            <span>Delete</span>
+                          </button>
+                        )}
                       </>
                     )}
                   </div>

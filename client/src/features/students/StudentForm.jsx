@@ -4,13 +4,13 @@ import {
   GraduationCap, 
   User, 
   Mail, 
-  Heart, 
   School, 
   FileText, 
   AlertCircle,
-  ShieldCheck,
-  MapPin,
-  Loader2
+  AlertTriangle,
+  ShieldCheck, 
+  MapPin, 
+  Loader2 
 } from 'lucide-react';
 import studentService from './studentService';
 import userService from '../users/userService';
@@ -56,6 +56,10 @@ export default function StudentForm({
   const [error, setError] = useState('');
   const [validationErrors, setValidationErrors] = useState({});
 
+  // Duplicate Warning State
+  const [duplicateWarning, setDuplicateWarning] = useState(null);
+  const [duplicateOverride, setDuplicateOverride] = useState(false);
+
   // Fetch student-role users for account linking
   useEffect(() => {
     if (isOpen) {
@@ -87,6 +91,8 @@ export default function StudentForm({
     if (isOpen) {
       setError('');
       setValidationErrors({});
+      setDuplicateWarning(null);
+      setDuplicateOverride(false);
 
       if (mode === 'edit' && studentToEdit) {
         setRegistrationNumber(studentToEdit.registrationNumber || '');
@@ -166,7 +172,7 @@ export default function StudentForm({
     }
 
     if (phone && phone.trim()) {
-      const cleanedPhone = phone.trim().replace(/[\s\-\(\)\.]/g, '');
+      const cleanedPhone = phone.trim().replace(/[\s\-().]/g, '');
       let digits = cleanedPhone;
       if (digits.startsWith('+91')) digits = digits.slice(3);
       else if (digits.startsWith('91') && digits.length === 12) digits = digits.slice(2);
@@ -187,16 +193,32 @@ export default function StudentForm({
     return Object.keys(errors).length === 0;
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (loading) return; // Prevent double-clicking
+  const executeSave = async (overrideDup = false) => {
+    setLoading(true);
     setError('');
 
-    if (!validateForm()) {
-      return;
+    // Pre-save duplicate check in create mode unless user explicitly overrode
+    if (mode === 'create' && !overrideDup && !duplicateOverride) {
+      try {
+        const dupRes = await studentService.checkDuplicate({
+          registrationNumber: registrationNumber.trim().toUpperCase(),
+          firstName: firstName.trim(),
+          lastName: lastName.trim(),
+          dateOfBirth: dateOfBirth || null,
+          phone: phone.trim(),
+          email: email.trim().toLowerCase()
+        });
+        if (dupRes.success && dupRes.data?.isDuplicate && dupRes.data?.candidates?.length > 0) {
+          setDuplicateWarning(dupRes.data.candidates);
+          setLoading(false);
+          return;
+        }
+      } catch (dupErr) {
+        // Non-blocking if pre-check encounters an error
+        console.warn('Duplicate pre-check skipped:', dupErr.message);
+      }
     }
 
-    setLoading(true);
     try {
       // Build clean payload matching backend Zod schemas
       const payload = {
@@ -247,6 +269,13 @@ export default function StudentForm({
     }
   };
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (loading) return; // Prevent double-clicking
+    if (!validateForm()) return;
+    executeSave(false);
+  };
+
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div 
@@ -288,6 +317,56 @@ export default function StudentForm({
               <div className="alert alert-error">
                 <AlertCircle size={16} className="flex-shrink-0" />
                 <span>{error}</span>
+              </div>
+            )}
+
+            {/* Pre-save Duplicate Warning Banner */}
+            {duplicateWarning && (
+              <div className="alert alert-warning duplicate-warning-banner" role="alert" style={{ display: 'block', padding: '1rem', marginBottom: '1.25rem', border: '1px solid #f59e0b', borderRadius: '8px', background: 'rgba(245, 158, 11, 0.08)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                  <AlertTriangle size={18} className="text-warning flex-shrink-0" style={{ color: '#d97706' }} />
+                  <strong style={{ color: '#b45309' }}>Potential Duplicate Beneficiary Detected</strong>
+                </div>
+                <p style={{ margin: '0 0 0.75rem 0', fontSize: '0.9rem', color: 'var(--text-color, #374151)' }}>
+                  Existing records in your organization share matching or highly similar demographic details. Real NGO policy requires confirmation before creating duplicate entries. <em>Records will never be automatically merged or overwritten.</em>
+                </p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1rem' }}>
+                  {duplicateWarning.map((candidate, idx) => (
+                    <div key={idx} style={{ padding: '0.5rem 0.75rem', background: 'rgba(255,255,255,0.7)', borderRadius: '6px', border: '1px solid rgba(245, 158, 11, 0.2)' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <strong>{candidate.name}</strong>
+                        <span style={{ fontSize: '0.75rem', padding: '2px 8px', borderRadius: '4px', background: '#fef3c7', color: '#92400e', fontWeight: 600 }}>
+                          {(candidate.confidence || 'MEDIUM').toUpperCase()} CONFIDENCE
+                        </span>
+                      </div>
+                      <div style={{ fontSize: '0.825rem', color: 'var(--text-muted, #6b7280)', marginTop: '2px' }}>
+                        Registration: {candidate.registrationNumber || 'N/A'} • {candidate.reason}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
+                  <button
+                    type="button"
+                    onClick={() => setDuplicateWarning(null)}
+                    className="btn-secondary"
+                    style={{ fontSize: '0.85rem', padding: '6px 12px' }}
+                  >
+                    Cancel & Edit Details
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setDuplicateOverride(true);
+                      setDuplicateWarning(null);
+                      executeSave(true);
+                    }}
+                    className="btn-primary"
+                    style={{ fontSize: '0.85rem', padding: '6px 12px', background: '#d97706', borderColor: '#b45309' }}
+                  >
+                    Acknowledge & Proceed
+                  </button>
+                </div>
               </div>
             )}
 

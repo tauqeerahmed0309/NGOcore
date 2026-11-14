@@ -16,6 +16,7 @@
     "test:auth": "cd server && npm run test:auth",
     "test:users": "cd server && npm run test:users",
     "test:students": "cd server && npm run test:students",
+    "test:beneficiaries": "cd server && npm run test:beneficiaries",
     "test:programs": "cd server && npm run test:programs",
     "test:stage3a": "cd server && npm run test:stage3a",
     "test:stage3b": "cd server && npm run test:stage3b",
