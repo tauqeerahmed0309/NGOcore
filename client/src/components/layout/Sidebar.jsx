@@ -10,6 +10,7 @@ import {
   X,
   BookOpen,
   FileBarChart,
+  TrendingUp,
 } from 'lucide-react';
 
 /**
@@ -42,6 +43,7 @@ function getNavConfig(role) {
             { label: 'Students & Beneficiaries', path: '/students', icon: GraduationCap },
             { label: 'Programs & Activities', path: '/programs', icon: Calendar },
             { label: 'Reports & Exports', path: '/reports', icon: FileBarChart },
+            { label: 'Organization Analytics', path: '/analytics', icon: TrendingUp },
           ],
         },
       ];
@@ -60,6 +62,7 @@ function getNavConfig(role) {
             { label: 'Students & Beneficiaries', path: '/students', icon: GraduationCap },
             { label: 'Programs & Activities', path: '/programs', icon: Calendar },
             { label: 'Reports & Exports', path: '/reports', icon: FileBarChart },
+            { label: 'Organization Analytics', path: '/analytics', icon: TrendingUp },
           ],
         },
       ];
@@ -170,7 +173,7 @@ export default function Sidebar({ isOpen, closeSidebar }) {
                     className={({ isActive }) =>
                       `nav-item${isActive ? ' active' : ''}`
                     }
-                    end={item.path === '/admin/dashboard' || item.path === '/staff/dashboard' || item.path === '/volunteer/dashboard' || item.path === '/student/dashboard'}
+                    end={item.path === '/admin/dashboard' || item.path === '/staff/dashboard' || item.path === '/volunteer/dashboard' || item.path === '/student/dashboard' || item.path === '/analytics'}
                   >
                     <Icon size={17} className="nav-icon" aria-hidden="true" />
                     <span className="nav-label">{item.label}</span>

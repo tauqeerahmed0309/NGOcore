@@ -30,6 +30,9 @@ function usePageTitle(location) {
     '/students': 'Students & Beneficiaries',
     '/programs': 'Programs & Activities',
     '/reports': 'Reports & Exports',
+    '/analytics': 'Organization Analytics',
+    '/admin/analytics': 'Organization Analytics',
+    '/staff/analytics': 'Organization Analytics',
     '/unauthorized': 'Access Denied',
   };
   return map[location.pathname] || 'NGOcore';
