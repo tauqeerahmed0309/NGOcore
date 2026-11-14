@@ -23,10 +23,24 @@ const attendanceSchema = z.object({
     status: z.enum(['present', 'absent', 'excused']),
     note: z.string().trim().max(300).optional().default('')
   }).strict()).max(1000)
-}).strict();
+}).strict().refine((data) => {
+  const ids = data.entries.map((e) => e.studentId);
+  return new Set(ids).size === ids.length;
+}, {
+  message: 'Attendance entries cannot contain duplicate students for the same session.',
+  path: ['entries']
+});
+
 const enrollmentStatusSchema = z.object({
-  status: z.enum(['completed', 'withdrawn'])
+  status: z.enum(['enrolled', 'completed', 'withdrawn']),
+  reason: z.string().trim().max(500).optional().default('')
 }).strict();
+
+const attendanceHistoryQuerySchema = z.object({
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(100).default(50)
+});
+
 const participationReportQuerySchema = z.object({
   from: isoDate,
   to: isoDate
@@ -43,5 +57,6 @@ module.exports = {
   enrollmentListQuerySchema,
   attendanceSchema,
   enrollmentStatusSchema,
+  attendanceHistoryQuerySchema,
   participationReportQuerySchema
 };

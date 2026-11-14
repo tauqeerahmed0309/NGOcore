@@ -16,6 +16,7 @@
     "test:students": "node src/scripts/testPhase3Students.js",
     "test:beneficiaries": "node src/scripts/testBeneficiaryLifecycle.js",
     "test:programs": "node src/scripts/testPhase3Programs.js",
+    "test:programs:lifecycle": "node src/scripts/testProgramLifecycle.js",
     "test:ngo-isolation": "node src/scripts/testNgoIsolation.js",
     "test:ngo-approval": "node src/scripts/testNgoApproval.js",
     "test:signup": "node src/scripts/testSignup.js",

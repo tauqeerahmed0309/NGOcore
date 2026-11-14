@@ -30,6 +30,24 @@ const programEnrollmentSchema = new mongoose.Schema(
     enrolledAt: {
       type: Date,
       default: Date.now
+    },
+    withdrawnAt: {
+      type: Date,
+      default: null
+    },
+    withdrawalReason: {
+      type: String,
+      trim: true,
+      default: ''
+    },
+    completedAt: {
+      type: Date,
+      default: null
+    },
+    enrolledBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null
     }
   },
   { timestamps: true }

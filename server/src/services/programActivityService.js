@@ -38,7 +38,7 @@ const listEnrollments = async (programId, { page = 1, limit = 100 }, ngoFilter) 
   return { enrollments, pagination: makePagination(totalItems, page, limit) };
 };
 
-const enrollStudent = async (programId, studentId, ngoId, ngoFilter) => {
+const enrollStudent = async (programId, studentId, ngoId, ngoFilter, enrolledById = null) => {
   const [program, student] = await Promise.all([
     getProgram(programId, ngoFilter),
     Student.findOne(ngoFilter({ _id: studentId, status: 'active' }))
@@ -46,6 +46,7 @@ const enrollStudent = async (programId, studentId, ngoId, ngoFilter) => {
   if (!student) throw httpError(404, 'Active student record not found in this organization.');
   if (program.status !== 'active') throw httpError(400, 'Only active programs can accept enrollments.');
 
+  // Pre-creation capacity verification
   const currentCount = await ProgramEnrollment.countDocuments(ngoFilter({
     programId,
     status: 'enrolled'
@@ -55,22 +56,68 @@ const enrollStudent = async (programId, studentId, ngoId, ngoFilter) => {
   }
 
   const existing = await ProgramEnrollment.findOne(ngoFilter({ programId, studentId }));
+  let enrollment;
+
   if (existing) {
-    if (existing.status !== 'withdrawn') throw httpError(409, 'Student is already enrolled in this program.');
+    if (existing.status === 'enrolled') {
+      throw httpError(409, 'Student is already enrolled in this program.');
+    }
+    // Reactivate previous withdrawn or completed enrollment
     existing.status = 'enrolled';
     existing.enrolledAt = new Date();
+    existing.withdrawnAt = null;
+    existing.withdrawalReason = '';
+    existing.enrolledBy = enrolledById;
     await existing.save();
-    return existing.populate('studentId', 'registrationNumber firstName lastName email status userId');
+    enrollment = existing;
+  } else {
+    enrollment = await ProgramEnrollment.create({
+      ngoId,
+      programId,
+      studentId,
+      enrolledBy: enrolledById
+    });
   }
 
-  const enrollment = await ProgramEnrollment.create({ ngoId, programId, studentId });
+  // Post-creation concurrency verification:
+  // If concurrent requests raced, re-verify total active enrollments against capacity
+  if (program.capacity) {
+    const postCount = await ProgramEnrollment.countDocuments(ngoFilter({
+      programId,
+      status: 'enrolled'
+    }));
+    if (postCount > program.capacity) {
+      // Revert the enrollment to prevent oversubscription
+      if (!existing) {
+        await ProgramEnrollment.deleteOne({ _id: enrollment._id });
+      } else {
+        existing.status = 'withdrawn';
+        existing.withdrawnAt = new Date();
+        existing.withdrawalReason = 'Capacity exceeded during concurrent enrollment';
+        await existing.save();
+      }
+      throw httpError(409, 'This program has reached its enrollment capacity.');
+    }
+  }
+
   return enrollment.populate('studentId', 'registrationNumber firstName lastName email status userId');
 };
 
-const changeEnrollmentStatus = async (programId, studentId, status, ngoFilter) => {
+const changeEnrollmentStatus = async (programId, studentId, status, reason = '', ngoFilter) => {
+  const updateData = { status };
+  if (status === 'withdrawn') {
+    updateData.withdrawnAt = new Date();
+    updateData.withdrawalReason = reason || '';
+  } else if (status === 'completed') {
+    updateData.completedAt = new Date();
+  } else if (status === 'enrolled') {
+    updateData.withdrawnAt = null;
+    updateData.withdrawalReason = '';
+  }
+
   const enrollment = await ProgramEnrollment.findOneAndUpdate(
     ngoFilter({ programId, studentId }),
-    { $set: { status } },
+    { $set: updateData },
     { returnDocument: 'after', runValidators: true }
   ).populate('studentId', 'registrationNumber firstName lastName email status userId');
   if (!enrollment) throw httpError(404, 'Program enrollment not found.');
@@ -107,9 +154,90 @@ const getAttendance = async (programId, date, ngoFilter) => {
   return { date, roster, recordedAt: session?.updatedAt || null };
 };
 
+const getAttendanceHistory = async (programId, { page = 1, limit = 50 }, ngoFilter) => {
+  await getProgram(programId, ngoFilter);
+  const pageNum = parseInt(page, 10) || 1;
+  const limitNum = parseInt(limit, 10) || 50;
+  const skip = (pageNum - 1) * limitNum;
+
+  const query = ngoFilter({ programId });
+  const [totalSessions, rawSessions, overallAgg] = await Promise.all([
+    AttendanceSession.countDocuments(query),
+    AttendanceSession.find(query)
+      .populate('recordedBy', 'firstName lastName email role')
+      .sort({ sessionDate: -1 })
+      .skip(skip)
+      .limit(limitNum)
+      .lean(),
+    AttendanceSession.aggregate([
+      { $match: ngoFilter({ programId: new Program.base.Types.ObjectId(String(programId)) }) },
+      { $unwind: '$entries' },
+      {
+        $group: {
+          _id: null,
+          present: { $sum: { $cond: [{ $eq: ['$entries.status', 'present'] }, 1, 0] } },
+          absent: { $sum: { $cond: [{ $eq: ['$entries.status', 'absent'] }, 1, 0] } },
+          excused: { $sum: { $cond: [{ $eq: ['$entries.status', 'excused'] }, 1, 0] } },
+          total: { $sum: 1 }
+        }
+      }
+    ])
+  ]);
+
+  const sessions = rawSessions.map((s) => {
+    const present = s.entries.filter((e) => e.status === 'present').length;
+    const absent = s.entries.filter((e) => e.status === 'absent').length;
+    const excused = s.entries.filter((e) => e.status === 'excused').length;
+    const total = s.entries.length;
+    const denom = present + absent;
+    const presenceRate = denom > 0 ? Math.round((present / denom) * 100) : 0;
+    return {
+      id: s._id,
+      sessionDate: s.sessionDate ? s.sessionDate.toISOString().slice(0, 10) : null,
+      presentCount: present,
+      absentCount: absent,
+      excusedCount: excused,
+      totalEntries: total,
+      presenceRate,
+      recordedBy: s.recordedBy,
+      createdAt: s.createdAt,
+      updatedAt: s.updatedAt
+    };
+  });
+
+  const totals = overallAgg[0] || { present: 0, absent: 0, excused: 0, total: 0 };
+  const overallDenom = totals.present + totals.absent;
+  const overallPresenceRate = overallDenom > 0 ? Math.round((totals.present / overallDenom) * 100) : 0;
+
+  const overallStats = {
+    totalSessions,
+    totalEntries: totals.total,
+    presentCount: totals.present,
+    absentCount: totals.absent,
+    excusedCount: totals.excused,
+    presenceRate: overallPresenceRate,
+    overallPresenceRate
+  };
+
+  return {
+    sessions,
+    pagination: makePagination(totalSessions, pageNum, limitNum),
+    overallStats,
+    stats: overallStats
+  };
+};
+
 const saveAttendance = async (programId, date, entries, userId, ngoId, ngoFilter) => {
   await getProgram(programId, ngoFilter);
   const sessionDate = new Date(`${date}T00:00:00.000Z`);
+
+  // Prevent duplicate students within the same session payload
+  const studentIds = entries.map(({ studentId }) => String(studentId));
+  const uniqueStudentIds = new Set(studentIds);
+  if (uniqueStudentIds.size !== studentIds.length) {
+    throw httpError(400, 'Attendance entries cannot contain duplicate students for the same session.');
+  }
+
   const enrollmentIds = await ProgramEnrollment.find(ngoFilter({
     programId,
     status: 'enrolled',
@@ -155,6 +283,7 @@ module.exports = {
   enrollStudent,
   changeEnrollmentStatus,
   getAttendance,
+  getAttendanceHistory,
   saveAttendance,
   getMyEnrollments
 };

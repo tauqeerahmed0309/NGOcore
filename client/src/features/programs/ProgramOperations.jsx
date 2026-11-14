@@ -28,6 +28,9 @@ export default function ProgramOperations({ program, role, onClose }) {
   const [selectedStudent, setSelectedStudent] = useState('');
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
+  const [withdrawingStudent, setWithdrawingStudent] = useState(null);
+  const [withdrawalReason, setWithdrawalReason] = useState('');
+  const [withdrawingSubmitting, setWithdrawingSubmitting] = useState(false);
   const programId = program?._id || program?.id;
 
   const enrolledIds = useMemo(
@@ -115,10 +118,10 @@ export default function ProgramOperations({ program, role, onClose }) {
     }
   };
 
-  const changeEnrollment = async (enrollment, status) => {
+  const changeEnrollment = async (enrollment, status, reason = '') => {
     const student = enrollment.studentId;
     try {
-      await programService.updateEnrollment(programId, student._id || student.id, status);
+      await programService.updateEnrollment(programId, student._id || student.id, status, reason);
       setNotice(status === 'withdrawn' ? 'Student withdrawn from the program.' : 'Enrollment completed.');
       await load();
     } catch (requestError) {
@@ -126,7 +129,21 @@ export default function ProgramOperations({ program, role, onClose }) {
     }
   };
 
+  const handleConfirmWithdraw = async () => {
+    if (!withdrawingStudent) return;
+    setWithdrawingSubmitting(true);
+    try {
+      await changeEnrollment(withdrawingStudent, 'withdrawn', withdrawalReason);
+      setWithdrawingStudent(null);
+      setWithdrawalReason('');
+    } finally {
+      setWithdrawingSubmitting(false);
+    }
+  };
+
   const availableStudents = students.filter((student) => !enrolledIds.has(String(student._id || student.id)));
+  const activeEnrolledCount = enrollments.filter((e) => e.status === 'enrolled').length;
+  const isAtCapacity = program.capacity && activeEnrolledCount >= program.capacity;
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -162,11 +179,20 @@ export default function ProgramOperations({ program, role, onClose }) {
                     </option>
                   ))}
                 </select>
-                <button className="btn-primary" type="submit" disabled={!selectedStudent || saving}>
+                <button className="btn-primary" type="submit" disabled={!selectedStudent || saving || isAtCapacity}>
                   Enroll student
                 </button>
               </form>
-              {program.capacity && <p className="form-help-text">Program capacity: {program.capacity}</p>}
+              {program.capacity ? (
+                <p className="form-help-text" style={{ marginTop: '6px' }}>
+                  Program capacity: <strong>{activeEnrolledCount} / {program.capacity}</strong> seats filled.
+                  {isAtCapacity && (
+                    <span style={{ color: '#dc2626', marginLeft: '6px', fontWeight: 600 }}>
+                      (Full capacity reached)
+                    </span>
+                  )}
+                </p>
+              ) : null}
             </section>
           )}
 
@@ -181,12 +207,18 @@ export default function ProgramOperations({ program, role, onClose }) {
                     <div className="program-roster-row" key={enrollment._id}>
                       <div>
                         <strong>{student.firstName} {student.lastName}</strong>
-                        <span>{student.registrationNumber} · {enrollment.status}</span>
+                        <span>
+                          {student.registrationNumber} · {enrollment.status}
+                          {enrollment.status === 'withdrawn' && enrollment.withdrawalReason && ` (${enrollment.withdrawalReason})`}
+                        </span>
                       </div>
                       {canManage && enrollment.status === 'enrolled' && (
                         <div className="program-roster-actions">
                           <button type="button" className="btn-secondary" onClick={() => changeEnrollment(enrollment, 'completed')}>Complete</button>
-                          <button type="button" className="btn-secondary" onClick={() => changeEnrollment(enrollment, 'withdrawn')}>Withdraw</button>
+                          <button type="button" className="btn-secondary" onClick={() => {
+                            setWithdrawingStudent(enrollment);
+                            setWithdrawalReason('');
+                          }}>Withdraw</button>
                         </div>
                       )}
                     </div>
@@ -261,6 +293,75 @@ export default function ProgramOperations({ program, role, onClose }) {
           )}
         </div>
       </section>
+
+      {/* Withdrawal Reason Modal */}
+      {withdrawingStudent && (
+        <div className="modal-overlay" onClick={() => !withdrawingSubmitting && setWithdrawingStudent(null)}>
+          <div 
+            className="modal-container" 
+            onClick={(event) => event.stopPropagation()}
+            style={{ maxWidth: '440px', padding: '1.25rem' }}
+          >
+            <header className="modal-header">
+              <div className="modal-header-title">
+                <AlertCircle size={20} className="text-danger" style={{ color: '#ef4444' }} />
+                <h3>Withdraw Student</h3>
+              </div>
+              <button 
+                type="button" 
+                className="modal-close-btn" 
+                onClick={() => setWithdrawingStudent(null)} 
+                disabled={withdrawingSubmitting}
+                aria-label="Close dialog"
+              >
+                <X size={18} />
+              </button>
+            </header>
+
+            <div style={{ marginTop: '1rem' }}>
+              <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)' }}>
+                Are you sure you want to withdraw <strong>{withdrawingStudent.studentId?.firstName} {withdrawingStudent.studentId?.lastName}</strong> from this program?
+              </p>
+
+              <div style={{ marginTop: '1rem' }}>
+                <label htmlFor="withdrawal-reason-input" style={{ fontSize: '0.82rem', fontWeight: 600, display: 'block', marginBottom: '6px' }}>
+                  Reason for Withdrawal (Optional):
+                </label>
+                <textarea
+                  id="withdrawal-reason-input"
+                  className="input-textarea"
+                  rows={3}
+                  placeholder="e.g. Schedule conflict, relocated, completed prerequisites elsewhere..."
+                  value={withdrawalReason}
+                  onChange={(event) => setWithdrawalReason(event.target.value)}
+                  disabled={withdrawingSubmitting}
+                  style={{ width: '100%', fontSize: '0.85rem' }}
+                />
+              </div>
+            </div>
+
+            <div className="modal-actions" style={{ marginTop: '1.25rem' }}>
+              <button 
+                type="button" 
+                className="btn-secondary" 
+                onClick={() => setWithdrawingStudent(null)} 
+                disabled={withdrawingSubmitting}
+              >
+                Cancel
+              </button>
+              <button 
+                type="button" 
+                className="btn-danger" 
+                onClick={handleConfirmWithdraw} 
+                disabled={withdrawingSubmitting}
+                style={{ background: '#dc2626', color: '#fff', border: 'none', borderRadius: '6px', padding: '8px 16px' }}
+              >
+                {withdrawingSubmitting ? 'Withdrawing...' : 'Confirm Withdrawal'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

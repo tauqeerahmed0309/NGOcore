@@ -16,6 +16,8 @@ const {
   updateProgramSchema,
   updateProgramStatusSchema,
   programIdParamSchema,
+  assignStaffSchema,
+  staffParamSchema,
   listProgramsQuerySchema
 } = require('../validations/programValidation');
 const {
@@ -25,6 +27,7 @@ const {
   sessionDateQuerySchema,
   attendanceSchema,
   enrollmentStatusSchema,
+  attendanceHistoryQuerySchema,
   enrollmentListQuerySchema
 } = require('../validations/programActivityValidation');
 
@@ -99,6 +102,14 @@ router.get(
   programController.getProgramById
 );
 
+router.get(
+  '/:id/attendance-history',
+  roleMiddleware('admin', 'staff'),
+  validateParams(activityProgramIdParamSchema),
+  validateQuery(attendanceHistoryQuerySchema),
+  activityController.getAttendanceHistory
+);
+
 // 4. Update program (Admin only)
 router.put(
   '/:id',
@@ -115,6 +126,31 @@ router.patch(
   validateParams(programIdParamSchema),
   validateBody(updateProgramStatusSchema),
   programController.updateProgramStatus
+);
+
+// 6. Assign staff member to program (Admin only)
+router.post(
+  '/:id/staff',
+  roleMiddleware('admin'),
+  validateParams(programIdParamSchema),
+  validateBody(assignStaffSchema),
+  programController.assignStaff
+);
+
+// 7. Remove assigned staff member from program (Admin only)
+router.delete(
+  '/:id/staff/:staffId',
+  roleMiddleware('admin'),
+  validateParams(staffParamSchema),
+  programController.removeStaff
+);
+
+// 8. Permanently delete program with safe dependency guard (Admin only)
+router.delete(
+  '/:id',
+  roleMiddleware('admin'),
+  validateParams(programIdParamSchema),
+  programController.deleteProgram
 );
 
 module.exports = router;

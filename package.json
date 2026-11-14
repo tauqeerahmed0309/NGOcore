@@ -18,6 +18,7 @@
     "test:students": "cd server && npm run test:students",
     "test:beneficiaries": "cd server && npm run test:beneficiaries",
     "test:programs": "cd server && npm run test:programs",
+    "test:programs:lifecycle": "cd server && npm run test:programs:lifecycle",
     "test:stage3a": "cd server && npm run test:stage3a",
     "test:stage3b": "cd server && npm run test:stage3b",
     "test:stage3c-phase1": "cd server && npm run test:stage3c-phase1",

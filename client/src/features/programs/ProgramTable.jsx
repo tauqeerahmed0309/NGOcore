@@ -4,7 +4,8 @@ import {
   Edit3, 
   RefreshCw, 
   Calendar, 
-  AlertTriangle
+  AlertTriangle,
+  Trash2
 } from 'lucide-react';
 
 export default function ProgramTable({
@@ -13,7 +14,8 @@ export default function ProgramTable({
   currentUserRole = 'staff',
   onView,
   onEdit,
-  onChangeStatus
+  onChangeStatus,
+  onDelete
 }) {
   const isAdmin = currentUserRole === 'admin';
 
@@ -231,9 +233,40 @@ export default function ProgramTable({
 
                 {/* 10. Capacity */}
                 <td>
-                  <span className="capacity-text">
-                    {program.capacity ? `${program.capacity} max` : <span className="text-dim">Flexible</span>}
-                  </span>
+                  <div className="capacity-cell">
+                    <span className="capacity-text">
+                      {program.capacity ? (
+                        <>
+                          <span className="font-medium">{program.enrolledCount ?? 0}</span> / {program.capacity}
+                          {program.isFull ? (
+                            <span 
+                              className="badge badge-danger" 
+                              style={{ 
+                                marginLeft: '6px', 
+                                fontSize: '0.7rem', 
+                                padding: '2px 6px', 
+                                borderRadius: '4px', 
+                                background: '#fee2e2', 
+                                color: '#991b1b',
+                                fontWeight: 600
+                              }}
+                            >
+                              Full
+                            </span>
+                          ) : (
+                            <span className="text-dim" style={{ marginLeft: '4px', fontSize: '0.75rem' }}>
+                              ({program.availableSeats ?? (program.capacity - (program.enrolledCount || 0))} left)
+                            </span>
+                          )}
+                        </>
+                      ) : (
+                        <>
+                          <span className="font-medium">{program.enrolledCount ?? 0}</span> enrolled
+                          <span className="text-dim" style={{ marginLeft: '4px', fontSize: '0.75rem' }}> (Flexible)</span>
+                        </>
+                      )}
+                    </span>
+                  </div>
                 </td>
 
                 {/* 11. Actions */}
@@ -270,6 +303,19 @@ export default function ProgramTable({
                           <RefreshCw size={14} />
                           <span>Status</span>
                         </button>
+
+                        {onDelete && (
+                          <button
+                            type="button"
+                            onClick={() => onDelete(program)}
+                            className="btn-table-action btn-delete"
+                            title="Safely delete program (clean records only)"
+                            style={{ color: '#ef4444' }}
+                          >
+                            <Trash2 size={14} />
+                            <span>Delete</span>
+                          </button>
+                        )}
                       </>
                     )}
                   </div>

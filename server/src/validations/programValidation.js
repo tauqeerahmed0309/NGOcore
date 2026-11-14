@@ -114,6 +114,7 @@ const createProgramSchema = z
     schedule: scheduleSchema,
     location: optionalStringSchema.default(''),
     coordinator: optionalObjectIdSchema,
+    coordinatorId: optionalObjectIdSchema,
     assignedStaff: objectIdArraySchema,
     assignedVolunteers: objectIdArraySchema,
     capacity: capacitySchema,
@@ -153,6 +154,7 @@ const updateProgramSchema = z
     schedule: scheduleSchema.optional(),
     location: optionalStringSchema,
     coordinator: optionalObjectIdSchema,
+    coordinatorId: optionalObjectIdSchema,
     assignedStaff: z.array(z.string().trim().regex(/^[0-9a-fA-F]{24}$/, 'Invalid User ID format')).optional(),
     assignedVolunteers: z.array(z.string().trim().regex(/^[0-9a-fA-F]{24}$/, 'Invalid User ID format')).optional(),
     capacity: capacitySchema,
@@ -196,7 +198,27 @@ const programIdParamSchema = z.object({
     .regex(/^[0-9a-fA-F]{24}$/, 'Invalid program ID format. Must be a 24-character hexadecimal ObjectId')
 });
 
-// 5. List Programs Query Schema
+// 5. Staff Assignment Schemas
+const assignStaffSchema = z
+  .object({
+    staffId: z
+      .string({ required_error: 'Staff ID is required' })
+      .regex(/^[0-9a-fA-F]{24}$/, 'Invalid staff ID format. Must be a 24-character hexadecimal ObjectId')
+  })
+  .strict();
+
+const staffParamSchema = z
+  .object({
+    id: z
+      .string({ required_error: 'Program ID parameter is required' })
+      .regex(/^[0-9a-fA-F]{24}$/, 'Invalid program ID format'),
+    staffId: z
+      .string({ required_error: 'Staff ID parameter is required' })
+      .regex(/^[0-9a-fA-F]{24}$/, 'Invalid staff ID format')
+  })
+  .strict();
+
+// 6. List Programs Query Schema
 const listProgramsQuerySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(100).default(10),
@@ -205,7 +227,7 @@ const listProgramsQuerySchema = z.object({
   category: z.string().trim().optional().default('all'),
   status: z.enum(['all', ...allowedProgramStatuses]).optional().default('all'),
   sortBy: z
-    .enum(['createdAt', 'name', 'code', 'type', 'category', 'status', 'startDate', 'capacity'])
+    .enum(['createdAt', 'updatedAt', 'name', 'code', 'type', 'category', 'status', 'startDate', 'capacity'])
     .optional()
     .default('createdAt'),
   sortOrder: z.enum(['asc', 'desc']).optional().default('desc')
@@ -216,6 +238,8 @@ module.exports = {
   updateProgramSchema,
   updateProgramStatusSchema,
   programIdParamSchema,
+  assignStaffSchema,
+  staffParamSchema,
   listProgramsQuerySchema,
   allowedProgramStatuses
 };

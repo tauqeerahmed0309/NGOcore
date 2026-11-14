@@ -17,7 +17,8 @@ const enrollStudent = async (req, res, next) => {
       req.params.id,
       req.body.studentId,
       req.user.ngoId,
-      req.ngoFilter
+      req.ngoFilter,
+      req.user._id
     );
     await writeAuditLog({
       req,
@@ -38,6 +39,7 @@ const updateEnrollment = async (req, res, next) => {
       req.params.id,
       req.params.studentId,
       req.body.status,
+      req.body.reason,
       req.ngoFilter
     );
     await writeAuditLog({
@@ -45,7 +47,7 @@ const updateEnrollment = async (req, res, next) => {
       action: 'update',
       entityType: 'program_enrollment',
       entityId: enrollment._id,
-      metadata: { status: enrollment.status }
+      metadata: { status: enrollment.status, reason: req.body.reason || null }
     });
     return successResponse(res, 200, 'Enrollment status updated.', { enrollment });
   } catch (error) {
@@ -57,6 +59,15 @@ const getAttendance = async (req, res, next) => {
   try {
     const attendance = await activityService.getAttendance(req.params.id, req.query.date, req.ngoFilter);
     return successResponse(res, 200, 'Attendance roster retrieved.', attendance);
+  } catch (error) {
+    return next(error);
+  }
+};
+
+const getAttendanceHistory = async (req, res, next) => {
+  try {
+    const history = await activityService.getAttendanceHistory(req.params.id, req.query, req.ngoFilter);
+    return successResponse(res, 200, 'Attendance history retrieved.', history);
   } catch (error) {
     return next(error);
   }
@@ -99,6 +110,7 @@ module.exports = {
   enrollStudent,
   updateEnrollment,
   getAttendance,
+  getAttendanceHistory,
   saveAttendance,
   getMyEnrollments
 };

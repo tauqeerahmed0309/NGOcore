@@ -52,7 +52,7 @@ const createProgram = async (req, res, next) => {
 const getProgramById = async (req, res, next) => {
   try {
     const program = await programService.getProgramById(req.params.id, req.user, req.ngoFilter);
-    return successResponse(res, 200, 'Program retrieved successfully', { program });
+    return successResponse(res, 200, 'Program retrieved successfully', { program, ...program });
   } catch (error) {
     next(error);
   }
@@ -100,10 +100,85 @@ const updateProgramStatus = async (req, res, next) => {
   }
 };
 
+/**
+ * @desc    Permanently delete program with safe dependency guard
+ * @route   DELETE /api/v1/programs/:id
+ * @access  Admin only
+ */
+const deleteProgram = async (req, res, next) => {
+  try {
+    const result = await programService.deleteProgram(req.params.id, req.user, req.ngoFilter);
+    await writeAuditLog({
+      req,
+      action: 'delete',
+      entityType: 'program',
+      entityId: req.params.id
+    });
+    return successResponse(res, 200, 'Program permanently deleted successfully.', result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * @desc    Assign a staff member to a program
+ * @route   POST /api/v1/programs/:id/staff
+ * @access  Admin only
+ */
+const assignStaff = async (req, res, next) => {
+  try {
+    const program = await programService.assignStaffMember(
+      req.params.id,
+      req.body.staffId,
+      req.user,
+      req.ngoFilter
+    );
+    await writeAuditLog({
+      req,
+      action: 'update',
+      entityType: 'program',
+      entityId: program._id,
+      metadata: { action: 'assign_staff', staffId: req.body.staffId }
+    });
+    return successResponse(res, 200, 'Staff member assigned to program successfully.', { program });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * @desc    Remove an assigned staff member from a program
+ * @route   DELETE /api/v1/programs/:id/staff/:staffId
+ * @access  Admin only
+ */
+const removeStaff = async (req, res, next) => {
+  try {
+    const program = await programService.removeStaffMember(
+      req.params.id,
+      req.params.staffId,
+      req.user,
+      req.ngoFilter
+    );
+    await writeAuditLog({
+      req,
+      action: 'update',
+      entityType: 'program',
+      entityId: program._id,
+      metadata: { action: 'remove_staff', staffId: req.params.staffId }
+    });
+    return successResponse(res, 200, 'Staff member removed from program successfully.', { program });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   listPrograms,
   createProgram,
   getProgramById,
   updateProgram,
-  updateProgramStatus
+  updateProgramStatus,
+  deleteProgram,
+  assignStaff,
+  removeStaff
 };

@@ -10,7 +10,8 @@ import {
   CheckCircle2, 
   X, 
   BookOpen,
-  Sparkles
+  Sparkles,
+  Trash2
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import programService from './programService';
@@ -102,6 +103,11 @@ export default function ProgramManagement() {
   const [targetStatus, setTargetStatus] = useState('active');
   const [statusSubmitting, setStatusSubmitting] = useState(false);
 
+  // Safe Delete Dialog State
+  const [deleteDialogProgram, setDeleteDialogProgram] = useState(null);
+  const [deleteSubmitting, setDeleteSubmitting] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
+
   // Debounce search input
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -190,6 +196,33 @@ export default function ProgramManagement() {
   const handleOpenStatusDialog = (prog) => {
     setStatusDialogProgram(prog);
     setTargetStatus(prog.status || 'active');
+  };
+
+  const handleOpenDeleteDialog = (prog) => {
+    setDeleteDialogProgram(prog);
+    setDeleteError('');
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteDialogProgram) return;
+    setDeleteSubmitting(true);
+    setDeleteError('');
+    try {
+      const progId = deleteDialogProgram._id || deleteDialogProgram.id;
+      const res = await programService.deleteProgram(progId);
+      if (res.success) {
+        showNotification(
+          'success',
+          `Program [${deleteDialogProgram.code}] deleted successfully.`
+        );
+        setDeleteDialogProgram(null);
+        fetchPrograms();
+      }
+    } catch (err) {
+      setDeleteError(err.message || 'Cannot delete program with existing enrollments or activity history. Pause, cancel, or complete it instead.');
+    } finally {
+      setDeleteSubmitting(false);
+    }
   };
 
   const handleConfirmStatusChange = async () => {
@@ -458,6 +491,7 @@ export default function ProgramManagement() {
           onView={handleOpenView}
           onEdit={handleOpenEdit}
           onChangeStatus={handleOpenStatusDialog}
+          onDelete={isAdmin ? handleOpenDeleteDialog : undefined}
         />
 
         {/* Pagination Bar */}
@@ -595,6 +629,91 @@ export default function ProgramManagement() {
                 disabled={statusSubmitting}
               >
                 {statusSubmitting ? 'Updating...' : 'Update Status'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Safe Delete Modal Dialog (Admin only) */}
+      {isAdmin && deleteDialogProgram && (
+        <div className="modal-overlay" onClick={() => !deleteSubmitting && setDeleteDialogProgram(null)}>
+          <div
+            className="modal-container status-confirm-modal"
+            onClick={(e) => e.stopPropagation()}
+            style={{ maxWidth: '480px' }}
+          >
+            <div className="modal-header">
+              <div className="modal-header-title">
+                <Trash2 size={20} className="text-danger" style={{ color: '#ef4444' }} />
+                <h3>Delete Program</h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => !deleteSubmitting && setDeleteDialogProgram(null)}
+                className="modal-close-btn"
+                disabled={deleteSubmitting}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="modal-body-content">
+              <div className="status-student-meta">
+                <strong>{deleteDialogProgram.name}</strong>
+                <span className="code-badge">{deleteDialogProgram.code}</span>
+              </div>
+
+              {deleteError && (
+                <div className="alert alert-error" style={{ marginTop: '1rem', fontSize: '0.85rem' }}>
+                  <AlertCircle size={16} className="flex-shrink-0" />
+                  <span>{deleteError}</span>
+                </div>
+              )}
+
+              <p className="status-modal-desc" style={{ marginTop: '0.75rem', color: 'var(--text-secondary)' }}>
+                Are you sure you want to permanently delete this program?
+              </p>
+              <div
+                style={{
+                  marginTop: '0.75rem',
+                  padding: '10px 14px',
+                  borderRadius: '6px',
+                  background: '#fef2f2',
+                  border: '1px solid #fee2e2',
+                  fontSize: '0.82rem',
+                  color: '#991b1b',
+                  lineHeight: '1.4'
+                }}
+              >
+                <strong>Operational Safe Guard:</strong> Programs with enrolled beneficiaries, recorded attendance sessions, or logged audit history cannot be deleted. If this program has history, consider changing its status to <em>Cancelled</em> or <em>Completed</em> instead.
+              </div>
+            </div>
+
+            <div className="modal-actions" style={{ marginTop: '1.5rem' }}>
+              <button
+                type="button"
+                onClick={() => setDeleteDialogProgram(null)}
+                className="btn-secondary"
+                disabled={deleteSubmitting}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmDelete}
+                className="btn-danger"
+                disabled={deleteSubmitting}
+                style={{
+                  background: '#dc2626',
+                  color: '#fff',
+                  border: 'none',
+                  padding: '8px 16px',
+                  borderRadius: '6px',
+                  cursor: deleteSubmitting ? 'not-allowed' : 'pointer'
+                }}
+              >
+                {deleteSubmitting ? 'Deleting...' : 'Confirm Delete'}
               </button>
             </div>
           </div>
