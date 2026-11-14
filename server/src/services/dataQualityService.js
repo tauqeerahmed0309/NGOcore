@@ -65,6 +65,7 @@ const DQI_RATING_BANDS = [
 ];
 
 const classifyRating = (score) => {
+  if (score === null || score === undefined) return 'not_assessable';
   const normalized = Math.min(100, Math.max(0, Number(score) || 0));
   for (const band of DQI_RATING_BANDS) {
     if (normalized >= band.min) {
@@ -292,14 +293,16 @@ const calculateDatasetDQI = (recordType, records = [], flags = []) => {
 
   if (totalRecords === 0) {
     return {
-      score: 100,
-      rating: 'Excellent',
-      summary: `No ${recordType} records found to evaluate. Index baseline is optimal (100/100).`,
+      score: null,
+      rating: 'not_assessable',
+      category: 'not_assessable',
+      scanned: 0,
+      summary: `No ${recordType} records found to evaluate. Data quality is not assessable for an empty dataset.`,
       dimensions: {
-        completeness: { score: 100, weight: DQI_WEIGHTS.completeness, status: 'optimal' },
-        validity: { score: 100, weight: DQI_WEIGHTS.validity, status: 'optimal' },
-        standardization: { score: 100, weight: DQI_WEIGHTS.standardization, status: 'optimal' },
-        uniqueness: { score: 100, weight: DQI_WEIGHTS.uniqueness, status: 'optimal' }
+        completeness: { score: null, weight: DQI_WEIGHTS.completeness, status: 'not_assessable', description: 'Measures presence of required mandatory fields.' },
+        validity: { score: null, weight: DQI_WEIGHTS.validity, status: 'not_assessable', description: 'Measures format validity, regex adherence, date plausibility.' },
+        standardization: { score: null, weight: DQI_WEIGHTS.standardization, status: 'not_assessable', description: 'Measures standard capitalization and canonical formatting.' },
+        uniqueness: { score: null, weight: DQI_WEIGHTS.uniqueness, status: 'not_assessable', description: 'Measures freedom from duplicate entity candidates.' }
       },
       metrics: {
         totalRecordsScanned: 0,
@@ -307,7 +310,8 @@ const calculateDatasetDQI = (recordType, records = [], flags = []) => {
         flaggedRecordsCount: 0,
         criticalIssuesCount: 0,
         warningIssuesCount: 0,
-        optionalFieldsFillRate: 100
+        optionalFieldsProvidedRate: null,
+        optionalFieldsFillRate: null
       },
       methodology: getDqiMethodology()
     };
@@ -370,6 +374,8 @@ const calculateDatasetDQI = (recordType, records = [], flags = []) => {
   return {
     score: avgScore,
     rating,
+    category: rating,
+    scanned: totalRecords,
     summary: `Dataset data quality is rated ${rating} (${avgScore}/100) across ${totalRecords} ${recordType}. ` +
       `${cleanRecordsCount} record${cleanRecordsCount === 1 ? '' : 's'} fully clean, ` +
       `${flaggedRecordsCount} record${flaggedRecordsCount === 1 ? '' : 's'} flagged for human review.`,

@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const http = require('http');
+const crypto = require('crypto');
 const config = require('../config/env');
 const app = require('../app');
 const geminiService = require('../services/geminiService');
@@ -281,11 +282,18 @@ const runAll = async () => {
     'Exactly one deduction applies to the field (validity only)'
   );
 
-  // Test 11: Empty dataset handling is mathematically defensible
+  // Test 11: Empty dataset handling is mathematically defensible & semantically honest
   const emptyDqi = calculateDatasetDQI('students', [], []);
-  assert(emptyDqi.score === 100, 'Empty dataset reports baseline score of 100');
+  assert(emptyDqi.score === null, 'Empty dataset reports score: null');
+  assert(emptyDqi.category === 'not_assessable', 'Empty dataset classified as category: not_assessable');
+  assert(emptyDqi.rating === 'not_assessable', 'Empty dataset rating is not_assessable');
+  assert(emptyDqi.scanned === 0, 'Empty dataset reports scanned: 0');
   assert(emptyDqi.metrics.totalRecordsScanned === 0, 'Empty dataset reports 0 scanned records');
-  assert(emptyDqi.rating === 'Excellent', 'Empty dataset classified as Excellent');
+  assert(emptyDqi.dimensions.completeness.score === null, 'Completeness dimension score is null');
+  assert(emptyDqi.dimensions.validity.score === null, 'Validity dimension score is null');
+  assert(emptyDqi.dimensions.standardization.score === null, 'Standardization dimension score is null');
+  assert(emptyDqi.dimensions.uniqueness.score === null, 'Uniqueness dimension score is null');
+  assert(classifyRating(null) === 'not_assessable', 'classifyRating(null) returns not_assessable');
 
   // Test 12: Dataset DQI aggregation linear consistency
   const datasetRecords = [cleanStudent, sparseStudent, invalidPhoneStudent];
@@ -580,6 +588,16 @@ const runAll = async () => {
   assert(dqiRes.status === 200, 'GET /assistant/clean/students/dqi returns 200');
   assert(typeof dqiRes.data.data.dqi.score === 'number', 'DQI response includes numeric score');
 
+  // Empty dataset API check (NGO B has 0 students)
+  const emptyOrgDqiRes = await apiRequest(`${baseUrl}/assistant/clean/students/dqi`, {
+    method: 'GET',
+    headers: { Authorization: `Bearer ${tokenB}` }
+  });
+  assert(emptyOrgDqiRes.status === 200, 'GET /assistant/clean/students/dqi on empty organization returns 200');
+  assert(emptyOrgDqiRes.data.data.dqi.score === null, 'Empty organization DQI score is null');
+  assert(emptyOrgDqiRes.data.data.dqi.category === 'not_assessable', 'Empty organization DQI category is not_assessable');
+  assert(emptyOrgDqiRes.data.data.dqi.scanned === 0, 'Empty organization DQI reports scanned: 0');
+
   const recordDqiRes = await apiRequest(`${baseUrl}/assistant/clean/students/dqi/${studentPhoneId}`, {
     method: 'GET',
     headers: { Authorization: `Bearer ${tokenA}` }
@@ -694,6 +712,135 @@ const runAll = async () => {
   assert(legitAudit.metadata.targetField === 'phone', 'Audit records targetField');
   assert(legitAudit.metadata.decision === 'accept', 'Audit records decision');
   assert(legitAudit.metadata.applied === true, 'Audit records applied');
+
+  // Test: Reviewing an already-reviewed / already-resolved issue returns HTTP 409 Conflict
+  const auditCountBeforeDuplicate = await AuditLog.countDocuments({
+    entityType: 'data_cleaning_review',
+    entityId: studentPhoneId
+  });
+
+  const duplicateReviewRes = await apiRequest(`${baseUrl}/assistant/clean/students/review`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${tokenA}` },
+    body: JSON.stringify({
+      recordId: studentPhoneId,
+      issueType: 'inconsistent_format',
+      field: 'phone',
+      decision: 'accept',
+      proposedValue: '+91 98765 43210'
+    })
+  });
+  assert(duplicateReviewRes.status === 409, 'Already-resolved issue review rejected with HTTP 409');
+  assert(
+    JSON.stringify(duplicateReviewRes.data).includes('no longer present'),
+    'HTTP 409 error cites issue is no longer present'
+  );
+
+  const auditCountAfterDuplicate = await AuditLog.countDocuments({
+    entityType: 'data_cleaning_review',
+    entityId: studentPhoneId
+  });
+  assert(
+    auditCountAfterDuplicate === auditCountBeforeDuplicate,
+    'Zero duplicate audit records created on 409 conflict'
+  );
+
+  // Test: Rejection of already-resolved issue returns HTTP 409
+  const rejectCleanRes = await apiRequest(`${baseUrl}/assistant/clean/students/review`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${tokenA}` },
+    body: JSON.stringify({
+      recordId: studentPhoneId,
+      issueType: 'inconsistent_format',
+      field: 'phone',
+      decision: 'reject'
+    })
+  });
+  assert(rejectCleanRes.status === 409, 'Rejection of already-resolved issue returns HTTP 409');
+
+  // Test: Token reuse cannot create misleading duplicate approval audit records
+  // Reset student phone back to raw format to test token reuse
+  await Student.updateOne({ _id: studentPhoneId }, { phone: '9876543210' });
+
+  // Re-submit the exact same validToken that was already consumed in legitReviewRes
+  const reuseTokenRes = await apiRequest(`${baseUrl}/assistant/clean/students/review`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${tokenA}` },
+    body: JSON.stringify({
+      recordId: studentPhoneId,
+      issueType: 'inconsistent_format',
+      field: 'phone',
+      decision: 'accept',
+      proposedValue: '+91 98765 43210',
+      proposalToken: validToken // Already consumed!
+    })
+  });
+  assert(reuseTokenRes.status === 200, 'Review with reused token succeeds as human review');
+
+  const reuseAudit = await AuditLog.findOne({
+    entityType: 'data_cleaning_review',
+    entityId: studentPhoneId
+  }).sort({ createdAt: -1 });
+  assert(reuseAudit.metadata.aiProvider === null, 'Reused proposalToken cannot attribute aiProvider (logged as null)');
+  assert(reuseAudit.metadata.aiModel === null, 'Reused proposalToken cannot attribute aiModel (logged as null)');
+
+  // Test: Proposed value mismatch prevents AI provenance attribution
+  await Student.updateOne({ _id: studentPhoneId }, { phone: '9876543210' });
+  const freshToken = createProposalToken({
+    recordId: studentPhoneId,
+    recordType: 'students',
+    field: 'phone',
+    issueType: 'inconsistent_format',
+    proposedValue: '+91 98765 43210',
+    provider: 'gemini',
+    model: 'gemini-2.5-flash',
+    ngoId: ngoA._id
+  });
+
+  const valueMismatchRes = await apiRequest(`${baseUrl}/assistant/clean/students/review`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${tokenA}` },
+    body: JSON.stringify({
+      recordId: studentPhoneId,
+      issueType: 'inconsistent_format',
+      field: 'phone',
+      decision: 'accept',
+      proposedValue: '+91 91234 56789', // Different valid phone number!
+      proposalToken: freshToken
+    })
+  });
+  assert(valueMismatchRes.status === 200, 'Review with modified value succeeds as human custom fix');
+
+  const mismatchAudit = await AuditLog.findOne({
+    entityType: 'data_cleaning_review',
+    entityId: studentPhoneId
+  }).sort({ createdAt: -1 });
+  assert(mismatchAudit.metadata.aiProvider === null, 'Modified proposedValue cannot claim AI provenance (aiProvider: null)');
+  assert(mismatchAudit.metadata.aiModel === null, 'Modified proposedValue cannot claim AI provenance (aiModel: null)');
+
+  // Test: Direct cryptographic verification & timing-safe checks
+  const expiredToken = createProposalToken({
+    recordId: studentPhoneId,
+    recordType: 'students',
+    field: 'phone',
+    issueType: 'inconsistent_format',
+    proposedValue: '+91 98765 43210',
+    provider: 'gemini',
+    model: 'gemini-2.5-flash',
+    ngoId: ngoA._id
+  });
+  const expiredParts = expiredToken.split('.');
+  const expPayload = JSON.parse(Buffer.from(expiredParts[0], 'base64url').toString('utf8'));
+  expPayload.createdAt = Date.now() - 25 * 3600 * 1000; // 25 hours ago
+  const expSer = Buffer.from(JSON.stringify(expPayload)).toString('base64url');
+  const expSig = crypto.createHmac('sha256', config.JWT_SECRET).update(expSer).digest('base64url');
+  const signedExpiredToken = `${expSer}.${expSig}`;
+  assert(verifyProposalToken(signedExpiredToken) === null, 'Expired proposalToken is rejected by verifyProposalToken');
+
+  // Timing safe comparison: byte length mismatch does not throw error
+  assert(verifyProposalToken(`${expSer}.shortsig`) === null, 'Invalid signature byte length returns null safely');
+  assert(verifyProposalToken('not-a-token') === null, 'Malformed token string returns null');
+  assert(verifyProposalToken(null) === null, 'Null token returns null');
 
   // Test: Human Review Rejection
   const pinStudentBefore = await Student.findById(studentPinId);

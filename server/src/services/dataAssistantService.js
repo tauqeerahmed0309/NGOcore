@@ -1043,13 +1043,17 @@ const applyReview = async ({ recordType, recordId, issueType, field, relatedReco
   }
 
   // decision === 'reject'
+  const flags = buildRecordFlags(recordType, record.toObject());
+  const issue = flags.find((flag) => flag.type === issueType && flag.field === field);
+  if (!issue) throw Object.assign(new Error('This data-quality issue is no longer present.'), { statusCode: 409 });
+
   return {
     record,
     applied: false,
     originalValue,
     proposedValue: proposedValue || null,
     targetField: field || null,
-    findingId: null,
+    findingId: issue.id,
     associatedFinding: issueType
   };
 };

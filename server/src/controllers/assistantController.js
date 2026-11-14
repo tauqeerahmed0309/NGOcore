@@ -2,6 +2,7 @@ const crypto = require('crypto');
 const config = require('../config/env');
 const Student = require('../models/Student');
 const Program = require('../models/Program');
+const AuditLog = require('../models/AuditLog');
 const { successResponse, errorResponse } = require('../utils/apiResponse');
 const { writeAuditLog } = require('../services/auditService');
 const {
@@ -38,15 +39,28 @@ const sanitizeAuditValue = (val) => {
 };
 
 // Cryptographic proposal tokens to eliminate client metadata tampering in audit logs
-const createProposalToken = ({ recordId, field, issueType, proposedValue, provider, model }) => {
+const createProposalToken = ({
+  recordId,
+  recordType,
+  field,
+  issueType,
+  proposedValue,
+  provider,
+  model,
+  ngoId
+}) => {
   const secret = config.JWT_SECRET;
+  const tokenId = crypto.randomUUID();
   const payload = {
+    tokenId,
     recordId: String(recordId),
-    field: String(field),
+    recordType: String(recordType || ''),
+    field: String(field || ''),
     issueType: String(issueType),
-    proposedValue: String(proposedValue),
+    proposedValue: String(proposedValue || '').trim(),
     provider: String(provider),
     model: String(model),
+    ngoId: String(ngoId || ''),
     createdAt: Date.now()
   };
   const serialized = Buffer.from(JSON.stringify(payload)).toString('base64url');
@@ -60,16 +74,20 @@ const verifyProposalToken = (token) => {
   if (parts.length !== 2) return null;
   const [serialized, signature] = parts;
   if (!serialized || !signature) return null;
-  const secret = config.JWT_SECRET;
-  const expectedSig = crypto.createHmac('sha256', secret).update(serialized).digest('base64url');
-  const sigBuffer = Buffer.from(signature);
-  const expectedBuffer = Buffer.from(expectedSig);
-  if (sigBuffer.length !== expectedBuffer.length) return null;
-  if (!crypto.timingSafeEqual(sigBuffer, expectedBuffer)) return null;
+
   try {
+    const secret = config.JWT_SECRET;
+    const expectedSigBuffer = crypto.createHmac('sha256', secret).update(serialized).digest();
+    const sigBuffer = Buffer.from(signature, 'base64url');
+
+    if (sigBuffer.length !== expectedSigBuffer.length) return null;
+    if (!crypto.timingSafeEqual(sigBuffer, expectedSigBuffer)) return null;
+
     const payload = JSON.parse(Buffer.from(serialized, 'base64url').toString('utf8'));
     // Valid for 24 hours
-    if (Date.now() - payload.createdAt > 24 * 60 * 60 * 1000) return null;
+    if (typeof payload.createdAt !== 'number' || Date.now() - payload.createdAt > 24 * 60 * 60 * 1000) {
+      return null;
+    }
     return payload;
   } catch {
     return null;
@@ -124,16 +142,38 @@ const review = async (req, res, next) => {
     // Derive AI provider and model ONLY from verified cryptographic proposal token
     let trustedAiProvider = null;
     let trustedAiModel = null;
+    let trustedTokenId = null;
+
     if (proposalToken) {
       const verified = verifyProposalToken(proposalToken);
+      const tenantNgoId = String(req.ngoFilter?.ngoId || '');
+      const recordNgoId = String(result.record?.ngoId || '');
+      const matchesTenant = verified && (!verified.ngoId || verified.ngoId === tenantNgoId || verified.ngoId === recordNgoId);
+      const matchesProposedValue = decision !== 'accept' || verified?.proposedValue === String(proposedValue || '').trim();
+
       if (
         verified &&
         verified.recordId === String(recordId) &&
+        verified.recordType === String(recordType) &&
         verified.field === String(field || '') &&
-        verified.issueType === String(issueType)
+        verified.issueType === String(issueType) &&
+        matchesTenant &&
+        matchesProposedValue
       ) {
-        trustedAiProvider = verified.provider;
-        trustedAiModel = verified.model;
+        // Prevent token reuse from creating misleading duplicate approval audit records
+        const isReused = verified.tokenId
+          ? await AuditLog.exists({
+              action: 'update',
+              entityType: 'data_cleaning_review',
+              'metadata.proposalTokenId': verified.tokenId
+            })
+          : false;
+
+        if (!isReused) {
+          trustedAiProvider = verified.provider;
+          trustedAiModel = verified.model;
+          trustedTokenId = verified.tokenId || null;
+        }
       }
     }
 
@@ -162,6 +202,7 @@ const review = async (req, res, next) => {
         findingId: trustedFindingId,
         aiProvider: trustedAiProvider,
         aiModel: trustedAiModel,
+        proposalTokenId: trustedTokenId,
         decision,
         applied: result.applied,
         reviewerId: req.user?._id ? String(req.user._id) : null,
@@ -370,11 +411,13 @@ const proposeCorrection = async (req, res, next) => {
     const modelUsed = result.meta?.model || config.GEMINI_MODEL || 'gemini-2.5-flash';
     const proposalToken = createProposalToken({
       recordId,
+      recordType,
       field,
       issueType,
       proposedValue: validationCheck.sanitizedValue,
       provider: 'gemini',
-      model: modelUsed
+      model: modelUsed,
+      ngoId: req.ngoFilter?.ngoId || record.ngoId
     });
 
     return successResponse(res, 200, 'AI correction proposal ready.', {
