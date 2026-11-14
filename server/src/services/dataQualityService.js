@@ -149,8 +149,11 @@ const calculateRecordDQI = (recordType, record, recordFlags = []) => {
   // Evaluates formatting, casing, whitespace, and canonical representation.
   // Mutually exclusive with validity (does not double-count invalid fields).
   // --------------------------------------------------------------------------
+  const invalidFields = new Set(validityFlags.map((f) => f.field));
   const standardizationFlags = flags.filter((f) => {
     if (f.type === 'missing_required' || f.type === 'possible_duplicate') return false;
+    // Explicit safeguard: A field with an active validity defect is never double-penalized under standardization
+    if (invalidFields.has(f.field)) return false;
     return f.type === 'inconsistent_format' && (f.severity === 'low' || f.severity === 'medium');
   });
 

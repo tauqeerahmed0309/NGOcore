@@ -1,3 +1,5 @@
+const crypto = require('crypto');
+const config = require('../config/env');
 const Student = require('../models/Student');
 const Program = require('../models/Program');
 const { successResponse, errorResponse } = require('../utils/apiResponse');
@@ -35,6 +37,45 @@ const sanitizeAuditValue = (val) => {
   return masked.length > 150 ? `${masked.slice(0, 150)}...` : masked;
 };
 
+// Cryptographic proposal tokens to eliminate client metadata tampering in audit logs
+const createProposalToken = ({ recordId, field, issueType, proposedValue, provider, model }) => {
+  const secret = config.JWT_SECRET;
+  const payload = {
+    recordId: String(recordId),
+    field: String(field),
+    issueType: String(issueType),
+    proposedValue: String(proposedValue),
+    provider: String(provider),
+    model: String(model),
+    createdAt: Date.now()
+  };
+  const serialized = Buffer.from(JSON.stringify(payload)).toString('base64url');
+  const signature = crypto.createHmac('sha256', secret).update(serialized).digest('base64url');
+  return `${serialized}.${signature}`;
+};
+
+const verifyProposalToken = (token) => {
+  if (!token || typeof token !== 'string' || !token.includes('.')) return null;
+  const parts = token.split('.');
+  if (parts.length !== 2) return null;
+  const [serialized, signature] = parts;
+  if (!serialized || !signature) return null;
+  const secret = config.JWT_SECRET;
+  const expectedSig = crypto.createHmac('sha256', secret).update(serialized).digest('base64url');
+  const sigBuffer = Buffer.from(signature);
+  const expectedBuffer = Buffer.from(expectedSig);
+  if (sigBuffer.length !== expectedBuffer.length) return null;
+  if (!crypto.timingSafeEqual(sigBuffer, expectedBuffer)) return null;
+  try {
+    const payload = JSON.parse(Buffer.from(serialized, 'base64url').toString('utf8'));
+    // Valid for 24 hours
+    if (Date.now() - payload.createdAt > 24 * 60 * 60 * 1000) return null;
+    return payload;
+  } catch {
+    return null;
+  }
+};
+
 const analyze = async (req, res, next) => {
   try {
     const { recordType } = req.params;
@@ -66,9 +107,7 @@ const review = async (req, res, next) => {
       relatedRecordId,
       decision,
       proposedValue,
-      aiProvider,
-      aiModel,
-      findingId
+      proposalToken
     } = req.body;
 
     const result = await applyReview({
@@ -81,6 +120,25 @@ const review = async (req, res, next) => {
       proposedValue,
       ngoFilter: req.ngoFilter
     });
+
+    // Derive AI provider and model ONLY from verified cryptographic proposal token
+    let trustedAiProvider = null;
+    let trustedAiModel = null;
+    if (proposalToken) {
+      const verified = verifyProposalToken(proposalToken);
+      if (
+        verified &&
+        verified.recordId === String(recordId) &&
+        verified.field === String(field || '') &&
+        verified.issueType === String(issueType)
+      ) {
+        trustedAiProvider = verified.provider;
+        trustedAiModel = verified.model;
+      }
+    }
+
+    // findingId is strictly derived by the server from deterministic evaluation
+    const trustedFindingId = result.findingId || (field ? `${recordId}:${issueType}:${field}` : `${recordId}:${issueType}`);
 
     await writeAuditLog({
       req,
@@ -101,9 +159,9 @@ const review = async (req, res, next) => {
           ? sanitizeAuditValue(result.proposedValue)
           : null,
         associatedFinding: issueType,
-        findingId: result.findingId || findingId || null,
-        aiProvider: aiProvider || null,
-        aiModel: aiModel || null,
+        findingId: trustedFindingId,
+        aiProvider: trustedAiProvider,
+        aiModel: trustedAiModel,
         decision,
         applied: result.applied,
         reviewerId: req.user?._id ? String(req.user._id) : null,
@@ -309,6 +367,16 @@ const proposeCorrection = async (req, res, next) => {
       });
     }
 
+    const modelUsed = result.meta?.model || config.GEMINI_MODEL || 'gemini-2.5-flash';
+    const proposalToken = createProposalToken({
+      recordId,
+      field,
+      issueType,
+      proposedValue: validationCheck.sanitizedValue,
+      provider: 'gemini',
+      model: modelUsed
+    });
+
     return successResponse(res, 200, 'AI correction proposal ready.', {
       available: true,
       recordId,
@@ -319,6 +387,7 @@ const proposeCorrection = async (req, res, next) => {
       reasoning: result.data.reasoning,
       confidenceCategory: result.data.confidenceCategory,
       validated: true,
+      proposalToken,
       meta: result.meta,
       notice: 'This is an advisory AI proposal. Human review and explicit confirmation are required to apply any change.'
     });
@@ -389,5 +458,7 @@ module.exports = {
   normalizeText,
   proposeCorrection,
   getDqi,
-  getRecordDqi
+  getRecordDqi,
+  createProposalToken,
+  verifyProposalToken
 };

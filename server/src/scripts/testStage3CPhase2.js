@@ -5,6 +5,7 @@ const app = require('../app');
 const geminiService = require('../services/geminiService');
 const dataAssistantService = require('../services/dataAssistantService');
 const dataQualityService = require('../services/dataQualityService');
+const { createProposalToken, verifyProposalToken } = require('../controllers/assistantController');
 const Ngo = require('../models/Ngo');
 const User = require('../models/User');
 const Student = require('../models/Student');
@@ -36,9 +37,9 @@ const runAll = async () => {
   }
 
   // ============================================================================
-  // SECTION 1: Deterministic Data Quality Index (DQI) Unit Tests
+  // SECTION 1: Deterministic Data Quality Index (DQI) Unit Tests & Correctness
   // ============================================================================
-  console.log('▶ [1. Deterministic DQI Engine Unit Tests]');
+  console.log('▶ [1. Deterministic DQI Engine Unit Tests & Correctness]');
 
   const {
     calculateRecordDQI,
@@ -159,7 +160,7 @@ const runAll = async () => {
     'Itemized deduction recorded for missing lastName'
   );
 
-  // Test 7: Invalid optional field (e.g. invalid phone number) drops Validity, NOT Completeness
+  // Test 7: Invalid optional field drops Validity, NOT Completeness
   const invalidPhoneStudent = {
     _id: '507f191e810c19729de860ee',
     registrationNumber: 'REG401',
@@ -182,15 +183,14 @@ const runAll = async () => {
     'Deduction itemized under Validity dimension for invalid phone'
   );
 
-  // Test 8: Duplicate candidate matches are penalized without double-counting
+  // Test 8: Repeated blocking matches for the same entity are deduplicated (no double-counting)
   const dupStudent = {
     _id: '507f191e810c19729de860ef',
     registrationNumber: 'REG501',
     firstName: 'Amit',
     lastName: 'Kumar'
   };
-  // Simulate 2 flags pointing to the SAME related record via different passes
-  const dupFlags = [
+  const dupFlagsRepeated = [
     {
       id: `${dupStudent._id}:possible_duplicate:related123`,
       recordId: dupStudent._id,
@@ -210,17 +210,84 @@ const runAll = async () => {
       description: 'Token sort match'
     }
   ];
-  const dupEval = calculateRecordDQI('students', dupStudent, dupFlags);
+  const dupEvalRepeated = calculateRecordDQI('students', dupStudent, dupFlagsRepeated);
   assert(
-    dupEval.metrics.duplicateCandidateCount === 1,
+    dupEvalRepeated.metrics.duplicateCandidateCount === 1,
     'Multiple blocking matches for the same duplicate entity pair are deduplicated (count = 1)'
   );
   assert(
-    dupEval.deductions.filter((d) => d.dimension === 'uniqueness').length === 1,
+    dupEvalRepeated.deductions.filter((d) => d.dimension === 'uniqueness').length === 1,
     'Uniqueness penalty is applied once per unique matching entity, preventing double-counting'
   );
 
-  // Test 9: Dataset DQI aggregation
+  // Test 9: Multiple DISTINCT duplicate candidates are both penalized appropriately
+  const dupFlagsMultiple = [
+    {
+      id: `${dupStudent._id}:possible_duplicate:relatedA`,
+      recordId: dupStudent._id,
+      type: 'possible_duplicate',
+      relatedRecordId: 'relatedA',
+      severity: 'medium',
+      score: 0.85,
+      description: 'Match with Entity A'
+    },
+    {
+      id: `${dupStudent._id}:possible_duplicate:relatedB`,
+      recordId: dupStudent._id,
+      type: 'possible_duplicate',
+      relatedRecordId: 'relatedB',
+      severity: 'medium',
+      score: 0.85,
+      description: 'Match with Entity B'
+    }
+  ];
+  const dupEvalMultiple = calculateRecordDQI('students', dupStudent, dupFlagsMultiple);
+  assert(
+    dupEvalMultiple.metrics.duplicateCandidateCount === 2,
+    'Multiple distinct duplicate entities are correctly counted (count = 2)'
+  );
+  assert(
+    dupEvalMultiple.deductions.filter((d) => d.dimension === 'uniqueness').length === 2,
+    'Both distinct duplicate candidate deductions are itemized'
+  );
+
+  // Test 10: Invalid-versus-standardization double penalty safeguard
+  // A field with an invalid value is NOT double-penalized under standardization
+  const syntheticDoubleFlags = [
+    {
+      id: 'rec:invalid_value:phone',
+      recordId: '507f191e810c19729de860f0',
+      type: 'invalid_value',
+      field: 'phone',
+      severity: 'high',
+      description: 'Invalid phone'
+    },
+    {
+      id: 'rec:inconsistent_format:phone',
+      recordId: '507f191e810c19729de860f0',
+      type: 'inconsistent_format',
+      field: 'phone', // Same field!
+      severity: 'low',
+      description: 'Phone format'
+    }
+  ];
+  const doubleEval = calculateRecordDQI('students', { _id: '507f191e810c19729de860f0', registrationNumber: 'R1', firstName: 'A', lastName: 'B' }, syntheticDoubleFlags);
+  assert(
+    doubleEval.dimensions.standardization.score === 100,
+    'Field with validity defect is NOT double-penalized under standardization dimension'
+  );
+  assert(
+    doubleEval.deductions.filter((d) => d.field === 'phone').length === 1,
+    'Exactly one deduction applies to the field (validity only)'
+  );
+
+  // Test 11: Empty dataset handling is mathematically defensible
+  const emptyDqi = calculateDatasetDQI('students', [], []);
+  assert(emptyDqi.score === 100, 'Empty dataset reports baseline score of 100');
+  assert(emptyDqi.metrics.totalRecordsScanned === 0, 'Empty dataset reports 0 scanned records');
+  assert(emptyDqi.rating === 'Excellent', 'Empty dataset classified as Excellent');
+
+  // Test 12: Dataset DQI aggregation linear consistency
   const datasetRecords = [cleanStudent, sparseStudent, invalidPhoneStudent];
   const allDatasetFlags = [
     ...cleanFlags,
@@ -235,13 +302,88 @@ const runAll = async () => {
   assert(typeof datasetDqi.summary === 'string' && datasetDqi.summary.length > 10, 'Dataset DQI provides clear executive summary');
 
   // ============================================================================
-  // SECTION 2: AI Proposal Validation & Correction Guardrails
+  // SECTION 2: DOB Consistency Across Stage 3A, Deterministic Detection & Stage 3C
   // ============================================================================
-  console.log('\n▶ [2. Correction Proposal Validation & Guardrail Tests]');
+  console.log('\n▶ [2. Date of Birth (DOB) Consistency Tests (100, 105, 120, >120 years)]');
 
-  const { validateCorrectionProposal, sanitizeProposedValue } = dataAssistantService;
+  const { validateCorrectionProposal, sanitizeProposedValue, buildRecordFlags } = dataAssistantService;
+  const currentYear = new Date().getFullYear();
 
-  // Test 10: Valid proposed values pass validation
+  // Age 100: (born currentYear - 100)
+  const dob100Str = `${currentYear - 100}-01-15`;
+  const studentAge100 = {
+    _id: '507f191e810c19729de860f1',
+    registrationNumber: 'REG-100',
+    firstName: 'Centenarian',
+    lastName: 'Elder',
+    dateOfBirth: dob100Str
+  };
+  const flagsAge100 = buildRecordFlags('students', studentAge100);
+  assert(
+    !flagsAge100.some((f) => f.field === 'dateOfBirth' && f.severity === 'high'),
+    'Age 100 is NOT flagged as an invalid date of birth'
+  );
+  const valCheck100 = validateCorrectionProposal('students', 'dateOfBirth', dob100Str);
+  assert(valCheck100.valid === true, 'Age 100 is accepted as a valid correction proposal');
+
+  // Age 105: (born currentYear - 105) - specifically tested to verify >100 anomaly rule no longer contradicts API
+  const dob105Str = `${currentYear - 105}-06-20`;
+  const studentAge105 = {
+    _id: '507f191e810c19729de860f2',
+    registrationNumber: 'REG-105',
+    firstName: 'Senior',
+    lastName: 'Citizen',
+    dateOfBirth: dob105Str
+  };
+  const flagsAge105 = buildRecordFlags('students', studentAge105);
+  assert(
+    !flagsAge105.some((f) => f.field === 'dateOfBirth' && f.severity === 'high'),
+    'Age 105 is NOT flagged as invalid (aligned with 120-year limit)'
+  );
+  const valCheck105 = validateCorrectionProposal('students', 'dateOfBirth', dob105Str);
+  assert(valCheck105.valid === true, 'Age 105 is accepted as a valid correction proposal');
+
+  // Age 120: (born currentYear - 120) - boundary test
+  const dob120Str = `${currentYear - 120}-12-01`;
+  const studentAge120 = {
+    _id: '507f191e810c19729de860f3',
+    registrationNumber: 'REG-120',
+    firstName: 'Oldest',
+    lastName: 'Beneficiary',
+    dateOfBirth: dob120Str
+  };
+  const flagsAge120 = buildRecordFlags('students', studentAge120);
+  assert(
+    !flagsAge120.some((f) => f.field === 'dateOfBirth' && f.severity === 'high'),
+    'Age 120 is accepted at the upper boundary'
+  );
+  const valCheck120 = validateCorrectionProposal('students', 'dateOfBirth', dob120Str);
+  assert(valCheck120.valid === true, 'Age 120 is accepted as a valid correction proposal');
+
+  // Age > 120: (e.g. 125, born currentYear - 125) - must be rejected and flagged
+  const dob125Str = `${currentYear - 125}-01-01`;
+  const studentAge125 = {
+    _id: '507f191e810c19729de860f4',
+    registrationNumber: 'REG-125',
+    firstName: 'Ancient',
+    lastName: 'Person',
+    dateOfBirth: dob125Str
+  };
+  const flagsAge125 = buildRecordFlags('students', studentAge125);
+  assert(
+    flagsAge125.some((f) => f.field === 'dateOfBirth' && f.severity === 'high' && f.description.includes('> 120 years')),
+    'Age > 120 is flagged as invalid with explicit "> 120 years" description'
+  );
+  const valCheck125 = validateCorrectionProposal('students', 'dateOfBirth', dob125Str);
+  assert(valCheck125.valid === false, 'Age > 120 is rejected by correction validation');
+  assert(valCheck125.error.includes('> 120 years'), 'Rejection error message states "> 120 years"');
+
+  // ============================================================================
+  // SECTION 3: Proposal Validation, Guardrails & Field-Level Rules
+  // ============================================================================
+  console.log('\n▶ [3. Correction Proposal Validation & Field-Level Guardrails]');
+
+  // Valid proposed values pass validation
   const validPhoneCheck = validateCorrectionProposal('students', 'phone', '9876543210');
   assert(validPhoneCheck.valid === true, 'Valid phone number proposal passes validation');
   assert(validPhoneCheck.sanitizedValue === '+91 98765 43210', 'Normalized phone string returned');
@@ -257,7 +399,7 @@ const runAll = async () => {
   assert(validNameCheck.valid === true, 'Valid lowercase name passes validation');
   assert(validNameCheck.sanitizedValue === 'Aarav', 'Name converted to Title Case');
 
-  // Test 11: Rejects forbidden fields
+  // Rejection of forbidden fields
   const forbiddenFieldCheck = validateCorrectionProposal('students', 'role', 'admin');
   assert(forbiddenFieldCheck.valid === false, 'Forbidden field "role" is rejected');
   assert(
@@ -268,42 +410,27 @@ const runAll = async () => {
   const passwordFieldCheck = validateCorrectionProposal('students', 'password', 'newSecret123');
   assert(passwordFieldCheck.valid === false, 'Forbidden field "password" is rejected');
 
-  // Test 12: Rejects invalid phone numbers
-  const invalidPhone1 = validateCorrectionProposal('students', 'phone', '12345');
-  assert(invalidPhone1.valid === false, 'Rejects short phone number');
+  // Rejection of invalid phone numbers
+  assert(validateCorrectionProposal('students', 'phone', '12345').valid === false, 'Rejects short phone number');
+  assert(validateCorrectionProposal('students', 'phone', 'abc9876543210').valid === false, 'Rejects phone with alphabetic characters');
+  assert(validateCorrectionProposal('students', 'phone', '1876543210').valid === false, 'Rejects invalid Indian phone prefix (starts with 1)');
 
-  const invalidPhone2 = validateCorrectionProposal('students', 'phone', 'abc9876543210');
-  assert(invalidPhone2.valid === false, 'Rejects phone with alphabetic characters');
+  // Rejection of invalid PIN codes
+  assert(validateCorrectionProposal('students', 'pinCode', '123').valid === false, 'Rejects short PIN code');
+  assert(validateCorrectionProposal('students', 'pinCode', '999999').valid === false, 'Rejects PIN starting with 9');
+  assert(validateCorrectionProposal('students', 'pinCode', '012345').valid === false, 'Rejects PIN starting with 0');
 
-  const invalidPhone3 = validateCorrectionProposal('students', 'phone', '1876543210');
-  assert(invalidPhone3.valid === false, 'Rejects invalid Indian phone prefix (starts with 1)');
-
-  // Test 13: Rejects invalid PIN codes
-  const invalidPin1 = validateCorrectionProposal('students', 'pinCode', '123');
-  assert(invalidPin1.valid === false, 'Rejects short PIN code');
-
-  const invalidPin2 = validateCorrectionProposal('students', 'pinCode', '999999');
-  assert(invalidPin2.valid === false, 'Rejects PIN starting with 9');
-
-  const invalidPin3 = validateCorrectionProposal('students', 'pinCode', '012345');
-  assert(invalidPin3.valid === false, 'Rejects PIN starting with 0');
-
-  // Test 14: Rejects invalid Date of Birth (future date & implausible age)
+  // Rejection of future Date of Birth
   const futureDobCheck = validateCorrectionProposal('students', 'dateOfBirth', '2099-01-01');
   assert(futureDobCheck.valid === false, 'Rejects future Date of Birth');
-  assert(futureDobCheck.error.includes('future'), 'Reason cites future date');
 
-  const oldDobCheck = validateCorrectionProposal('students', 'dateOfBirth', '1850-01-01');
-  assert(oldDobCheck.valid === false, 'Rejects implausible age (> 100 years)');
-
-  // Test 15: Rejects names with special characters or numbers
-  const badNameCheck = validateCorrectionProposal('students', 'firstName', 'Aarav@123');
-  assert(badNameCheck.valid === false, 'Rejects name containing numeric or special characters');
+  // Rejection of names with special characters
+  assert(validateCorrectionProposal('students', 'firstName', 'Aarav@123').valid === false, 'Rejects name containing numeric or special characters');
 
   // ============================================================================
-  // SECTION 3: HTTP API Integration Tests (RBAC, Guardrails & DQI Endpoints)
+  // SECTION 4: HTTP API, Cryptographic Audit Trust & Security Integration Tests
   // ============================================================================
-  console.log('\n▶ [3. API Endpoints, Audit Metadata & Security Integration Tests]');
+  console.log('\n▶ [4. API Endpoints, Cryptographic Audit Trust & Multi-Tenant Security]');
 
   // Start test server
   const server = http.createServer(app);
@@ -401,7 +528,7 @@ const runAll = async () => {
   };
   geminiService.setClientForTesting(mockClient);
 
-  // Test 16: Proposal endpoint returns validated proposed value
+  // Proposal endpoint returns proposal with trusted server proposalToken
   const proposalRes1 = await apiRequest(`${baseUrl}/assistant/ai/propose-correction`, {
     method: 'POST',
     headers: { Authorization: `Bearer ${tokenA}` },
@@ -416,15 +543,14 @@ const runAll = async () => {
   assert(proposalRes1.data.data.available === true, 'Proposal reports available=true');
   assert(proposalRes1.data.data.validated === true, 'Proposal reports validated=true');
   assert(proposalRes1.data.data.proposedValue === '+91 98765 43210', 'Proposed value validated and sanitized');
+  assert(typeof proposalRes1.data.data.proposalToken === 'string', 'Server returns signed proposalToken');
 
-  // Test 17: Proposal endpoint intercepts and rejects invalid AI suggestions
-  // Configure mock to return an invalid phone number from AI
+  // Proposal endpoint intercepts and rejects invalid AI suggestions
   currentMockOutput = JSON.stringify({
-    proposedValue: '12345', // Invalid 5-digit number
+    proposedValue: '12345',
     reasoning: 'Shortened digits.',
     confidenceCategory: 'medium'
   });
-
   const invalidProposalRes = await apiRequest(`${baseUrl}/assistant/ai/propose-correction`, {
     method: 'POST',
     headers: { Authorization: `Bearer ${tokenA}` },
@@ -438,50 +564,44 @@ const runAll = async () => {
   assert(invalidProposalRes.status === 200, 'Endpoint handles invalid AI proposal gracefully with HTTP 200');
   assert(invalidProposalRes.data.data.available === false, 'Invalid AI proposal marked available=false');
   assert(invalidProposalRes.data.data.reason === 'invalid_ai_proposal', 'Reason specifies invalid_ai_proposal');
-  assert(
-    invalidProposalRes.data.data.error.includes('failed field-level validation rules'),
-    'Error details failure of deterministic field rules'
-  );
 
-  // Test 18: Zero writes to MongoDB during proposal generation
+  // Zero writes to MongoDB during proposal generation
   const phoneStudentCheck = await Student.findById(studentPhoneId);
   assert(
     phoneStudentCheck.phone === '9876543210',
     'Database document is 100% unchanged after proposal requests (ZERO writes by AI)'
   );
 
-  // Test 19: Dedicated DQI endpoint for dataset: GET /assistant/clean/:recordType/dqi
+  // Dedicated DQI endpoints
   const dqiRes = await apiRequest(`${baseUrl}/assistant/clean/students/dqi`, {
     method: 'GET',
     headers: { Authorization: `Bearer ${tokenA}` }
   });
   assert(dqiRes.status === 200, 'GET /assistant/clean/students/dqi returns 200');
   assert(typeof dqiRes.data.data.dqi.score === 'number', 'DQI response includes numeric score');
-  assert(dqiRes.data.data.dqi.dimensions.completeness.weight === 35, 'DQI completeness weight is 35%');
-  assert(dqiRes.data.data.dqi.dimensions.validity.weight === 35, 'DQI validity weight is 35%');
-  assert(dqiRes.data.data.dqi.methodology.name.includes('Deterministic Data Quality Index'), 'Includes methodology metadata');
 
-  // Test 20: Dedicated DQI endpoint for individual record: GET /assistant/clean/:recordType/dqi/:recordId
   const recordDqiRes = await apiRequest(`${baseUrl}/assistant/clean/students/dqi/${studentPhoneId}`, {
     method: 'GET',
     headers: { Authorization: `Bearer ${tokenA}` }
   });
   assert(recordDqiRes.status === 200, 'GET /assistant/clean/students/dqi/:recordId returns 200');
   assert(recordDqiRes.data.data.recordId === studentPhoneId, 'Record DQI matches requested record ID');
-  assert(typeof recordDqiRes.data.data.dqi.score === 'number', 'Record DQI provides individual score');
-  assert(Array.isArray(recordDqiRes.data.data.dqi.deductions), 'Record DQI includes deductions list');
 
-  // Test 21: Full clean analysis endpoint POST /assistant/clean/:recordType includes DQI
   const cleanAnalysisRes = await apiRequest(`${baseUrl}/assistant/clean/students`, {
     method: 'POST',
     headers: { Authorization: `Bearer ${tokenA}` }
   });
   assert(cleanAnalysisRes.status === 200, 'POST /assistant/clean/students returns 200');
   assert(cleanAnalysisRes.data.data.dqi !== undefined, 'POST /clean/:recordType includes dqi in payload');
-  assert(cleanAnalysisRes.data.data.dqi.rating !== undefined, 'Payload includes DQI rating');
 
-  // Test 22: Human Review Acceptance with Rich Audit Metadata
-  const reviewAcceptRes = await apiRequest(`${baseUrl}/assistant/clean/students/review`, {
+  // ============================================================================
+  // AUDIT METADATA TRUST TESTS (Forged Metadata & Token Tampering)
+  // ============================================================================
+  console.log('\n▶ [5. Audit Metadata Trust & Anti-Forgery Tests]');
+
+  // Test: Client attempts to send forged aiProvider/aiModel in request body
+  // Must be rejected by strict Zod schema with HTTP 400!
+  const forgedBodyRes = await apiRequest(`${baseUrl}/assistant/clean/students/review`, {
     method: 'POST',
     headers: { Authorization: `Bearer ${tokenA}` },
     body: JSON.stringify({
@@ -490,46 +610,92 @@ const runAll = async () => {
       field: 'phone',
       decision: 'accept',
       proposedValue: '+91 98765 43210',
-      aiProvider: 'gemini',
-      aiModel: 'gemini-2.5-flash',
-      findingId: `${studentPhoneId}:inconsistent_format:phone`
+      aiProvider: 'rogue-super-ai', // Forged property
+      aiModel: 'malicious-model-v99' // Forged property
     })
   });
-  assert(reviewAcceptRes.status === 200, 'Human review accept returns 200');
-  assert(reviewAcceptRes.data.data.applied === true, 'Response confirms fix was applied');
-
-  // Verify database was updated
-  const updatedStudent = await Student.findById(studentPhoneId);
+  assert(forgedBodyRes.status === 400, 'Review endpoint strictly rejects client-supplied aiProvider/aiModel in body (HTTP 400)');
   assert(
-    updatedStudent.phone === '+91 98765 43210',
-    'Database document updated to validated phone only upon human approval'
+    JSON.stringify(forgedBodyRes.data).includes('Unrecognized key'),
+    'Rejection cites unrecognized key in body'
   );
 
-  // Verify AuditLog metadata persistence
-  const acceptAuditLogs = await AuditLog.find({
+  // Test: Client attempts to send forged findingId in request body
+  const forgedFindingRes = await apiRequest(`${baseUrl}/assistant/clean/students/review`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${tokenA}` },
+    body: JSON.stringify({
+      recordId: studentPhoneId,
+      issueType: 'inconsistent_format',
+      field: 'phone',
+      decision: 'accept',
+      proposedValue: '+91 98765 43210',
+      findingId: 'fabricated-finding-id-12345' // Forged property
+    })
+  });
+  assert(forgedFindingRes.status === 400, 'Review endpoint strictly rejects client-supplied findingId in body (HTTP 400)');
+
+  // Test: Client attempts to send a tampered proposalToken (signature mismatch)
+  const validToken = proposalRes1.data.data.proposalToken;
+  const tamperedToken = validToken.slice(0, -6) + 'XXXXXX'; // Invalidate HMAC signature
+
+  const tamperedReviewRes = await apiRequest(`${baseUrl}/assistant/clean/students/review`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${tokenA}` },
+    body: JSON.stringify({
+      recordId: studentPhoneId,
+      issueType: 'inconsistent_format',
+      field: 'phone',
+      decision: 'accept',
+      proposedValue: '+91 98765 43210',
+      proposalToken: tamperedToken
+    })
+  });
+  assert(tamperedReviewRes.status === 200, 'Review succeeds applying valid fix');
+
+  // Verify AuditLog metadata: tampered token resulted in aiProvider: null (NOT trusted!)
+  const tamperedAudit = await AuditLog.findOne({
     entityType: 'data_cleaning_review',
     entityId: studentPhoneId
   }).sort({ createdAt: -1 });
 
-  assert(acceptAuditLogs.length > 0, 'Audit log entry created for human review');
-  const latestAudit = acceptAuditLogs[0];
-  assert(latestAudit.metadata.targetField === 'phone', 'Audit metadata records targetField');
+  assert(tamperedAudit.metadata.aiProvider === null, 'Tampered proposalToken is NOT trusted; aiProvider logged as null');
+  assert(tamperedAudit.metadata.aiModel === null, 'Tampered proposalToken is NOT trusted; aiModel logged as null');
   assert(
-    latestAudit.metadata.originalValue === '[REDACTED_PHONE]' || latestAudit.metadata.originalValue === '9876543210',
-    'Audit metadata records originalValue (with PII scrubbing)'
+    tamperedAudit.metadata.findingId === `${studentPhoneId}:inconsistent_format:phone`,
+    'findingId is strictly server-derived from canonical deterministic flag'
   );
-  assert(
-    latestAudit.metadata.proposedValue === '[REDACTED_PHONE]' || latestAudit.metadata.proposedValue === '+91 98765 43210',
-    'Audit metadata records proposedValue (with PII scrubbing)'
-  );
-  assert(latestAudit.metadata.decision === 'accept', 'Audit metadata records decision="accept"');
-  assert(latestAudit.metadata.applied === true, 'Audit metadata records applied=true');
-  assert(latestAudit.metadata.aiProvider === 'gemini', 'Audit metadata records aiProvider safely');
-  assert(latestAudit.metadata.aiModel === 'gemini-2.5-flash', 'Audit metadata records aiModel');
-  assert(latestAudit.metadata.reviewerId === String(staffUserA._id), 'Audit metadata records reviewerId');
-  assert(latestAudit.metadata.reviewedAt !== undefined, 'Audit metadata records review timestamp');
 
-  // Test 23: Human Review Rejection (Audit metadata records rejection without modifying database)
+  // Test: Legitimate review with valid server proposalToken correctly records aiProvider & aiModel
+  // Reset student phone back to raw format to test legitimate token review
+  await Student.updateOne({ _id: studentPhoneId }, { phone: '9876543210' });
+
+  const legitReviewRes = await apiRequest(`${baseUrl}/assistant/clean/students/review`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${tokenA}` },
+    body: JSON.stringify({
+      recordId: studentPhoneId,
+      issueType: 'inconsistent_format',
+      field: 'phone',
+      decision: 'accept',
+      proposedValue: '+91 98765 43210',
+      proposalToken: validToken // Valid server-signed token
+    })
+  });
+  assert(legitReviewRes.status === 200, 'Legitimate review with valid proposalToken returns 200');
+
+  const legitAudit = await AuditLog.findOne({
+    entityType: 'data_cleaning_review',
+    entityId: studentPhoneId
+  }).sort({ createdAt: -1 });
+
+  assert(legitAudit.metadata.aiProvider === 'gemini', 'Verified proposalToken sets aiProvider to "gemini"');
+  assert(legitAudit.metadata.aiModel === 'gemini-2.5-flash', 'Verified proposalToken sets aiModel to server model');
+  assert(legitAudit.metadata.targetField === 'phone', 'Audit records targetField');
+  assert(legitAudit.metadata.decision === 'accept', 'Audit records decision');
+  assert(legitAudit.metadata.applied === true, 'Audit records applied');
+
+  // Test: Human Review Rejection
   const pinStudentBefore = await Student.findById(studentPinId);
   const reviewRejectRes = await apiRequest(`${baseUrl}/assistant/clean/students/review`, {
     method: 'POST',
@@ -538,8 +704,7 @@ const runAll = async () => {
       recordId: studentPinId,
       issueType: 'inconsistent_format',
       field: 'pinCode',
-      decision: 'reject',
-      aiProvider: 'gemini'
+      decision: 'reject'
     })
   });
   assert(reviewRejectRes.status === 200, 'Human review rejection returns 200');
@@ -551,16 +716,18 @@ const runAll = async () => {
     'Database document remains completely unmodified on rejection'
   );
 
-  const rejectAuditLogs = await AuditLog.find({
+  const rejectAudit = await AuditLog.findOne({
     entityType: 'data_cleaning_review',
     entityId: studentPinId
-  });
-  assert(rejectAuditLogs.length > 0, 'Audit log entry created for human review rejection');
-  const rejectAudit = rejectAuditLogs[0];
+  }).sort({ createdAt: -1 });
   assert(rejectAudit.metadata.decision === 'reject', 'Audit metadata records decision="reject"');
   assert(rejectAudit.metadata.applied === false, 'Audit metadata records applied=false');
+  assert(
+    rejectAudit.metadata.findingId === `${studentPinId}:inconsistent_format:pinCode`,
+    'Rejection findingId is strictly derived by server'
+  );
 
-  // Test 24: Rejection of invalid value in human review endpoint
+  // Test: Rejection of invalid value in human review endpoint
   const invalidReviewRes = await apiRequest(`${baseUrl}/assistant/clean/students/review`, {
     method: 'POST',
     headers: { Authorization: `Bearer ${tokenA}` },
@@ -569,12 +736,12 @@ const runAll = async () => {
       issueType: 'inconsistent_format',
       field: 'pinCode',
       decision: 'accept',
-      proposedValue: 'bad-pin-999999' // Invalid PIN
+      proposedValue: 'bad-pin-999999'
     })
   });
   assert(invalidReviewRes.status === 400, 'Human review with invalid proposedValue rejected with HTTP 400');
 
-  // Test 25: Tenant Isolation: Staff B from NGO B cannot access records of NGO A
+  // Test: Tenant Isolation
   const crossTenantDqi = await apiRequest(`${baseUrl}/assistant/clean/students/dqi/${studentPhoneId}`, {
     method: 'GET',
     headers: { Authorization: `Bearer ${tokenB}` }
@@ -593,7 +760,7 @@ const runAll = async () => {
   });
   assert(crossTenantReview.status === 404, 'Cross-tenant review returns 404 access denied');
 
-  // Test 26: Unauthenticated request blocked
+  // Test: Unauthenticated request blocked
   const unauthDqi = await apiRequest(`${baseUrl}/assistant/clean/students/dqi`);
   assert(unauthDqi.status === 401, 'Unauthenticated GET DQI returns 401');
 

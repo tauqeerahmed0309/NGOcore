@@ -203,7 +203,7 @@ const parseBeneficiaryDOB = (raw) => {
     const now = new Date();
     if (raw > now) return { valid: false, reason: 'future date of birth' };
     const age = (now - raw) / (365.25 * 24 * 3600 * 1000);
-    if (age > 100) return { valid: false, reason: 'implausible age (> 100 years)' };
+    if (age > 120) return { valid: false, reason: 'implausible age (> 120 years)' };
     const iso = raw.toISOString().split('T')[0];
     return { valid: true, date: raw, iso, needsFormatting: false };
   }
@@ -221,7 +221,7 @@ const parseBeneficiaryDOB = (raw) => {
     const now = new Date();
     if (parsed > now) return { valid: false, reason: 'future date of birth' };
     const age = (now - parsed) / (365.25 * 24 * 3600 * 1000);
-    if (age > 100) return { valid: false, reason: 'implausible age (> 100 years)' };
+    if (age > 120) return { valid: false, reason: 'implausible age (> 120 years)' };
     const mm = String(month).padStart(2, '0');
     const dd = String(day).padStart(2, '0');
     return { valid: true, date: parsed, iso: `${year}-${mm}-${dd}`, needsFormatting: true };
@@ -239,7 +239,7 @@ const parseBeneficiaryDOB = (raw) => {
     const now = new Date();
     if (parsed > now) return { valid: false, reason: 'future date of birth' };
     const age = (now - parsed) / (365.25 * 24 * 3600 * 1000);
-    if (age > 100) return { valid: false, reason: 'implausible age (> 100 years)' };
+    if (age > 120) return { valid: false, reason: 'implausible age (> 120 years)' };
     return { valid: true, date: parsed, iso: str, needsFormatting: false };
   }
 
@@ -250,7 +250,7 @@ const parseBeneficiaryDOB = (raw) => {
   const now = new Date();
   if (d > now) return { valid: false, reason: 'future date of birth' };
   const age = (now - d) / (365.25 * 24 * 3600 * 1000);
-  if (age > 100) return { valid: false, reason: 'implausible age (> 100 years)' };
+  if (age > 120) return { valid: false, reason: 'implausible age (> 120 years)' };
   return { valid: true, date: d, iso: d.toISOString().split('T')[0], needsFormatting: true };
 };
 
