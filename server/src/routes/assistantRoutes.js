@@ -46,6 +46,8 @@ router.use(authMiddleware, ngoScope);
 
 // Deterministic data cleaning and human review endpoints
 router.post('/clean/:recordType', cleaningLimiter, roleMiddleware('admin', 'staff'), assistantController.analyze);
+router.get('/clean/:recordType/dqi', cleaningLimiter, roleMiddleware('admin', 'staff'), assistantController.getDqi);
+router.get('/clean/:recordType/dqi/:recordId', cleaningLimiter, roleMiddleware('admin', 'staff'), assistantController.getRecordDqi);
 router.post('/clean/:recordType/review', cleaningLimiter, roleMiddleware('admin', 'staff'), validateBody(cleanReviewSchema), assistantController.review);
 router.get('/insights/:recordType', insightsLimiter, roleMiddleware('admin'), assistantController.insights);
 

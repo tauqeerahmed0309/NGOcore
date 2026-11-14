@@ -1,6 +1,14 @@
 const mongoose = require('mongoose');
 const Student = require('../models/Student');
 const Program = require('../models/Program');
+const {
+  calculateRecordDQI,
+  calculateDatasetDQI,
+  classifyRating,
+  getDqiMethodology,
+  DQI_WEIGHTS,
+  DQI_RATING_BANDS
+} = require('./dataQualityService');
 
 const MODELS = {
   students: Student,
@@ -901,7 +909,8 @@ const analyzeRecords = async (recordType, ngoFilter) => {
     }
   }
 
-  return { flags, scanned: records.length };
+  const dqi = calculateDatasetDQI(recordType, records, flags);
+  return { flags, scanned: records.length, dqi };
 };
 
 const sanitizeProposedValue = (recordType, field, proposedValue, record) => {
@@ -954,7 +963,7 @@ const sanitizeProposedValue = (recordType, field, proposedValue, record) => {
         throw Object.assign(new Error(`Invalid date of birth: ${dobRes.reason}`), { statusCode: 400 });
       }
     }
-    const otherDate = field === 'startDate' ? record.endDate : record.startDate;
+    const otherDate = field === 'startDate' ? record?.endDate : record?.startDate;
     const otherParsed = otherDate ? parseDate(otherDate) : null;
     if (field === 'endDate' && otherParsed && date < otherParsed) {
       throw Object.assign(new Error('Program end date cannot be before its start date.'), { statusCode: 400 });
@@ -970,11 +979,22 @@ const sanitizeProposedValue = (recordType, field, proposedValue, record) => {
   return value;
 };
 
+const validateCorrectionProposal = (recordType, field, proposedValue, record) => {
+  try {
+    const sanitized = sanitizeProposedValue(recordType, field, proposedValue, record);
+    return { valid: true, sanitizedValue: sanitized };
+  } catch (error) {
+    return { valid: false, error: error.message };
+  }
+};
+
 const applyReview = async ({ recordType, recordId, issueType, field, relatedRecordId, decision, proposedValue, ngoFilter }) => {
   const Model = getModel(recordType);
   if (!Model) throw Object.assign(new Error('Record type must be students or programs.'), { statusCode: 400 });
   const record = await Model.findOne(ngoFilter({ _id: recordId }));
   if (!record) throw Object.assign(new Error('Record not found.'), { statusCode: 404 });
+
+  const originalValue = field ? record.get(field) : null;
 
   if (issueType === 'possible_duplicate') {
     if (!relatedRecordId || relatedRecordId === recordId) {
@@ -985,19 +1005,53 @@ const applyReview = async ({ recordType, recordId, issueType, field, relatedReco
     if (!areLikelyDuplicates(recordType, record, relatedRecord)) {
       throw Object.assign(new Error('These records are no longer flagged as likely duplicates.'), { statusCode: 409 });
     }
+
+    return {
+      record,
+      applied: false,
+      originalValue: null,
+      proposedValue: null,
+      targetField: null,
+      findingId: `${recordId}:possible_duplicate:${relatedRecordId}`,
+      associatedFinding: issueType
+    };
   } else if (decision === 'accept') {
     const flags = buildRecordFlags(recordType, record.toObject());
     const issue = flags.find((flag) => flag.type === issueType && flag.field === field);
     if (!issue) throw Object.assign(new Error('This data-quality issue is no longer present.'), { statusCode: 409 });
     const suggestion = issue.suggestedValue;
-    const safeValue = suggestion === null
-      ? sanitizeProposedValue(recordType, field, proposedValue, record)
-      : suggestion;
+    let safeValue;
+    if (proposedValue !== undefined && proposedValue !== null && String(proposedValue).trim() !== '') {
+      safeValue = sanitizeProposedValue(recordType, field, proposedValue, record);
+    } else if (suggestion !== null && suggestion !== undefined) {
+      safeValue = suggestion;
+    } else {
+      throw Object.assign(new Error('Enter a non-empty corrected value before accepting this fix.'), { statusCode: 400 });
+    }
     record.set(field, safeValue);
     await record.save();
+
+    return {
+      record,
+      applied: true,
+      originalValue,
+      proposedValue: safeValue,
+      targetField: field,
+      findingId: issue.id,
+      associatedFinding: issueType
+    };
   }
 
-  return { record, applied: issueType !== 'possible_duplicate' && decision === 'accept' };
+  // decision === 'reject'
+  return {
+    record,
+    applied: false,
+    originalValue,
+    proposedValue: proposedValue || null,
+    targetField: field || null,
+    findingId: null,
+    associatedFinding: issueType
+  };
 };
 
 module.exports = {
@@ -1007,5 +1061,11 @@ module.exports = {
   scorePair,
   generateCandidatePairs,
   buildRecordFlags,
-  CORRECTION_ALLOWED_FIELDS
+  CORRECTION_ALLOWED_FIELDS,
+  sanitizeProposedValue,
+  validateCorrectionProposal,
+  calculateRecordDQI,
+  calculateDatasetDQI,
+  classifyRating,
+  getDqiMethodology
 };

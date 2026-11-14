@@ -6,7 +6,10 @@ const cleanReviewSchema = z.object({
   field: z.string().max(40).optional().default(''),
   relatedRecordId: z.string().regex(/^[0-9a-fA-F]{24}$/).optional(),
   decision: z.enum(['accept', 'reject']),
-  proposedValue: z.string().max(200).optional()
+  proposedValue: z.string().max(200).optional(),
+  aiProvider: z.string().max(50).optional(),
+  aiModel: z.string().max(50).optional(),
+  findingId: z.string().max(150).optional()
 }).strict();
 
 const explainFindingRequestSchema = z.object({

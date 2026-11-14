@@ -2,7 +2,16 @@ const Student = require('../models/Student');
 const Program = require('../models/Program');
 const { successResponse, errorResponse } = require('../utils/apiResponse');
 const { writeAuditLog } = require('../services/auditService');
-const { analyzeRecords, applyReview, buildRecordFlags, CORRECTION_ALLOWED_FIELDS } = require('../services/dataAssistantService');
+const {
+  analyzeRecords,
+  applyReview,
+  buildRecordFlags,
+  CORRECTION_ALLOWED_FIELDS,
+  validateCorrectionProposal,
+  calculateRecordDQI,
+  calculateDatasetDQI
+} = require('../services/dataAssistantService');
+const geminiService = require('../services/geminiService');
 const {
   summarizeMetrics,
   getProviderStatus,
@@ -18,6 +27,13 @@ const recordModels = {
 };
 
 const validateRecordType = (recordType) => Boolean(recordModels[recordType]);
+
+const sanitizeAuditValue = (val) => {
+  if (val === null || val === undefined) return null;
+  const str = String(val).trim();
+  const masked = geminiService.sanitizeText(str);
+  return masked.length > 150 ? `${masked.slice(0, 150)}...` : masked;
+};
 
 const analyze = async (req, res, next) => {
   try {
@@ -43,7 +59,18 @@ const review = async (req, res, next) => {
       return errorResponse(res, 400, 'Record type must be students or programs.');
     }
 
-    const { recordId, issueType, field, relatedRecordId, decision, proposedValue } = req.body;
+    const {
+      recordId,
+      issueType,
+      field,
+      relatedRecordId,
+      decision,
+      proposedValue,
+      aiProvider,
+      aiModel,
+      findingId
+    } = req.body;
+
     const result = await applyReview({
       recordType,
       recordId,
@@ -54,17 +81,43 @@ const review = async (req, res, next) => {
       proposedValue,
       ngoFilter: req.ngoFilter
     });
+
     await writeAuditLog({
       req,
       actor: req.user,
       action: 'update',
       entityType: 'data_cleaning_review',
       entityId: recordId,
-      metadata: { recordType, issueType, field: field || null, relatedRecordId: relatedRecordId || null, decision, applied: result.applied }
+      metadata: {
+        recordType,
+        issueType,
+        targetField: field || null,
+        field: field || null,
+        relatedRecordId: relatedRecordId || null,
+        originalValue: result.originalValue !== undefined && result.originalValue !== null
+          ? sanitizeAuditValue(result.originalValue)
+          : null,
+        proposedValue: result.proposedValue !== undefined && result.proposedValue !== null
+          ? sanitizeAuditValue(result.proposedValue)
+          : null,
+        associatedFinding: issueType,
+        findingId: result.findingId || findingId || null,
+        aiProvider: aiProvider || null,
+        aiModel: aiModel || null,
+        decision,
+        applied: result.applied,
+        reviewerId: req.user?._id ? String(req.user._id) : null,
+        reviewerRole: req.user?.role || null,
+        reviewedAt: new Date().toISOString()
+      }
     });
+
     return successResponse(res, 200, result.applied ? 'The confirmed fix was applied.' : 'Review decision recorded; the record was not changed.', {
       applied: result.applied,
-      recordId
+      recordId,
+      targetField: field || null,
+      decision,
+      auditLogged: true
     });
   } catch (error) {
     return next(error);
@@ -240,14 +293,86 @@ const proposeCorrection = async (req, res, next) => {
       });
     }
 
+    // STAGE 3C PHASE 2: Deterministic validation of AI proposed value using existing field rules
+    const validationCheck = validateCorrectionProposal(
+      recordType,
+      field,
+      result.data.proposedValue,
+      record.toObject()
+    );
+
+    if (!validationCheck.valid) {
+      return successResponse(res, 200, 'AI correction proposal could not be validated against field rules.', {
+        available: false,
+        reason: 'invalid_ai_proposal',
+        error: `AI proposed value failed field-level validation rules: ${validationCheck.error}`
+      });
+    }
+
     return successResponse(res, 200, 'AI correction proposal ready.', {
       available: true,
       recordId,
       field,
       issueType,
-      ...result.data,
+      proposedValue: validationCheck.sanitizedValue,
+      rawProposedValue: result.data.proposedValue,
+      reasoning: result.data.reasoning,
+      confidenceCategory: result.data.confidenceCategory,
+      validated: true,
       meta: result.meta,
       notice: 'This is an advisory AI proposal. Human review and explicit confirmation are required to apply any change.'
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+const getDqi = async (req, res, next) => {
+  try {
+    const { recordType } = req.params;
+    const Model = recordModels[recordType];
+    if (!Model) {
+      return errorResponse(res, 400, 'Record type must be students or programs.');
+    }
+
+    const records = await Model.find(req.ngoFilter({})).select(
+      recordType === 'students'
+        ? 'firstName lastName registrationNumber email dateOfBirth phone pinCode state address createdAt'
+        : 'name code type category startDate endDate createdAt'
+    ).lean();
+
+    const flags = records.flatMap((record) => buildRecordFlags(recordType, record));
+    const dqi = calculateDatasetDQI(recordType, records, flags);
+
+    return successResponse(res, 200, 'Data Quality Index calculated.', {
+      recordType,
+      dqi
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+const getRecordDqi = async (req, res, next) => {
+  try {
+    const { recordType, recordId } = req.params;
+    const Model = recordModels[recordType];
+    if (!Model) {
+      return errorResponse(res, 400, 'Record type must be students or programs.');
+    }
+
+    const record = await Model.findOne(req.ngoFilter({ _id: recordId })).lean();
+    if (!record) {
+      return errorResponse(res, 404, 'Record not found or access denied.');
+    }
+
+    const flags = buildRecordFlags(recordType, record);
+    const dqi = calculateRecordDQI(recordType, record, flags);
+
+    return successResponse(res, 200, 'Record Data Quality Index calculated.', {
+      recordType,
+      recordId,
+      dqi
     });
   } catch (error) {
     return next(error);
@@ -262,5 +387,7 @@ module.exports = {
   explainFinding,
   explainDuplicate,
   normalizeText,
-  proposeCorrection
+  proposeCorrection,
+  getDqi,
+  getRecordDqi
 };

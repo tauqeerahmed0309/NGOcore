@@ -20,6 +20,8 @@
     "test:stage3a": "cd server && npm run test:stage3a",
     "test:stage3b": "cd server && npm run test:stage3b",
     "test:stage3c-phase1": "cd server && npm run test:stage3c-phase1",
+    "test:stage3c-phase2": "cd server && npm run test:stage3c-phase2",
+    "test:stage3c": "cd server && npm run test:stage3c",
     "test:reports": "cd server && npm run test:reports",
     "test:analytics": "cd server && npm run test:analytics",
     "test:db": "cd server && npm run test:db",

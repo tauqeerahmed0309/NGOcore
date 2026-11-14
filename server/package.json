@@ -22,6 +22,8 @@
     "test:stage3a": "node src/scripts/testStage3AValidation.js",
     "test:stage3b": "node src/scripts/testStage3BGemini.js",
     "test:stage3c-phase1": "node src/scripts/testStage3CPhase1.js",
+    "test:stage3c-phase2": "node src/scripts/testStage3CPhase2.js",
+    "test:stage3c": "node src/scripts/testStage3CPhase1.js && node src/scripts/testStage3CPhase2.js",
     "test:reports": "node src/scripts/testReportsModule.js",
     "test:analytics": "node src/scripts/testAnalyticsModule.js",
     "test:db": "node src/scripts/testDatabaseConnection.js",
