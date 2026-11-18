@@ -1,0 +1,114 @@
+version: '3.8'
+
+# ==============================================================================
+# NGOcore — Production Docker Compose Orchestration
+# Services:
+#   1. frontend — React 19 / Vite SPA served via Nginx with reverse proxy
+#   2. backend  — Node.js 20 / Express 5 REST API
+#   3. mongodb  — MongoDB 7.0 database with persistent storage
+# ==============================================================================
+
+services:
+  # ----------------------------------------------------------------------------
+  # Database: MongoDB 7.0
+  # ----------------------------------------------------------------------------
+  mongodb:
+    image: mongo:7.0
+    container_name: ngocore-mongodb
+    restart: unless-stopped
+    environment:
+      - MONGO_INITDB_DATABASE=${MONGO_INITDB_DATABASE:-ngo_records_db}
+    volumes:
+      - ngocore_mongodb_data:/data/db
+    networks:
+      - ngocore_network
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    # Not exposed publicly by default. Uncomment for external host inspection:
+    # ports:
+    #   - "127.0.0.1:${MONGO_PORT:-27017}:27017"
+
+  # ----------------------------------------------------------------------------
+  # Backend API: Node.js 20 LTS Express Application
+  # ----------------------------------------------------------------------------
+  backend:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: ngocore-backend
+    restart: unless-stopped
+    ports:
+      - "${PORT:-5000}:5000"
+    environment:
+      - NODE_ENV=production
+      - PORT=5000
+      - MONGODB_URI=mongodb://mongodb:27017/${MONGO_INITDB_DATABASE:-ngo_records_db}
+      - JWT_SECRET=${JWT_SECRET:-super_secret_production_jwt_key_ngocore_2026_at_least_32_chars}
+      - JWT_REFRESH_EXPIRES_IN=${JWT_REFRESH_EXPIRES_IN:-7d}
+      - JWT_EXPIRES_IN=${JWT_EXPIRES_IN:-20m}
+      - CLIENT_URL=${CLIENT_URL:-http://localhost:3000,http://localhost:80,http://127.0.0.1:3000,http://localhost:5000}
+      - MAX_FILE_SIZE_MB=${MAX_FILE_SIZE_MB:-10}
+      - ADMIN_EMAIL=${ADMIN_EMAIL:-admin@ngo.org}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-}
+      - SMTP_HOST=${SMTP_HOST:-}
+      - SMTP_PORT=${SMTP_PORT:-587}
+      - SMTP_SECURE=${SMTP_SECURE:-false}
+      - SMTP_USER=${SMTP_USER:-}
+      - SMTP_PASSWORD=${SMTP_PASSWORD:-}
+      - MAIL_FROM=${MAIL_FROM:-}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID:-}
+      - AI_PROVIDER=${AI_PROVIDER:-auto}
+      - GEMINI_ENABLED=${GEMINI_ENABLED:-false}
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      - GEMINI_MODEL=${GEMINI_MODEL:-gemini-2.5-flash}
+      - GEMINI_PII_MODE=${GEMINI_PII_MODE:-disabled}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - ANTHROPIC_MODEL=${ANTHROPIC_MODEL:-claude-haiku-4-5-20251001}
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    volumes:
+      - ngocore_uploads:/app/uploads
+      - ngocore_private_uploads:/app/private-uploads
+    networks:
+      - ngocore_network
+
+  # ----------------------------------------------------------------------------
+  # Frontend: React / Vite SPA served via Nginx Alpine Web Server
+  # ----------------------------------------------------------------------------
+  frontend:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=${VITE_API_URL:-/api/v1}
+        - VITE_GOOGLE_CLIENT_ID=${VITE_GOOGLE_CLIENT_ID:-}
+    container_name: ngocore-frontend
+    restart: unless-stopped
+    ports:
+      - "${FRONTEND_PORT:-3000}:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - ngocore_network
+
+# ------------------------------------------------------------------------------
+# Isolated Internal Network & Persistent Named Volumes
+# ------------------------------------------------------------------------------
+networks:
+  ngocore_network:
+    name: ngocore_network
+    driver: bridge
+
+volumes:
+  ngocore_mongodb_data:
+    name: ngocore_mongodb_data
+  ngocore_uploads:
+    name: ngocore_uploads
+  ngocore_private_uploads:
+    name: ngocore_private_uploads

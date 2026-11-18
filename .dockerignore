@@ -1,0 +1,35 @@
+# Dependency directories
+node_modules
+client/node_modules
+server/node_modules
+
+# Build artifacts
+client/dist
+coverage
+
+# Environment variables & credentials
+.env
+.env.*
+!.env.example
+!.env.docker.example
+client/.env
+client/.env.*
+!client/.env.example
+server/.env
+server/.env.*
+!server/.env.example
+
+# Version control & IDE files
+.git
+.github
+.vscode
+.idea
+*.log
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Test reports & execution artifacts
+test-results
+playwright-report

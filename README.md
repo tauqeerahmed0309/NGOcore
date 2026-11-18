@@ -270,6 +270,156 @@ npm run test:assistant     # Data cleaning and aggregate insights checks (uses a
 
 ## 9. Deployment Architecture
 
+### 9.1 Containerized Docker Deployment (Recommended)
+
+NGOcore includes production-ready Docker and Docker Compose orchestration across three decoupled, security-hardened services:
+1. **`frontend`**: React 19 / Vite SPA compiled in a multi-stage build and served via Nginx Alpine with SPA fallback routing and API reverse-proxying.
+2. **`backend`**: Node.js 20 LTS Express REST API running under a non-root user (`node`), managed with `dumb-init` for signal handling, and verified with built-in health checks.
+3. **`mongodb`**: MongoDB 7.0 database running on an isolated bridge network (`ngocore_network`) with persistent named volumes and `mongosh` health checking.
+
+```
+                  ┌────────────────────────────────────────────────────────┐
+                  │                    Host Browser                        │
+                  └───────────────────────────┬────────────────────────────┘
+                                              │ HTTP :3000 (or :80)
+                                              ▼
+                        ┌──────────────────────────────────────────┐
+                        │        ngocore-frontend (Nginx)          │
+                        │   ├── Static SPA (Vite / React 19)       │
+                        │   ├── SPA Route Fallback (/index.html)   │
+                        │   └── Reverse Proxy (/api/ -> backend)   │
+                        └─────────────────────┬────────────────────┘
+                                              │ Internal Docker Network (ngocore_network)
+                                              ▼
+                        ┌──────────────────────────────────────────┐
+                        │         ngocore-backend (Node 20)        │
+                        │   ├── REST API Listener (0.0.0.0:5000)   │
+                        │   ├── Non-root User ('node')             │
+                        │   └── Signal Handler (dumb-init)         │
+                        └─────────────────────┬────────────────────┘
+                                              │ Internal Docker Network (mongodb:27017)
+                                              ▼
+                        ┌──────────────────────────────────────────┐
+                        │         ngocore-mongodb (Mongo 7)        │
+                        │   └── Named Volume: ngocore_mongodb_data │
+                        └──────────────────────────────────────────┘
+```
+
+#### Prerequisites
+- **Docker Desktop** (Engine 20.10+ / Compose v2.0+) installed and running.
+- (Windows users: Ensure WSL 2 backend or Hyper-V is enabled).
+
+#### Step 1: Configure Environment Variables
+Copy the provided Docker environment template:
+```bash
+cp .env.docker.example .env
+```
+Ensure `JWT_SECRET` is set to a secure random string of at least 32 characters.
+
+#### Step 2: Build and Start All Services
+Launch the orchestrated stack in detached mode:
+```bash
+docker compose up -d --build
+```
+
+#### Step 3: Verify Service Status & Health
+Check container state and healthcheck readiness:
+```bash
+docker compose ps
+```
+Expected output:
+- `ngocore-mongodb` — `Up (healthy)`
+- `ngocore-backend` — `Up (healthy)`
+- `ngocore-frontend` — `Up (healthy)`
+
+#### Application URLs & Endpoints
+| Component | URL | Description |
+|---|---|---|
+| **Frontend Web App** | `http://localhost:3000` | Complete NGOcore web interface |
+| **Backend REST API** | `http://localhost:5000` | Direct backend API access |
+| **API Health Check** | `http://localhost:5000/api/v1/health` | Backend status & system metrics |
+| **Nginx Proxied API** | `http://localhost:3000/api/v1/health` | Same-origin API route via reverse proxy |
+
+#### Inspect Container Logs
+Follow live logs across all services or individually:
+```bash
+# All services
+docker compose logs -f
+
+# Backend API logs only
+docker compose logs -f backend
+
+# Frontend Nginx logs only
+docker compose logs -f frontend
+
+# MongoDB database logs only
+docker compose logs -f mongodb
+```
+
+#### Stop Services
+Gracefully stop containers and networks while strictly preserving all database records:
+```bash
+docker compose down
+```
+> [!IMPORTANT]
+> Running `docker compose down` stops the containers without removing named volumes. All MongoDB data, uploads, and configuration files remain completely safe.
+
+#### Rebuild Images After Code Changes
+When modifying source code or updating dependencies:
+```bash
+# Rebuild and restart all containers
+docker compose up -d --build
+
+# Rebuild only the frontend
+docker compose up -d --build frontend
+
+# Rebuild only the backend API
+docker compose up -d --build backend
+```
+
+#### Data Persistence
+NGOcore persists all stateful data using named Docker volumes managed independently of container lifecycles:
+- `ngocore_mongodb_data`: Stores MongoDB database collections, indexes, and write-ahead logs (`/data/db`).
+- `ngocore_uploads`: Stores public beneficiary profile pictures and event images (`/app/uploads`).
+- `ngocore_private_uploads`: Stores encrypted compliance filings, NGO registration documents, and verification records (`/app/private-uploads`).
+
+To inspect volume storage:
+```bash
+docker volume ls | grep ngocore
+```
+
+#### Troubleshooting Common Issues
+
+1. **Port Conflicts (`address already in use`)**:
+   - If port `3000` or `5000` is already in use by local services, open `.env` and assign alternate host ports:
+     ```env
+     FRONTEND_PORT=8080
+     PORT=5001
+     ```
+   - Restart with `docker compose up -d`.
+
+2. **MongoDB Connection Failures**:
+   - Check MongoDB container status: `docker compose ps mongodb`.
+   - Inspect MongoDB logs: `docker compose logs mongodb`.
+   - Ensure the backend `MONGODB_URI` uses `mongodb://mongodb:27017/...` (using the internal Docker service name, not `localhost`).
+
+3. **`JWT_SECRET` Validation Error during Backend Startup**:
+   - The backend enforces a minimum length of 32 characters for `JWT_SECRET`. If the backend exits with code 1, check `.env` and verify `JWT_SECRET` contains $\ge 32$ characters.
+
+4. **Frontend API Connection / CORS Errors**:
+   - By default, the frontend Nginx web server proxies all `/api/` traffic to `http://backend:5000/api/` as a same-origin request, preventing browser CORS blocks and cookie rejection.
+   - If connecting from a custom domain, ensure the domain is added to `CLIENT_URL` in `.env`.
+
+5. **Container Startup Sequence**:
+   - The backend container utilizes `depends_on: mongodb: condition: service_healthy` to guarantee that database indexes and sockets are ready before accepting HTTP requests.
+
+> [!CAUTION]
+> Never run `docker compose down -v` or `docker volume rm ngocore_mongodb_data` as a routine troubleshooting step, as this will permanently delete all persisted database records.
+
+---
+
+### 9.2 Cloud PaaS Architecture (Render & Vercel)
+
 ```
 GitHub (Source Repository)
    │
@@ -333,5 +483,7 @@ GitHub (Source Repository)
 - [x] Production check blocks `localhost`/`127.0.0.1` MongoDB connection strings in production
 - [x] Frontend dynamically routes API traffic via `VITE_API_URL`
 - [x] Vercel SPA routing configured via `vercel.json`
-- [x] Full 175-check backend regression suite passing
-- [x] Frontend production bundle built with 0 errors
+- [x] Full 657-check master regression suite passing (21/21 suites, 100%)
+- [x] 14-workflow Playwright browser end-to-end suite passing (100%)
+- [x] Persistent cloud object storage service abstraction (`storageService.js`) verified
+- [x] Frontend production bundle built with 0 errors (Vite v6)
