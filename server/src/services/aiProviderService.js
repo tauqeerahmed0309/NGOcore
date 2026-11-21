@@ -61,8 +61,15 @@ const summarizeMetrics = async (recordType, metrics) => {
     }
   }
 
-  // Fallback or primary to Anthropic Claude
-  return anthropicSummaryService.summarizeMetrics(recordType, metrics);
+  // Fallback or primary to Anthropic Claude if explicitly configured in environment
+  if (config.ANTHROPIC_API_KEY) {
+    const claudeSummary = await anthropicSummaryService.summarizeMetrics(recordType, metrics);
+    if (claudeSummary) return claudeSummary;
+  }
+
+  // Deterministic rule-based summary fallback
+  const total = metrics?.totalRecords ?? 0;
+  return `Operational summary for ${recordType}: ${total} total records tracked across organizational programs. Ongoing audit and verification recommended for database integrity.`;
 };
 
 module.exports = {

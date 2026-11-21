@@ -108,6 +108,12 @@ const programSchema = new mongoose.Schema(
       type: Number,
       default: null
     },
+    enrolledCount: {
+      type: Number,
+      default: 0,
+      min: 0,
+      index: true
+    },
     status: {
       type: String,
       required: [true, 'Status is required'],

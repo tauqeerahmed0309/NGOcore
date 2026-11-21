@@ -3,13 +3,11 @@ import {
   X, 
   Calendar, 
   Clock, 
-  MapPin, 
   Users, 
   Plus, 
   Trash2, 
   AlertCircle, 
   Layers, 
-  Award,
   Loader2,
   FileText
 } from 'lucide-react';

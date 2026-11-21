@@ -3,11 +3,23 @@ node_modules
 client/node_modules
 server/node_modules
 
-# Build artifacts
+# Build & test artifacts
 client/dist
 coverage
+test-results
+playwright-report
 
-# Environment variables & credentials
+# Runtime upload directories
+uploads/*
+!uploads/.gitkeep
+private-uploads/*
+!private-uploads/.gitkeep
+server/uploads/*
+!server/uploads/.gitkeep
+server/private-uploads/*
+!server/private-uploads/.gitkeep
+
+# Environment variables & secrets
 .env
 .env.*
 !.env.example
@@ -18,6 +30,10 @@ client/.env.*
 server/.env
 server/.env.*
 !server/.env.example
+*.pem
+*.key
+*.cert
+*.crt
 
 # Version control & IDE files
 .git
@@ -25,11 +41,10 @@ server/.env.*
 .vscode
 .idea
 *.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
 # System files
 .DS_Store
 Thumbs.db
-
-# Test reports & execution artifacts
-test-results
-playwright-report

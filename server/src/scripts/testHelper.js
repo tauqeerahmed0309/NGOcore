@@ -19,7 +19,11 @@ const isServerListening = async () => {
 
 const setupTestEnvironment = async () => {
   process.env.NODE_ENV = 'test';
-  await connectDB();
+  const localFallbackUri = 'mongodb://127.0.0.1:27017/ngo_records_db';
+  const targetUri = (process.env.MONGODB_URI && !process.env.MONGODB_URI.startsWith('mongodb+srv://'))
+    ? process.env.MONGODB_URI
+    : localFallbackUri;
+  await connectDB(targetUri);
   await ensureTestFixtures();
 
   const listening = await isServerListening();

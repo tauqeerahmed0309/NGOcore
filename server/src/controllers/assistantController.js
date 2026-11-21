@@ -293,14 +293,27 @@ const explainFinding = async (req, res, next) => {
     const { issueType, field, currentValue, suggestedValue } = req.body;
     const result = await explainFindingAi({ issueType, field, currentValue, suggestedValue });
     if (!result.success) {
-      return successResponse(res, 200, 'AI explanation is currently unavailable.', {
+      const fallbackExplanation = {
+        explanation: `Field "${field}" has an identified issue of type "${issueType}". Current recorded value: "${currentValue || ''}". Standardizing this field ensures consistency and reporting integrity.`,
+        impact: `Inconsistent ${field} records can lead to reporting errors, search mismatches, and compliance discrepancies during organizational audits.`,
+        actionAdvice: suggestedValue
+          ? `Update the value to "${suggestedValue}" after verifying against official documentation.`
+          : `Review and correct the entry according to organization formatting standards.`
+      };
+      return successResponse(res, 200, 'AI explanation is currently unavailable (deterministic fallback provided).', {
         available: false,
+        source: 'deterministic',
+        isFallback: true,
         reason: result.reason,
-        error: result.error
+        error: result.error,
+        ...fallbackExplanation,
+        meta: { model: 'deterministic-rules', latencyMs: 0 }
       });
     }
     return successResponse(res, 200, 'AI finding explanation ready.', {
       available: true,
+      source: 'gemini',
+      isFallback: false,
       ...result.data,
       meta: result.meta
     });
@@ -314,14 +327,26 @@ const explainDuplicate = async (req, res, next) => {
     const { score, reason, matchedFields, recordLabel, relatedRecordLabel } = req.body;
     const result = await explainDuplicateAi({ score, reason, matchedFields, recordLabel, relatedRecordLabel });
     if (!result.success) {
-      return successResponse(res, 200, 'AI explanation is currently unavailable.', {
+      const fallbackDuplicate = {
+        matchingFactors: matchedFields?.length
+          ? matchedFields.map((f) => `Deterministic match identified on field "${f}".`)
+          : ['High similarity score across critical identifier fields.'],
+        recommendation: 'Compare both beneficiary profiles side-by-side. Verify identification numbers, addresses, and family details before taking any merge action. Never automatically merge records.'
+      };
+      return successResponse(res, 200, 'AI duplicate explanation is currently unavailable (deterministic fallback provided).', {
         available: false,
+        source: 'deterministic',
+        isFallback: true,
         reason: result.reason,
-        error: result.error
+        error: result.error,
+        ...fallbackDuplicate,
+        meta: { model: 'deterministic-rules', latencyMs: 0 }
       });
     }
     return successResponse(res, 200, 'AI duplicate explanation ready.', {
       available: true,
+      source: 'gemini',
+      isFallback: false,
       ...result.data,
       meta: result.meta
     });
@@ -335,14 +360,24 @@ const normalizeText = async (req, res, next) => {
     const { text, fieldType } = req.body;
     const result = await suggestNormalizationAi({ text, fieldType });
     if (!result.success) {
-      return successResponse(res, 200, 'AI text normalization is currently unavailable.', {
+      const trimmed = text ? String(text).trim().replace(/\s+/g, ' ') : '';
+      return successResponse(res, 200, 'AI text normalization is currently unavailable (deterministic fallback provided).', {
         available: false,
+        source: 'deterministic',
+        isFallback: true,
         reason: result.reason,
-        error: result.error
+        error: result.error,
+        original: text || '',
+        suggested: trimmed,
+        changesMade: ['Trimmed extraneous whitespace and normalized spacing.'],
+        safeToApply: true,
+        meta: { model: 'deterministic-rules', latencyMs: 0 }
       });
     }
     return successResponse(res, 200, 'AI text normalization suggestion ready.', {
       available: true,
+      source: 'gemini',
+      isFallback: false,
       ...result.data,
       meta: result.meta
     });
@@ -385,8 +420,65 @@ const proposeCorrection = async (req, res, next) => {
     });
 
     if (!result.success) {
+      // Deterministic rule-based fallback proposal for resilient offline / high-demand operations
+      let deterministicProposed = null;
+      let deterministicReasoning = '';
+
+      if (field === 'phone') {
+        let rawDigits = String(matchingFlag.currentValue || '').replace(/[^0-9]/g, '');
+        if (rawDigits.length === 12 && rawDigits.startsWith('91')) rawDigits = rawDigits.slice(2);
+        if (rawDigits.length === 10) {
+          deterministicProposed = `+91 ${rawDigits.slice(0, 5)} ${rawDigits.slice(5)}`;
+          deterministicReasoning = 'Standardized to official 10-digit format with +91 country prefix.';
+        }
+      } else if (field === 'firstName' || field === 'lastName') {
+        const str = String(matchingFlag.currentValue || '').trim();
+        if (str.length > 0) {
+          deterministicProposed = str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+          deterministicReasoning = 'Capitalized proper name casing via deterministic normalization.';
+        }
+      }
+
+      if (deterministicProposed) {
+        const modelUsed = 'deterministic-rules';
+        const proposalToken = createProposalToken({
+          recordId,
+          recordType,
+          field,
+          issueType,
+          proposedValue: deterministicProposed,
+          provider: 'deterministic',
+          model: modelUsed,
+          ngoId: req.ngoFilter?.ngoId || record.ngoId
+        });
+
+        const proposalPayload = {
+          available: true,
+          source: 'deterministic',
+          isFallback: true,
+          recordId,
+          field,
+          issueType,
+          proposedValue: deterministicProposed,
+          rawProposedValue: deterministicProposed,
+          reasoning: deterministicReasoning,
+          confidenceCategory: 'medium',
+          validated: true,
+          proposalToken,
+          meta: { model: 'deterministic-rules', latencyMs: 1 },
+          notice: 'Generated via deterministic rules while external AI is experiencing high demand. Explicit human review is required.'
+        };
+
+        return successResponse(res, 200, 'Deterministic correction proposal ready.', {
+          ...proposalPayload,
+          proposal: proposalPayload
+        });
+      }
+
       const unavailablePayload = {
         available: false,
+        source: 'deterministic',
+        isFallback: true,
         reason: result.reason,
         error: result.error
       };
@@ -407,6 +499,8 @@ const proposeCorrection = async (req, res, next) => {
     if (!validationCheck.valid) {
       const invalidPayload = {
         available: false,
+        source: 'deterministic',
+        isFallback: true,
         reason: 'invalid_ai_proposal',
         error: `AI proposed value failed field-level validation rules: ${validationCheck.error}`
       };
@@ -430,6 +524,8 @@ const proposeCorrection = async (req, res, next) => {
 
     const proposalPayload = {
       available: true,
+      source: 'gemini',
+      isFallback: false,
       recordId,
       field,
       issueType,

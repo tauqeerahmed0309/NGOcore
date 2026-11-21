@@ -163,7 +163,8 @@ const checkDuplicate = async (data, ngoFilter) => {
     })
   )
     .select('registrationNumber firstName lastName email phone dateOfBirth address state pinCode status')
-    .limit(200)
+    .sort({ createdAt: -1 })
+    .limit(500)
     .lean();
 
   for (const existing of existingPool) {

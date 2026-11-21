@@ -178,30 +178,59 @@ export default function OrganizationAnalytics() {
   const recentActivity = analyticsData?.recentActivity || [];
 
   return (
-    <div className="analytics-dashboard-page" ref={containerRef}>
+    <div
+      className="feature-page-container analytics-dashboard-page"
+      ref={containerRef}
+      style={{ padding: '24px 28px', maxWidth: '1400px', margin: '0 auto' }}
+    >
       {/* 1. Header & Controls Bar */}
-      <div className="analytics-header-controls">
-        <div className="analytics-header-left">
-          <div className="analytics-header-icon" aria-hidden="true">
-            <TrendingUp size={24} />
-          </div>
-          <div>
-            <div className="analytics-breadcrumb-bar">
-              <Link to={dashPath} className="analytics-back-link">
-                ← Back to Dashboard
-              </Link>
-              <span className={`badge ${isStaff ? 'badge-staff' : 'badge-admin'}`}>
-                {isStaff ? 'Staff View' : 'Admin View'}
-              </span>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: 24,
+          flexWrap: 'wrap',
+          gap: 16
+        }}
+      >
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div
+              style={{
+                width: 42,
+                height: 42,
+                borderRadius: '10px',
+                background: 'var(--brand-green-muted)',
+                color: 'var(--brand-green)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0
+              }}
+            >
+              <TrendingUp size={24} />
             </div>
-            <h1 className="analytics-header-title">Organization Analytics</h1>
-            <p className="analytics-header-subtitle">
-              Demographic distribution, capacity utilization, attendance trends, and operational activity.
-            </p>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                <Link to={dashPath} className="analytics-back-link">
+                  ← Back to Dashboard
+                </Link>
+                <span className={`badge ${isStaff ? 'badge-staff' : 'badge-admin'}`}>
+                  {isStaff ? 'Staff View' : 'Admin View'}
+                </span>
+              </div>
+              <h1 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>
+                Organization Analytics
+              </h1>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', margin: '4px 0 0 0' }}>
+                Demographic distribution, capacity utilization, attendance trends, and operational activity
+              </p>
+            </div>
           </div>
         </div>
 
-        <div className="analytics-controls-right">
+        <div className="analytics-controls-right" style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
           {/* Timeframe selector (3, 6, 12, 24 months) */}
           <div className="analytics-timeframe-group" role="group" aria-label="Select analytics timeframe">
             {[3, 6, 12, 24].map((m) => (
@@ -221,11 +250,20 @@ export default function OrganizationAnalytics() {
           {/* Refresh Action */}
           <button
             type="button"
-            className="analytics-refresh-btn"
+            className="btn btn-outline"
             onClick={() => fetchAnalytics(timeframeMonths)}
             disabled={loading}
             title="Refresh dashboard data"
             aria-label="Refresh organization analytics data"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              padding: '8px 16px',
+              borderRadius: 8,
+              fontSize: '0.875rem',
+              fontWeight: 600
+            }}
           >
             <RefreshCw size={15} className={loading ? 'animate-spin' : ''} />
             <span>Refresh</span>
@@ -233,7 +271,11 @@ export default function OrganizationAnalytics() {
 
           {/* Generated timestamp */}
           {analyticsData?.generatedAt && (
-            <span className="analytics-meta-badge" title="Timestamp of report generation">
+            <span
+              className="analytics-meta-badge"
+              title="Timestamp of report generation"
+              style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'inline-flex', alignItems: 'center', gap: 4 }}
+            >
               <Clock size={13} />
               <span>Updated {formatDateTime(analyticsData.generatedAt)}</span>
             </span>
@@ -243,14 +285,28 @@ export default function OrganizationAnalytics() {
 
       {/* Global Error Notice with Retry */}
       {error && (
-        <div className="alert alert-error" role="alert" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div
+          className="alert alert-error"
+          role="alert"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginBottom: 20,
+            padding: '12px 18px',
+            borderRadius: 8,
+            backgroundColor: 'var(--status-danger-bg)',
+            color: 'var(--status-danger)',
+            border: '1px solid #fecaca'
+          }}
+        >
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <AlertCircle size={18} />
             <span>{error}</span>
           </div>
           <button
             type="button"
-            className="btn-secondary"
+            className="btn btn-outline"
             onClick={() => fetchAnalytics(timeframeMonths)}
             style={{ padding: '4px 10px', fontSize: '0.8rem' }}
           >
@@ -262,7 +318,14 @@ export default function OrganizationAnalytics() {
       {/* Loading Skeletons */}
       {loading && !analyticsData && (
         <div className="analytics-skeleton-view" aria-busy="true" aria-label="Loading analytics data">
-          <div className="analytics-kpi-ribbon">
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+              gap: 16,
+              marginBottom: 24
+            }}
+          >
             {[1, 2, 3, 4].map((i) => (
               <div key={i} className="analytics-skeleton-card">
                 <div className="analytics-skeleton-bar" style={{ width: '40%', height: '10px' }} />
@@ -289,62 +352,171 @@ export default function OrganizationAnalytics() {
       {analyticsData && (
         <>
           {/* Top KPI Summary Ribbon */}
-          <div className="analytics-kpi-ribbon">
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+              gap: 16,
+              marginBottom: 24
+            }}
+          >
             {/* KPI 1: Beneficiaries */}
-            <div className="analytics-kpi-card">
-              <div className="analytics-kpi-icon-box green">
+            <div
+              style={{
+                background: 'var(--bg-surface)',
+                border: '1px solid var(--border)',
+                borderRadius: 10,
+                padding: '16px 20px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 14
+              }}
+            >
+              <div
+                style={{
+                  width: 42,
+                  height: 42,
+                  borderRadius: 10,
+                  background: 'var(--brand-green-muted)',
+                  color: 'var(--brand-green)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0
+                }}
+              >
                 <Users size={22} />
               </div>
-              <div className="analytics-kpi-body">
-                <span className="analytics-kpi-label">Total Beneficiaries</span>
-                <div className="analytics-kpi-value">{beneficiaries.total.toLocaleString()}</div>
-                <span className="analytics-kpi-subtext">
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 600 }}>
+                  Total Beneficiaries
+                </span>
+                <div style={{ fontSize: '1.6rem', fontWeight: 700, color: 'var(--text-primary)', marginTop: 2, lineHeight: 1.2 }}>
+                  {beneficiaries.total.toLocaleString()}
+                </div>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: 2, display: 'block' }}>
                   {beneficiaries.byStatus.active} active ({beneficiaries.total > 0 ? Math.round((beneficiaries.byStatus.active / beneficiaries.total) * 100) : 0}%)
                 </span>
               </div>
             </div>
 
             {/* KPI 2: Programs */}
-            <div className="analytics-kpi-card">
-              <div className="analytics-kpi-icon-box blue">
+            <div
+              style={{
+                background: 'var(--bg-surface)',
+                border: '1px solid var(--border)',
+                borderRadius: 10,
+                padding: '16px 20px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 14
+              }}
+            >
+              <div
+                style={{
+                  width: 42,
+                  height: 42,
+                  borderRadius: 10,
+                  background: '#eff6ff',
+                  color: '#2563eb',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0
+                }}
+              >
                 <Calendar size={22} />
               </div>
-              <div className="analytics-kpi-body">
-                <span className="analytics-kpi-label">Active Programs</span>
-                <div className="analytics-kpi-value">{programs.byStatus.active.toLocaleString()}</div>
-                <span className="analytics-kpi-subtext">
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 600 }}>
+                  Active Programs
+                </span>
+                <div style={{ fontSize: '1.6rem', fontWeight: 700, color: 'var(--text-primary)', marginTop: 2, lineHeight: 1.2 }}>
+                  {programs.byStatus.active.toLocaleString()}
+                </div>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: 2, display: 'block' }}>
                   {programs.total} total programs registered
                 </span>
               </div>
             </div>
 
             {/* KPI 3: Capacity Utilization */}
-            <div className="analytics-kpi-card">
-              <div className="analytics-kpi-icon-box amber">
+            <div
+              style={{
+                background: 'var(--bg-surface)',
+                border: '1px solid var(--border)',
+                borderRadius: 10,
+                padding: '16px 20px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 14
+              }}
+            >
+              <div
+                style={{
+                  width: 42,
+                  height: 42,
+                  borderRadius: 10,
+                  background: '#fffbeb',
+                  color: '#d97706',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0
+                }}
+              >
                 <Layers size={22} />
               </div>
-              <div className="analytics-kpi-body">
-                <span className="analytics-kpi-label">Capacity Utilization</span>
-                <div className="analytics-kpi-value">
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 600 }}>
+                  Capacity Utilization
+                </span>
+                <div style={{ fontSize: '1.6rem', fontWeight: 700, color: 'var(--text-primary)', marginTop: 2, lineHeight: 1.2 }}>
                   {programs.capacityMetrics.overallCapacityUtilizationRate !== null
                     ? `${programs.capacityMetrics.overallCapacityUtilizationRate}%`
                     : 'Uncapped'}
                 </div>
-                <span className="analytics-kpi-subtext">
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: 2, display: 'block' }}>
                   {programs.capacityMetrics.totalActiveEnrollments} active students enrolled
                 </span>
               </div>
             </div>
 
             {/* KPI 4: Attendance Presence Rate */}
-            <div className="analytics-kpi-card">
-              <div className="analytics-kpi-icon-box purple">
+            <div
+              style={{
+                background: 'var(--bg-surface)',
+                border: '1px solid var(--border)',
+                borderRadius: 10,
+                padding: '16px 20px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 14
+              }}
+            >
+              <div
+                style={{
+                  width: 42,
+                  height: 42,
+                  borderRadius: 10,
+                  background: '#faf5ff',
+                  color: '#7c3aed',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0
+                }}
+              >
                 <Award size={22} />
               </div>
-              <div className="analytics-kpi-body">
-                <span className="analytics-kpi-label">Attendance Presence</span>
-                <div className="analytics-kpi-value">{attendance.overallPresenceRate}%</div>
-                <span className="analytics-kpi-subtext">
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 600 }}>
+                  Attendance Presence
+                </span>
+                <div style={{ fontSize: '1.6rem', fontWeight: 700, color: 'var(--text-primary)', marginTop: 2, lineHeight: 1.2 }}>
+                  {attendance.overallPresenceRate}%
+                </div>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: 2, display: 'block' }}>
                   Across {attendance.totalSessionsRecorded} logged session(s)
                 </span>
               </div>
@@ -600,9 +772,9 @@ export default function OrganizationAnalytics() {
 
             {/* Active Programs Roster Table */}
             {programs.activeProgramsRoster && programs.activeProgramsRoster.length > 0 && (
-              <div className="analytics-card">
-                <div className="analytics-card-header">
-                  <h3 className="analytics-card-title">
+              <div className="analytics-card" style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 10, overflow: 'hidden' }}>
+                <div className="analytics-card-header" style={{ padding: '14px 20px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <h3 className="analytics-card-title" style={{ fontSize: '0.95rem', fontWeight: 600, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 8, margin: 0 }}>
                     <Calendar size={18} style={{ color: 'var(--brand-green)' }} />
                     <span>Active Programs Roster</span>
                   </h3>
@@ -610,16 +782,16 @@ export default function OrganizationAnalytics() {
                     {programs.activeProgramsRoster.length} Active Program(s)
                   </span>
                 </div>
-                <div className="table-container" style={{ border: 'none', borderRadius: '0' }}>
-                  <table className="analytics-roster-table">
+                <div className="table-responsive" style={{ overflowX: 'auto', width: '100%' }}>
+                  <table className="analytics-roster-table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.875rem' }}>
                     <thead>
-                      <tr>
-                        <th>Code</th>
-                        <th>Program Name</th>
-                        <th>Type</th>
-                        <th>Capacity</th>
-                        <th>Enrolled</th>
-                        <th>Utilization</th>
+                      <tr style={{ background: 'var(--bg-hover)', borderBottom: '1px solid var(--border)' }}>
+                        <th style={{ padding: '12px 16px', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Code</th>
+                        <th style={{ padding: '12px 16px', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Program Name</th>
+                        <th style={{ padding: '12px 16px', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Type</th>
+                        <th style={{ padding: '12px 16px', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Capacity</th>
+                        <th style={{ padding: '12px 16px', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Enrolled</th>
+                        <th style={{ padding: '12px 16px', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Utilization</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -627,43 +799,82 @@ export default function OrganizationAnalytics() {
                         const hasFinite = prog.capacity !== null && prog.capacity > 0;
                         const util = prog.utilizationRate;
                         return (
-                          <tr key={prog.id}>
-                            <td>
-                              <span className="badge badge-outline" style={{ fontFamily: 'monospace' }}>
+                          <tr key={prog.id} className="table-row-hover" style={{ borderBottom: '1px solid var(--border)' }}>
+                            <td style={{ padding: '12px 16px' }}>
+                              <span
+                                style={{
+                                  fontFamily: 'monospace',
+                                  fontSize: '0.75rem',
+                                  fontWeight: 600,
+                                  backgroundColor: '#f1f5f9',
+                                  color: 'var(--text-primary)',
+                                  padding: '2px 8px',
+                                  borderRadius: 4,
+                                  border: '1px solid #e2e8f0'
+                                }}
+                              >
                                 {prog.code}
                               </span>
                             </td>
-                            <td>
+                            <td style={{ padding: '12px 16px' }}>
                               <strong style={{ color: 'var(--text-primary)' }}>{prog.name}</strong>
                             </td>
-                            <td>
-                              <span style={{ textTransform: 'capitalize' }}>{prog.type || 'N/A'}</span>
+                            <td style={{ padding: '12px 16px' }}>
+                              <span style={{ textTransform: 'capitalize', color: 'var(--text-secondary)' }}>{prog.type || 'N/A'}</span>
                             </td>
-                            <td>
+                            <td style={{ padding: '12px 16px', color: 'var(--text-secondary)' }}>
                               {hasFinite ? (
                                 `${prog.capacity} seats`
                               ) : (
                                 <span className="badge badge-muted">Unlimited</span>
                               )}
                             </td>
-                            <td>
-                              <strong>{prog.enrolledCount}</strong> student(s)
+                            <td style={{ padding: '12px 16px' }}>
+                              <strong style={{ color: 'var(--text-primary)' }}>{prog.enrolledCount}</strong>{' '}
+                              <span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>student(s)</span>
                             </td>
-                            <td>
+                            <td style={{ padding: '12px 16px' }}>
                               {hasFinite ? (
                                 <span
-                                  className={`badge ${
-                                    util >= 90
-                                      ? 'badge-danger'
-                                      : util >= 75
-                                        ? 'badge-warning'
-                                        : 'badge-success'
-                                  }`}
+                                  style={{
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: 5,
+                                    padding: '3px 10px',
+                                    borderRadius: 9999,
+                                    fontSize: '0.75rem',
+                                    fontWeight: 600,
+                                    backgroundColor: util >= 90 ? '#fef2f2' : util >= 75 ? '#fffbeb' : '#f0fdf4',
+                                    color: util >= 90 ? '#dc2626' : util >= 75 ? '#d97706' : '#16a34a',
+                                    border: `1px solid ${util >= 90 ? '#fecaca' : util >= 75 ? '#fde68a' : '#bbf7d0'}`
+                                  }}
                                 >
+                                  <span
+                                    style={{
+                                      width: 6,
+                                      height: 6,
+                                      borderRadius: '50%',
+                                      backgroundColor: util >= 90 ? '#dc2626' : util >= 75 ? '#d97706' : '#16a34a'
+                                    }}
+                                  />
                                   {util}%
                                 </span>
                               ) : (
-                                <span className="badge badge-muted">Uncapped</span>
+                                <span
+                                  style={{
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    padding: '3px 10px',
+                                    borderRadius: 9999,
+                                    fontSize: '0.75rem',
+                                    fontWeight: 600,
+                                    backgroundColor: '#f1f5f9',
+                                    color: 'var(--text-secondary)',
+                                    border: '1px solid #cbd5e1'
+                                  }}
+                                >
+                                  Uncapped
+                                </span>
                               )}
                             </td>
                           </tr>
@@ -776,4 +987,3 @@ export default function OrganizationAnalytics() {
     </div>
   );
 }
-

@@ -6,7 +6,10 @@ const { hashPassword } = require('../utils/passwordHelper');
 
 const ensureTestFixtures = async () => {
   if (mongoose.connection.readyState === 0) {
-    await mongoose.connect(config.MONGODB_URI);
+    const mongoUri = (config.MONGODB_URI && !config.MONGODB_URI.startsWith('mongodb+srv://'))
+      ? config.MONGODB_URI
+      : 'mongodb://127.0.0.1:27017/ngo_records_db';
+    await mongoose.connect(mongoUri);
   }
 
   const legacyNgo = await Ngo.findOneAndUpdate(

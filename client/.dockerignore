@@ -1,11 +1,26 @@
+# Dependency & build directories
 node_modules
 dist
-npm-debug.log
+
+# Environment variables & secrets
 .env
 .env.*
 !.env.example
+*.pem
+*.key
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Version control & IDE files
 .git
 .github
-*.log
+.vscode
+.idea
+
+# System files
 .DS_Store
 Thumbs.db

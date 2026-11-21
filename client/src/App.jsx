@@ -3,12 +3,15 @@ import { AuthProvider } from './context/AuthContext';
 import AppShell from './components/layout/AppShell';
 import AppRoutes from './routes/AppRoutes';
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import ErrorBoundary from './components/common/ErrorBoundary';
 
 export default function App() {
   const appContent = (
-    <AppShell>
-      <AppRoutes />
-    </AppShell>
+    <ErrorBoundary>
+      <AppShell>
+        <AppRoutes />
+      </AppShell>
+    </ErrorBoundary>
   );
 
   return (

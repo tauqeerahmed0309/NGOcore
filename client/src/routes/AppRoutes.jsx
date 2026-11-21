@@ -14,6 +14,15 @@ const StudentManagement = lazy(() => import('../features/students/StudentManagem
 const ProgramManagement = lazy(() => import('../features/programs/ProgramManagement'));
 const ReportsPage = lazy(() => import('../features/reports/ReportsPage'));
 const OrganizationAnalytics = lazy(() => import('../features/analytics/OrganizationAnalytics'));
+const DonorManagement = lazy(() => import('../features/donors/DonorManagement'));
+const DonationManagement = lazy(() => import('../features/donations/DonationManagement'));
+const ExpenseManagement = lazy(() => import('../features/expenses/ExpenseManagement'));
+const VolunteerManagement = lazy(() => import('../features/volunteers/VolunteerManagement'));
+const TaskManagement = lazy(() => import('../features/tasks/TaskManagement'));
+const EventManagement = lazy(() => import('../features/events/EventManagement'));
+const InventoryManagement = lazy(() => import('../features/inventory/InventoryManagement'));
+const DocumentManagement = lazy(() => import('../features/documents/DocumentManagement'));
+const AiInsightsStudio = lazy(() => import('../features/aiInsights/AiInsightsStudio'));
 import ProtectedRoute from './ProtectedRoute';
 import RoleGuard from './RoleGuard';
 import AccessDenied from '../components/common/AccessDenied';
@@ -183,6 +192,186 @@ export default function AppRoutes() {
           <ProtectedRoute>
             <RoleGuard allowedRoles={['admin', 'staff']}>
               <OrganizationAnalytics />
+            </RoleGuard>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/donors"
+        element={
+          <ProtectedRoute>
+            <RoleGuard allowedRoles={['admin', 'staff']}>
+              <DonorManagement />
+            </RoleGuard>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/donors/:id"
+        element={
+          <ProtectedRoute>
+            <RoleGuard allowedRoles={['admin', 'staff']}>
+              <DonorManagement />
+            </RoleGuard>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/donations"
+        element={
+          <ProtectedRoute>
+            <RoleGuard allowedRoles={['admin', 'staff']}>
+              <DonationManagement />
+            </RoleGuard>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/donations/:id"
+        element={
+          <ProtectedRoute>
+            <RoleGuard allowedRoles={['admin', 'staff']}>
+              <DonationManagement />
+            </RoleGuard>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/expenses"
+        element={
+          <ProtectedRoute>
+            <RoleGuard allowedRoles={['admin', 'staff']}>
+              <ExpenseManagement />
+            </RoleGuard>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/expenses/:id"
+        element={
+          <ProtectedRoute>
+            <RoleGuard allowedRoles={['admin', 'staff']}>
+              <ExpenseManagement />
+            </RoleGuard>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/volunteers"
+        element={
+          <ProtectedRoute>
+            <RoleGuard allowedRoles={['admin', 'staff', 'volunteer']}>
+              <VolunteerManagement />
+            </RoleGuard>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/volunteers/:id"
+        element={
+          <ProtectedRoute>
+            <RoleGuard allowedRoles={['admin', 'staff', 'volunteer']}>
+              <VolunteerManagement />
+            </RoleGuard>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/tasks"
+        element={
+          <ProtectedRoute>
+            <RoleGuard allowedRoles={['admin', 'staff', 'volunteer']}>
+              <TaskManagement />
+            </RoleGuard>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/tasks/:id"
+        element={
+          <ProtectedRoute>
+            <RoleGuard allowedRoles={['admin', 'staff', 'volunteer']}>
+              <TaskManagement />
+            </RoleGuard>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/events"
+        element={
+          <ProtectedRoute>
+            <RoleGuard allowedRoles={['admin', 'staff', 'volunteer']}>
+              <EventManagement />
+            </RoleGuard>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/events/:id"
+        element={
+          <ProtectedRoute>
+            <RoleGuard allowedRoles={['admin', 'staff', 'volunteer']}>
+              <EventManagement />
+            </RoleGuard>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/inventory"
+        element={
+          <ProtectedRoute>
+            <RoleGuard allowedRoles={['admin', 'staff', 'volunteer']}>
+              <InventoryManagement />
+            </RoleGuard>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/inventory/:id"
+        element={
+          <ProtectedRoute>
+            <RoleGuard allowedRoles={['admin', 'staff', 'volunteer']}>
+              <InventoryManagement />
+            </RoleGuard>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/documents"
+        element={
+          <ProtectedRoute>
+            <RoleGuard allowedRoles={['admin', 'staff', 'volunteer']}>
+              <DocumentManagement />
+            </RoleGuard>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/documents/:id"
+        element={
+          <ProtectedRoute>
+            <RoleGuard allowedRoles={['admin', 'staff', 'volunteer']}>
+              <DocumentManagement />
+            </RoleGuard>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/insights"
+        element={
+          <ProtectedRoute>
+            <RoleGuard allowedRoles={['admin', 'staff']}>
+              <AiInsightsStudio />
+            </RoleGuard>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/report-studio"
+        element={
+          <ProtectedRoute>
+            <RoleGuard allowedRoles={['admin', 'staff']}>
+              <AiInsightsStudio />
             </RoleGuard>
           </ProtectedRoute>
         }

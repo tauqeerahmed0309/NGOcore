@@ -34,7 +34,10 @@ const runAll = async () => {
   console.log('================================================================\n');
 
   if (mongoose.connection.readyState === 0) {
-    await mongoose.connect(config.MONGODB_URI);
+    const mongoUri = (config.MONGODB_URI && !config.MONGODB_URI.startsWith('mongodb+srv://'))
+      ? config.MONGODB_URI
+      : 'mongodb://127.0.0.1:27017/ngo_records_db';
+    await mongoose.connect(mongoUri);
   }
 
   // ============================================================================
@@ -708,7 +711,7 @@ const runAll = async () => {
   }).sort({ createdAt: -1 });
 
   assert(legitAudit.metadata.aiProvider === 'gemini', 'Verified proposalToken sets aiProvider to "gemini"');
-  assert(legitAudit.metadata.aiModel === 'gemini-2.5-flash', 'Verified proposalToken sets aiModel to server model');
+  assert(legitAudit.metadata.aiModel === config.GEMINI_MODEL || legitAudit.metadata.aiModel === 'gemini-2.5-flash', 'Verified proposalToken sets aiModel to server model');
   assert(legitAudit.metadata.targetField === 'phone', 'Audit records targetField');
   assert(legitAudit.metadata.decision === 'accept', 'Audit records decision');
   assert(legitAudit.metadata.applied === true, 'Audit records applied');

@@ -11,6 +11,15 @@ import {
   BookOpen,
   FileBarChart,
   TrendingUp,
+  HeartHandshake,
+  Receipt,
+  CreditCard,
+  UserCheck,
+  CheckSquare,
+  CalendarDays,
+  Package,
+  FileText,
+  Sparkles,
 } from 'lucide-react';
 
 /**
@@ -42,6 +51,15 @@ function getNavConfig(role) {
             { label: 'Users', path: '/admin/users', icon: Users },
             { label: 'Students & Beneficiaries', path: '/students', icon: GraduationCap },
             { label: 'Programs & Activities', path: '/programs', icon: Calendar },
+            { label: 'Donors & Stakeholders', path: '/donors', icon: HeartHandshake },
+            { label: 'Donations & Receipts', path: '/donations', icon: Receipt },
+            { label: 'Expenses & Outflow', path: '/expenses', icon: CreditCard },
+            { label: 'Volunteers & Hours', path: '/volunteers', icon: UserCheck },
+            { label: 'Tasks & Operations', path: '/tasks', icon: CheckSquare },
+            { label: 'Events & Camps', path: '/events', icon: CalendarDays },
+            { label: 'Inventory & Supplies', path: '/inventory', icon: Package },
+            { label: 'Documents & Legal', path: '/documents', icon: FileText },
+            { label: 'AI Data Insights', path: '/insights', icon: Sparkles },
             { label: 'Reports & Exports', path: '/reports', icon: FileBarChart },
             { label: 'Organization Analytics', path: '/analytics', icon: TrendingUp },
           ],
@@ -61,6 +79,15 @@ function getNavConfig(role) {
           items: [
             { label: 'Students & Beneficiaries', path: '/students', icon: GraduationCap },
             { label: 'Programs & Activities', path: '/programs', icon: Calendar },
+            { label: 'Donors & Stakeholders', path: '/donors', icon: HeartHandshake },
+            { label: 'Donations & Receipts', path: '/donations', icon: Receipt },
+            { label: 'Expenses & Outflow', path: '/expenses', icon: CreditCard },
+            { label: 'Volunteers & Hours', path: '/volunteers', icon: UserCheck },
+            { label: 'Tasks & Operations', path: '/tasks', icon: CheckSquare },
+            { label: 'Events & Camps', path: '/events', icon: CalendarDays },
+            { label: 'Inventory & Supplies', path: '/inventory', icon: Package },
+            { label: 'Documents & Legal', path: '/documents', icon: FileText },
+            { label: 'AI Data Insights', path: '/insights', icon: Sparkles },
             { label: 'Reports & Exports', path: '/reports', icon: FileBarChart },
             { label: 'Organization Analytics', path: '/analytics', icon: TrendingUp },
           ],
@@ -80,6 +107,11 @@ function getNavConfig(role) {
           items: [
             { label: 'Programs & Activities', path: '/programs', icon: Calendar },
             { label: 'Students & Beneficiaries', path: '/students', icon: GraduationCap },
+            { label: 'Volunteers & Hours', path: '/volunteers', icon: UserCheck },
+            { label: 'Tasks & Operations', path: '/tasks', icon: CheckSquare },
+            { label: 'Events & Camps', path: '/events', icon: CalendarDays },
+            { label: 'Inventory & Supplies', path: '/inventory', icon: Package },
+            { label: 'Documents & Legal', path: '/documents', icon: FileText },
           ],
         },
       ];
@@ -145,8 +177,8 @@ export default function Sidebar({ isOpen, closeSidebar }) {
             <span>NC</span>
           </div>
           <div className="brand-text">
-            <h3>NGOcore</h3>
-            <span className="brand-sub">Digital Records for NGOs</span>
+            <h3>ngocore</h3>
+            <span className="brand-sub">digital records for ngos</span>
           </div>
           {/* Mobile close button */}
           <button

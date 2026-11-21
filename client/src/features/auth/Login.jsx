@@ -73,8 +73,8 @@ export default function Login({ variant = 'default' }) {
     }
   };
 
-  const brandLabel = isStudentVariant ? 'NGOcore Student Portal' : 'NGOcore';
-  const brandSubLabel = isStudentVariant ? 'Student access portal' : 'Digital Records for NGOs';
+  const brandLabel = isStudentVariant ? 'ngocore student portal' : 'ngocore';
+  const brandSubLabel = isStudentVariant ? 'student access portal' : 'digital record management';
   const headingText = isStudentVariant ? 'Student sign in' : 'Welcome back';
   const subHeadingText = isStudentVariant ? 'Access your student workspace' : 'Sign in to access your workspace';
   const submitText = isStudentVariant ? 'Access student portal' : 'Sign In';
@@ -86,7 +86,7 @@ export default function Login({ variant = 'default' }) {
         <div className="login-brand">
           <div className="login-logo" aria-hidden="true">
             <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect width="28" height="28" rx="8" fill={isStudentVariant ? '#2563eb' : '#16a34a'} />
+              <rect width="28" height="28" rx="8" fill="#030303" />
               <path d="M7 8h14M7 14h10M7 20h7" stroke="white" strokeWidth="2.2" strokeLinecap="round"/>
             </svg>
           </div>

@@ -51,9 +51,9 @@ const validateAssignments = async ({ coordinator, assignedStaff, assignedVolunte
       error.statusCode = 400;
       throw error;
     }
-    if (user.role !== 'staff') {
+    if (!['staff', 'admin', 'ngo_admin'].includes(user.role)) {
       const error = new Error(
-        `Assigned staff must have the 'staff' role. User '${user.email}' has role '${user.role}'. Student or Volunteer users cannot be assigned as staff.`
+        `Assigned staff must have the 'staff' or 'admin' role. User '${user.email}' has role '${user.role}'. Student or Volunteer users cannot be assigned as staff.`
       );
       error.statusCode = 400;
       throw error;
@@ -466,6 +466,52 @@ const updateProgramStatus = async (id, status, currentUser, ngoFilter) => {
   }
 
   program.status = status;
+
+  // Transparently handle active enrollments upon program closure without deleting history
+  const now = new Date();
+  if (status === 'completed') {
+    const res = await ProgramEnrollment.updateMany(
+      ngoFilter({ programId: id, status: 'enrolled' }),
+      {
+        $set: {
+          status: 'completed',
+          completedAt: now
+        },
+        $push: {
+          history: {
+            status: 'completed',
+            changedAt: now,
+            reason: 'Program concluded by organization',
+            changedBy: currentUser?._id || null
+          }
+        }
+      }
+    );
+    program.enrolledCount = 0;
+    logger.info(`Program completed: [${program.code}]. Concluded ${res.modifiedCount} active enrollments as completed.`);
+  } else if (status === 'cancelled') {
+    const res = await ProgramEnrollment.updateMany(
+      ngoFilter({ programId: id, status: 'enrolled' }),
+      {
+        $set: {
+          status: 'withdrawn',
+          withdrawnAt: now,
+          withdrawalReason: 'Program cancelled by organization'
+        },
+        $push: {
+          history: {
+            status: 'withdrawn',
+            changedAt: now,
+            reason: 'Program cancelled by organization',
+            changedBy: currentUser?._id || null
+          }
+        }
+      }
+    );
+    program.enrolledCount = 0;
+    logger.info(`Program cancelled: [${program.code}]. Transitioned ${res.modifiedCount} active enrollments to withdrawn.`);
+  }
+
   await program.save();
 
   await program.populate([

@@ -1,8 +1,17 @@
 const dotenv = require('dotenv');
 const path = require('path');
 
-// Load environment variables from .env file (server directory or root)
-dotenv.config({ path: path.resolve(__dirname, '../../.env') });
+const fs = require('fs');
+
+const rootEnvPath = path.resolve(__dirname, '../../../.env');
+const serverEnvPath = path.resolve(__dirname, '../../.env');
+
+const rootEnv = fs.existsSync(rootEnvPath) ? dotenv.parse(fs.readFileSync(rootEnvPath)) : {};
+const serverEnv = fs.existsSync(serverEnvPath) ? dotenv.parse(fs.readFileSync(serverEnvPath)) : {};
+
+// Load environment variables: server directory first for local development, then root for shared secrets
+dotenv.config({ path: serverEnvPath });
+dotenv.config({ path: rootEnvPath });
 dotenv.config();
 
 const jwtExpiresIn = process.env.JWT_EXPIRES_IN || '20m';
@@ -27,13 +36,13 @@ if (!/^\d+d$/.test(refreshExpiresIn) || Number.parseInt(refreshExpiresIn, 10) < 
   throw new Error('FATAL: JWT_REFRESH_EXPIRES_IN must be between 1d and 30d.');
 }
 
-const rawMongoUri = process.env.MONGODB_URI ? process.env.MONGODB_URI.trim() : '';
+const rawMongoUri = (process.env.MONGODB_URI && process.env.MONGODB_URI.trim()) || serverEnv.MONGODB_URI || rootEnv.MONGODB_URI || '';
 
 const config = {
   PORT: parseIntegerEnv('PORT', 5000, 1, 65535),
   NODE_ENV: process.env.NODE_ENV || 'development',
   CLIENT_URL: process.env.CLIENT_URL || 'http://localhost:5173',
-  MONGODB_URI: rawMongoUri || 'mongodb://127.0.0.1:27017/ngocore_db',
+  MONGODB_URI: rawMongoUri || 'mongodb://127.0.0.1:27017/ngo_records_db',
   JWT_SECRET: process.env.JWT_SECRET,
   JWT_EXPIRES_IN: jwtExpiresIn,
   JWT_REFRESH_EXPIRES_IN: refreshExpiresIn,
@@ -46,12 +55,12 @@ const config = {
   SMTP_USER: process.env.SMTP_USER || '',
   SMTP_PASSWORD: process.env.SMTP_PASSWORD || '',
   MAIL_FROM: process.env.MAIL_FROM || '',
-  GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID || '',
+  GOOGLE_CLIENT_ID: (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_ID.trim()) || rootEnv.GOOGLE_CLIENT_ID || '',
   ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY || '',
   ANTHROPIC_MODEL: process.env.ANTHROPIC_MODEL || 'claude-haiku-4-5-20251001',
-  GEMINI_ENABLED: process.env.GEMINI_ENABLED === 'true',
-  GEMINI_API_KEY: process.env.GEMINI_API_KEY || '',
-  GEMINI_MODEL: process.env.GEMINI_MODEL || 'gemini-2.5-flash',
+  GEMINI_ENABLED: process.env.GEMINI_ENABLED === 'true' || rootEnv.GEMINI_ENABLED === 'true',
+  GEMINI_API_KEY: (process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY.trim()) || rootEnv.GEMINI_API_KEY || '',
+  GEMINI_MODEL: process.env.GEMINI_MODEL || 'gemini-3.8-flash',
   GEMINI_PII_MODE: process.env.GEMINI_PII_MODE || 'disabled',
   AI_PROVIDER: process.env.AI_PROVIDER || 'auto'
 };

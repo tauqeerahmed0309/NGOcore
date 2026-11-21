@@ -25,7 +25,7 @@ const {
 
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  limit: 10,
+  limit: process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test' ? 1000 : 10,
   standardHeaders: true,
   legacyHeaders: false,
   skip: () => process.env.NODE_ENV === 'test',

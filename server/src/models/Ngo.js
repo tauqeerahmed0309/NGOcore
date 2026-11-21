@@ -45,6 +45,42 @@ const ngoSchema = new mongoose.Schema(
       default: false,
       index: true
     },
+    donorSequence: {
+      type: Number,
+      default: 0
+    },
+    donationSequence: {
+      type: Number,
+      default: 0
+    },
+    receiptSequence: {
+      type: Number,
+      default: 0
+    },
+    expenseSequence: {
+      type: Number,
+      default: 0
+    },
+    volunteerSequence: {
+      type: Number,
+      default: 0
+    },
+    taskSequence: {
+      type: Number,
+      default: 0
+    },
+    eventSequence: {
+      type: Number,
+      default: 0
+    },
+    inventorySequence: {
+      type: Number,
+      default: 0
+    },
+    documentSequence: {
+      type: Number,
+      default: 0
+    },
     supportingDocuments: {
       type: [{
         filename: { type: String, required: true },

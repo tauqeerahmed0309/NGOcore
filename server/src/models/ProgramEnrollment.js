@@ -1,5 +1,31 @@
 const mongoose = require('mongoose');
 
+const enrollmentHistoryEntrySchema = new mongoose.Schema(
+  {
+    status: {
+      type: String,
+      enum: ['enrolled', 'completed', 'withdrawn'],
+      required: true
+    },
+    changedAt: {
+      type: Date,
+      default: Date.now,
+      required: true
+    },
+    reason: {
+      type: String,
+      trim: true,
+      default: ''
+    },
+    changedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null
+    }
+  },
+  { _id: false }
+);
+
 const programEnrollmentSchema = new mongoose.Schema(
   {
     ngoId: {
@@ -48,6 +74,10 @@ const programEnrollmentSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       default: null
+    },
+    history: {
+      type: [enrollmentHistoryEntrySchema],
+      default: []
     }
   },
   { timestamps: true }

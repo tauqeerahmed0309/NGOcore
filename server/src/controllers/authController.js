@@ -215,17 +215,46 @@ const googleLogin = async (req, res, next) => {
       return errorResponse(res, 401, 'Google sign-in could not be verified. Please try again.');
     }
 
+    // Verify token issuer
+    const validIssuers = ['accounts.google.com', 'https://accounts.google.com'];
+    if (!payload?.iss || !validIssuers.includes(payload.iss)) {
+      logger.warn(`Google sign-in token issuer invalid: ${payload?.iss}`);
+      return errorResponse(res, 401, 'Google sign-in token issuer is invalid.');
+    }
+
+    // Verify token expiration
+    if (!payload?.exp || payload.exp * 1000 <= Date.now()) {
+      logger.warn(`Google sign-in token expired (exp: ${payload?.exp})`);
+      return errorResponse(res, 401, 'Google sign-in token has expired. Please sign in again.');
+    }
+
+    // Verify email verification from Google
     if (!payload?.email || payload.email_verified !== true) {
       return errorResponse(res, 401, 'Google must confirm your email address before you can sign in.');
     }
 
     const email = payload.email.toLowerCase().trim();
-    const user = await User.findOne({ email, isEmailVerified: true });
+    // Allow login only for existing, registered users
+    const user = await User.findOne({ email });
     if (!user) {
+      logger.warn(`Google sign-in attempted for non-existent user: ${email}`);
       return errorResponse(res, 401, 'No existing verified NGOcore account is linked to this Google email.');
     }
+
+    // Reject deactivated or suspended accounts
+    if (user.status === 'suspended' || !user.isActive) {
+      await recordFailedLogin(req, email, user);
+      return errorResponse(res, 401, 'Account has been deactivated or suspended. Please contact an administrator.');
+    }
+
+    // Reject unverified email in NGOcore system
+    if (!user.isEmailVerified) {
+      await recordFailedLogin(req, email, user);
+      return errorResponse(res, 403, 'Please verify your email address before signing in.');
+    }
+
     if (req.body.role && user.role !== req.body.role) {
-      return errorResponse(res, 403, 'This Google account does not have access to the student portal.');
+      return errorResponse(res, 403, 'This Google account does not have access to the requested portal.');
     }
 
     return await completeLogin(req, res, user);

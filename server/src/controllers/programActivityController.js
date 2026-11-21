@@ -40,7 +40,8 @@ const updateEnrollment = async (req, res, next) => {
       req.params.studentId,
       req.body.status,
       req.body.reason,
-      req.ngoFilter
+      req.ngoFilter,
+      req.user?._id
     );
     await writeAuditLog({
       req,

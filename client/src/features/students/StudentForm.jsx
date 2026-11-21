@@ -8,7 +8,6 @@ import {
   FileText, 
   AlertCircle,
   AlertTriangle,
-  ShieldCheck, 
   MapPin, 
   Loader2 
 } from 'lucide-react';

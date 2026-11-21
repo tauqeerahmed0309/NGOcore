@@ -28,13 +28,13 @@ function AuthCard({ title, subtitle, children }) {
         <div className="login-brand">
           <div className="login-logo" aria-hidden="true">
             <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect width="28" height="28" rx="8" fill="#16a34a" />
+              <rect width="28" height="28" rx="8" fill="#030303" />
               <path d="M7 8h14M7 14h10M7 20h7" stroke="white" strokeWidth="2.2" strokeLinecap="round" />
             </svg>
           </div>
           <div className="login-brand-text">
-            <h1 className="login-brand-name">NGOcore</h1>
-            <p className="login-brand-sub">Digital Records for NGOs</p>
+            <h1 className="login-brand-name">ngocore</h1>
+            <p className="login-brand-sub">digital record management</p>
           </div>
         </div>
         <div className="login-heading">

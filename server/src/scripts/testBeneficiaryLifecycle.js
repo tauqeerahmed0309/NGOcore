@@ -667,6 +667,7 @@ const runTests = async () => {
         })
       });
       const prop = res.data?.data?.proposal || res.data?.data;
+      if (!prop?.available) console.log('Test 28 prop:', res.status, res.data);
       const ok =
         res.status === 200 &&
         prop?.available === true &&

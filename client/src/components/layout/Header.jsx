@@ -35,7 +35,7 @@ function usePageTitle(location) {
     '/staff/analytics': 'Organization Analytics',
     '/unauthorized': 'Access Denied',
   };
-  return map[location.pathname] || 'NGOcore';
+  return map[location.pathname] || 'ngocore';
 }
 
 export default function Header({ toggleSidebar }) {

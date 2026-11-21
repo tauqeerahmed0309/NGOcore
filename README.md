@@ -295,31 +295,61 @@ NGOcore includes production-ready Docker and Docker Compose orchestration across
                         │         ngocore-backend (Node 20)        │
                         │   ├── REST API Listener (0.0.0.0:5000)   │
                         │   ├── Non-root User ('node')             │
-                        │   └── Signal Handler (dumb-init)         │
+                        │   ├── Signal Handler (dumb-init)         │
+                        │   └── Custom DNS Resolvers (8.8.8.8)     │
                         └─────────────────────┬────────────────────┘
-                                              │ Internal Docker Network (mongodb:27017)
+                                              │ External Cloud Connection (mongodb+srv://)
                                               ▼
                         ┌──────────────────────────────────────────┐
-                        │         ngocore-mongodb (Mongo 7)        │
-                        │   └── Named Volume: ngocore_mongodb_data │
+                        │      MongoDB Atlas Cloud Database        │
+                        │   (cluster0.xxxxx.mongodb.net/ngocore_db)│
                         └──────────────────────────────────────────┘
 ```
 
 #### Prerequisites
 - **Docker Desktop** (Engine 20.10+ / Compose v2.0+) installed and running.
 - (Windows users: Ensure WSL 2 backend or Hyper-V is enabled).
+- **MongoDB Atlas Cluster**: An active Atlas M0/M10 cluster with:
+  1. A Database User with `readWrite` permissions.
+  2. Network Access configured to whitelist your public IP (or `0.0.0.0/0` for initial testing).
 
 #### Step 1: Configure Environment Variables
 Copy the provided Docker environment template:
 ```bash
 cp .env.docker.example .env
 ```
-Ensure `JWT_SECRET` is set to a secure random string of at least 32 characters.
 
-#### Step 2: Build and Start All Services
-Launch the orchestrated stack in detached mode:
+1. **Configure MongoDB Atlas Connection String (`MONGODB_URI`)**:
+   In `.env`, set `MONGODB_URI` to your actual Atlas connection URI:
+   ```env
+   MONGODB_URI=mongodb+srv://<username>:<password>@cluster0.xxxxx.mongodb.net/ngocore_db?retryWrites=true&w=majority
+   ```
+   > [!IMPORTANT]
+   > `MONGODB_URI` is strictly mandatory. Docker Compose will fail fast and refuse to start if this variable is missing or empty.
+
+2. **Generate a Secure `JWT_SECRET`**:
+   Generate a cryptographically secure 32+ character signing key:
+   ```bash
+   # Using OpenSSL:
+   openssl rand -base64 32
+
+   # Or using Node.js:
+   node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+   ```
+   Paste the generated value into `.env` for `JWT_SECRET`.
+
+> [!NOTE]
+> Optional integrations (SMTP email, Google OAuth, Gemini AI, Anthropic Claude) can remain empty in `.env`. When left empty, NGOcore automatically falls back to deterministic rule-based algorithms and local authentication without error.
+
+#### Step 2: Build and Start Services in MongoDB Atlas Mode
+In Atlas mode (the default), Docker Compose launches **only the backend and frontend services**. The local MongoDB container is bypassed:
 ```bash
 docker compose up -d --build
+```
+
+*(Optional)* If you ever wish to test against a local containerized MongoDB database instead of Atlas:
+```bash
+docker compose --profile local-db up -d --build
 ```
 
 #### Step 3: Verify Service Status & Health
@@ -327,10 +357,9 @@ Check container state and healthcheck readiness:
 ```bash
 docker compose ps
 ```
-Expected output:
-- `ngocore-mongodb` — `Up (healthy)`
-- `ngocore-backend` — `Up (healthy)`
-- `ngocore-frontend` — `Up (healthy)`
+Expected output in Atlas mode:
+- `ngocore-backend` — `Up (healthy)` (Express REST API connected to Atlas, verified via `http://127.0.0.1:5000/api/v1/health`)
+- `ngocore-frontend` — `Up (healthy)` (Nginx web server serving SPA on `http://127.0.0.1:80/`)
 
 #### Application URLs & Endpoints
 | Component | URL | Description |
@@ -339,6 +368,7 @@ Expected output:
 | **Backend REST API** | `http://localhost:5000` | Direct backend API access |
 | **API Health Check** | `http://localhost:5000/api/v1/health` | Backend status & system metrics |
 | **Nginx Proxied API** | `http://localhost:3000/api/v1/health` | Same-origin API route via reverse proxy |
+| **Document Uploads** | `http://localhost:3000/uploads/...` | Static public asset route via reverse proxy |
 
 #### Inspect Container Logs
 Follow live logs across all services or individually:
@@ -390,28 +420,35 @@ docker volume ls | grep ngocore
 
 #### Troubleshooting Common Issues
 
-1. **Port Conflicts (`address already in use`)**:
-   - If port `3000` or `5000` is already in use by local services, open `.env` and assign alternate host ports:
+1. **Missing or Short `JWT_SECRET`**:
+   - Error: `JWT_SECRET environment variable is required and must be at least 32 characters` or backend exits with code 1 (`FATAL: Set JWT_SECRET to a random value of at least 32 characters.`).
+   - Fix: Open `.env` and assign a secure string $\ge 32$ characters.
+
+2. **Port Conflicts (`address already in use`)**:
+   - If port `3000` or `5000` is already in use by local processes, open `.env` and assign alternate host ports:
      ```env
      FRONTEND_PORT=8080
      PORT=5001
      ```
    - Restart with `docker compose up -d`.
 
-2. **MongoDB Connection Failures**:
-   - Check MongoDB container status: `docker compose ps mongodb`.
-   - Inspect MongoDB logs: `docker compose logs mongodb`.
-   - Ensure the backend `MONGODB_URI` uses `mongodb://mongodb:27017/...` (using the internal Docker service name, not `localhost`).
+3. **MongoDB Atlas Connection Failures**:
+   - Inspect backend logs: `docker compose logs backend`.
+   - Ensure `MONGODB_URI` in `.env` is a valid Atlas connection string (`mongodb+srv://...`).
+   - Check **Network Access** in the MongoDB Atlas Console: verify your current public IP is whitelisted (or `0.0.0.0/0` is permitted for testing).
+   - Check **Database Access**: verify username and password are correct and the user has permissions on the target database.
+   - Note: The backend container uses public DNS (`8.8.8.8`, `1.1.1.1`) to guarantee SRV and TXT lookup resolution for Atlas.
 
-3. **`JWT_SECRET` Validation Error during Backend Startup**:
-   - The backend enforces a minimum length of 32 characters for `JWT_SECRET`. If the backend exits with code 1, check `.env` and verify `JWT_SECRET` contains $\ge 32$ characters.
+4. **Frontend API Connection / CORS / Cookie Errors**:
+   - The frontend Nginx reverse proxy routes `/api` traffic to `http://backend:5000` as a same-origin request, preventing browser third-party cookie blocking.
+   - If accessing from a custom domain, ensure the domain is added to `CLIENT_URL` in `.env`.
 
-4. **Frontend API Connection / CORS Errors**:
-   - By default, the frontend Nginx web server proxies all `/api/` traffic to `http://backend:5000/api/` as a same-origin request, preventing browser CORS blocks and cookie rejection.
-   - If connecting from a custom domain, ensure the domain is added to `CLIENT_URL` in `.env`.
+5. **Uploads Failing (`413 Request Entity Too Large`)**:
+   - The Nginx reverse proxy is configured with `client_max_body_size 25M;` to support document and beneficiary photo uploads up to `MAX_FILE_SIZE_MB` (default 10MB).
 
-5. **Container Startup Sequence**:
-   - The backend container utilizes `depends_on: mongodb: condition: service_healthy` to guarantee that database indexes and sockets are ready before accepting HTTP requests.
+6. **Container Startup Sequence**:
+   - In Atlas mode, the backend connects directly to your Atlas cluster and starts listening on port 5000.
+   - The frontend container utilizes `depends_on: backend: condition: service_healthy` to guarantee API availability before serving web traffic.
 
 > [!CAUTION]
 > Never run `docker compose down -v` or `docker volume rm ngocore_mongodb_data` as a routine troubleshooting step, as this will permanently delete all persisted database records.

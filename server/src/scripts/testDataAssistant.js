@@ -33,7 +33,10 @@ const runTests = async () => {
   let user;
   let studentIds = [];
   let programIds = [];
-  await mongoose.connect(config.MONGODB_URI);
+  const mongoUri = (config.MONGODB_URI && !config.MONGODB_URI.startsWith('mongodb+srv://'))
+    ? config.MONGODB_URI
+    : 'mongodb://127.0.0.1:27017/ngo_records_db';
+  await mongoose.connect(mongoUri);
   config.ANTHROPIC_API_KEY = '';
 
   try {

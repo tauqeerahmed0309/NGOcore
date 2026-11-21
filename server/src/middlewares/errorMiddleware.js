@@ -24,6 +24,16 @@ const errorHandler = (err, req, res, next) => {
     message = `Supporting document exceeds the ${config.MAX_FILE_SIZE_MB} MB upload limit.`;
   }
 
+  // Handle Zod Validation Error
+  if (err.name === 'ZodError') {
+    statusCode = 400;
+    message = 'Validation failed';
+    errors = (err.issues || err.errors || []).map((e) => ({
+      field: e.path ? e.path.join('.') : '',
+      message: e.message || 'Validation error'
+    }));
+  }
+
   // Handle Mongoose Validation Error
   if (err.name === 'ValidationError') {
     statusCode = 400;

@@ -109,7 +109,7 @@ export default function PublicLandingPage() {
       <header className="landing-nav">
         <Link className="landing-brand" to="/" aria-label="NGOcore home">
           <span className="landing-brand-mark" aria-hidden="true">NC</span>
-          <span><strong>NGOcore</strong><small>Digital Records for NGOs</small></span>
+          <span><strong>ngocore</strong><small>digital records for ngos</small></span>
         </Link>
         <nav className="landing-nav-links" aria-label="Main navigation">
           <a href="#features">Features</a>
@@ -200,7 +200,7 @@ export default function PublicLandingPage() {
       <footer className="landing-footer">
         <Link className="landing-brand" to="/">
           <span className="landing-brand-mark" aria-hidden="true">NC</span>
-          <span><strong>NGOcore</strong><small>Digital Records for NGOs</small></span>
+          <span><strong>ngocore</strong><small>digital records for ngos</small></span>
         </Link>
         <span>Clear records. More room for impact.</span>
         <Link to="/login">Sign in</Link>

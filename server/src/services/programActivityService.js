@@ -2,11 +2,12 @@ const AttendanceSession = require('../models/AttendanceSession');
 const Program = require('../models/Program');
 const ProgramEnrollment = require('../models/ProgramEnrollment');
 const Student = require('../models/Student');
+const logger = require('../utils/logger');
 
 const httpError = (statusCode, message) => Object.assign(new Error(message), { statusCode });
 
 const getProgram = async (programId, ngoFilter) => {
-  const program = await Program.findOne(ngoFilter({ _id: programId })).select('status capacity').lean();
+  const program = await Program.findOne(ngoFilter({ _id: programId })).select('status capacity enrolledCount').lean();
   if (!program) throw httpError(404, 'Program not found.');
   return program;
 };
@@ -38,6 +39,25 @@ const listEnrollments = async (programId, { page = 1, limit = 100 }, ngoFilter) 
   return { enrollments, pagination: makePagination(totalItems, page, limit) };
 };
 
+const ensureEnrolledCountSynchronized = async (program, ngoFilter) => {
+  if (program.enrolledCount === undefined || program.enrolledCount === null) {
+    const trueCount = await ProgramEnrollment.countDocuments(
+      ngoFilter({ programId: program._id, status: 'enrolled' })
+    );
+    // Conditional update: only sets enrolledCount if it is missing or null in DB
+    await Program.updateOne(
+      ngoFilter({
+        _id: program._id,
+        $or: [{ enrolledCount: { $exists: false } }, { enrolledCount: null }]
+      }),
+      { $set: { enrolledCount: trueCount } }
+    );
+    const fresh = await Program.findOne(ngoFilter({ _id: program._id })).select('enrolledCount').lean();
+    program.enrolledCount = fresh?.enrolledCount ?? trueCount;
+  }
+  return program.enrolledCount;
+};
+
 const enrollStudent = async (programId, studentId, ngoId, ngoFilter, enrolledById = null) => {
   const [program, student] = await Promise.all([
     getProgram(programId, ngoFilter),
@@ -46,81 +66,285 @@ const enrollStudent = async (programId, studentId, ngoId, ngoFilter, enrolledByI
   if (!student) throw httpError(404, 'Active student record not found in this organization.');
   if (program.status !== 'active') throw httpError(400, 'Only active programs can accept enrollments.');
 
-  // Pre-creation capacity verification
-  const currentCount = await ProgramEnrollment.countDocuments(ngoFilter({
-    programId,
-    status: 'enrolled'
-  }));
-  if (program.capacity && currentCount >= program.capacity) {
-    throw httpError(409, 'This program has reached its enrollment capacity.');
-  }
-
+  // Pre-check duplicate active enrollment
   const existing = await ProgramEnrollment.findOne(ngoFilter({ programId, studentId }));
-  let enrollment;
-
-  if (existing) {
-    if (existing.status === 'enrolled') {
-      throw httpError(409, 'Student is already enrolled in this program.');
-    }
-    // Reactivate previous withdrawn or completed enrollment
-    existing.status = 'enrolled';
-    existing.enrolledAt = new Date();
-    existing.withdrawnAt = null;
-    existing.withdrawalReason = '';
-    existing.enrolledBy = enrolledById;
-    await existing.save();
-    enrollment = existing;
-  } else {
-    enrollment = await ProgramEnrollment.create({
-      ngoId,
-      programId,
-      studentId,
-      enrolledBy: enrolledById
-    });
+  if (existing && existing.status === 'enrolled') {
+    throw httpError(409, 'Student is already enrolled in this program.');
   }
 
-  // Post-creation concurrency verification:
-  // If concurrent requests raced, re-verify total active enrollments against capacity
-  if (program.capacity) {
-    const postCount = await ProgramEnrollment.countDocuments(ngoFilter({
-      programId,
-      status: 'enrolled'
-    }));
-    if (postCount > program.capacity) {
-      // Revert the enrollment to prevent oversubscription
-      if (!existing) {
-        await ProgramEnrollment.deleteOne({ _id: enrollment._id });
-      } else {
-        existing.status = 'withdrawn';
-        existing.withdrawnAt = new Date();
-        existing.withdrawalReason = 'Capacity exceeded during concurrent enrollment';
-        await existing.save();
-      }
+  // Ensure program enrolledCount is synchronized before checking or reserving capacity
+  await ensureEnrolledCountSynchronized(program, ngoFilter);
+
+  // ATOMIC RESERVATION STRATEGY:
+  // If program has finite capacity, atomically reserve a seat on the Program document.
+  // Unsafe fallback `{ enrolledCount: { $exists: false } }` has been completely removed.
+  let reserved = false;
+  if (program.capacity !== null && program.capacity !== undefined) {
+    // Immediate pre-check against synchronized counter
+    if (program.enrolledCount >= program.capacity) {
       throw httpError(409, 'This program has reached its enrollment capacity.');
     }
+
+    const reservationUpdate = await Program.findOneAndUpdate(
+      ngoFilter({
+        _id: programId,
+        enrolledCount: { $lt: program.capacity }
+      }),
+      { $inc: { enrolledCount: 1 } },
+      { returnDocument: 'after' }
+    );
+
+    if (!reservationUpdate) {
+      const checkProg = await Program.findOne(ngoFilter({ _id: programId }));
+      if (!checkProg) throw httpError(404, 'Program not found.');
+      throw httpError(409, 'This program has reached its enrollment capacity.');
+    }
+    reserved = true;
+  } else {
+    await Program.updateOne(ngoFilter({ _id: programId }), { $inc: { enrolledCount: 1 } });
+    reserved = true;
+  }
+
+  const now = new Date();
+  let enrollment;
+  try {
+    if (existing) {
+      // Re-enrollment of previously withdrawn or completed enrollment:
+      // PRESERVE previous enrollment history without wiping it
+      const historyEntry = {
+        status: 'enrolled',
+        changedAt: now,
+        reason: 'Re-enrollment',
+        changedBy: enrolledById
+      };
+
+      // Perform atomic CAS state transition on the enrollment document
+      const updated = await ProgramEnrollment.findOneAndUpdate(
+        ngoFilter({
+          _id: existing._id,
+          status: { $ne: 'enrolled' } // CAS guard: only if currently withdrawn or completed
+        }),
+        {
+          $set: {
+            status: 'enrolled',
+            enrolledAt: now,
+            withdrawnAt: null,
+            withdrawalReason: '',
+            completedAt: null,
+            enrolledBy: enrolledById
+          },
+          $push: { history: historyEntry }
+        },
+        { returnDocument: 'after', runValidators: true }
+      );
+
+      if (!updated) {
+        // Another concurrent request already re-enrolled this student!
+        // Release reservation seat to prevent over-counting
+        if (reserved) {
+          await Program.updateOne(ngoFilter({ _id: programId, enrolledCount: { $gt: 0 } }), { $inc: { enrolledCount: -1 } });
+        }
+        throw httpError(409, 'Student is already enrolled in this program.');
+      }
+      enrollment = updated;
+    } else {
+      // New enrollment
+      const historyEntry = {
+        status: 'enrolled',
+        changedAt: now,
+        reason: 'Initial enrollment',
+        changedBy: enrolledById
+      };
+
+      enrollment = await ProgramEnrollment.create({
+        ngoId,
+        programId,
+        studentId,
+        status: 'enrolled',
+        enrolledAt: now,
+        enrolledBy: enrolledById,
+        history: [historyEntry]
+      });
+    }
+  } catch (createErr) {
+    // Release atomic reservation on document creation failure or collision
+    if (reserved) {
+      await Program.updateOne({ _id: programId, enrolledCount: { $gt: 0 } }, { $inc: { enrolledCount: -1 } });
+    }
+    throw createErr;
   }
 
   return enrollment.populate('studentId', 'registrationNumber firstName lastName email status userId');
 };
 
-const changeEnrollmentStatus = async (programId, studentId, status, reason = '', ngoFilter) => {
+const changeEnrollmentStatus = async (programId, studentId, status, reason = '', ngoFilter, userId = null) => {
+  const current = await ProgramEnrollment.findOne(ngoFilter({ programId, studentId }));
+  if (!current) throw httpError(404, 'Program enrollment not found.');
+
+  // Idempotency: If already in target status, return consistently without altering counters or duplicate history
+  if (current.status === status) {
+    return current.populate('studentId', 'registrationNumber firstName lastName email status userId');
+  }
+
+  const now = new Date();
+
+  // CASE 1: Transitioning AWAY from active 'enrolled' ('enrolled' -> 'withdrawn' OR 'enrolled' -> 'completed')
+  if (current.status === 'enrolled' && (status === 'withdrawn' || status === 'completed')) {
+    const historyEntry = {
+      status,
+      changedAt: now,
+      reason: reason || (status === 'completed' ? 'Program completed' : 'Beneficiary withdrawn'),
+      changedBy: userId
+    };
+
+    // CONDITIONAL ATOMIC CAS TRANSITION on ProgramEnrollment:
+    // Only matches and updates if the document is still in 'enrolled' status at the instant of the write.
+    const updatedEnrollment = await ProgramEnrollment.findOneAndUpdate(
+      ngoFilter({
+        programId,
+        studentId,
+        status: 'enrolled' // Atomic CAS condition: prevents double-withdrawals under concurrency
+      }),
+      {
+        $set: {
+          status,
+          withdrawnAt: status === 'withdrawn' ? now : null,
+          withdrawalReason: status === 'withdrawn' ? (reason || '') : '',
+          completedAt: status === 'completed' ? now : null
+        },
+        $push: { history: historyEntry }
+      },
+      { returnDocument: 'after', runValidators: true }
+    );
+
+    if (updatedEnrollment) {
+      // ONLY the request that successfully executed the atomic transition decrements the program counter
+      try {
+        await Program.updateOne(
+          ngoFilter({ _id: programId, enrolledCount: { $gt: 0 } }),
+          { $inc: { enrolledCount: -1 } }
+        );
+      } catch (counterErr) {
+        // Recovery mechanism: If the subsequent program update fails, reconcile program counter
+        logger.error(`Failed to decrement enrolledCount for program ${programId}: ${counterErr.message}`);
+        const actualCount = await ProgramEnrollment.countDocuments(
+          ngoFilter({ programId, status: 'enrolled' })
+        );
+        await Program.updateOne(ngoFilter({ _id: programId }), { $set: { enrolledCount: actualCount } });
+      }
+      return updatedEnrollment.populate('studentId', 'registrationNumber firstName lastName email status userId');
+    } else {
+      // Another concurrent request already transitioned this record away from 'enrolled'.
+      // Return the current document state consistently without decrementing the program counter again.
+      const freshDoc = await ProgramEnrollment.findOne(ngoFilter({ programId, studentId }))
+        .populate('studentId', 'registrationNumber firstName lastName email status userId');
+      return freshDoc;
+    }
+  }
+
+  // CASE 2: Transitioning BACK TO active 'enrolled' from 'withdrawn' or 'completed' (Re-enrollment)
+  if (current.status !== 'enrolled' && status === 'enrolled') {
+    const prog = await getProgram(programId, ngoFilter);
+    if (prog.status !== 'active') {
+      throw httpError(400, 'Only active programs can accept enrollments.');
+    }
+
+    await ensureEnrolledCountSynchronized(prog, ngoFilter);
+
+    // Atomically reserve capacity first
+    let reserved = false;
+    if (prog.capacity !== null && prog.capacity !== undefined) {
+      if (prog.enrolledCount >= prog.capacity) {
+        throw httpError(409, 'This program has reached its enrollment capacity.');
+      }
+
+      const reservation = await Program.findOneAndUpdate(
+        ngoFilter({
+          _id: programId,
+          enrolledCount: { $lt: prog.capacity }
+        }),
+        { $inc: { enrolledCount: 1 } },
+        { returnDocument: 'after' }
+      );
+      if (!reservation) {
+        throw httpError(409, 'This program has reached its enrollment capacity.');
+      }
+      reserved = true;
+    } else {
+      await Program.updateOne(ngoFilter({ _id: programId }), { $inc: { enrolledCount: 1 } });
+      reserved = true;
+    }
+
+    const historyEntry = {
+      status: 'enrolled',
+      changedAt: now,
+      reason: reason || 'Re-enrollment',
+      changedBy: userId
+    };
+
+    // CONDITIONAL ATOMIC CAS on ProgramEnrollment:
+    // Only matches if current status is NOT 'enrolled'
+    const updatedEnrollment = await ProgramEnrollment.findOneAndUpdate(
+      ngoFilter({
+        programId,
+        studentId,
+        status: { $ne: 'enrolled' }
+      }),
+      {
+        $set: {
+          status: 'enrolled',
+          enrolledAt: now,
+          withdrawnAt: null,
+          withdrawalReason: '',
+          completedAt: null,
+          enrolledBy: userId
+        },
+        $push: { history: historyEntry }
+      },
+      { returnDocument: 'after', runValidators: true }
+    );
+
+    if (!updatedEnrollment) {
+      // Another concurrent request already re-enrolled this student. Release the reserved seat!
+      if (reserved) {
+        await Program.updateOne(
+          ngoFilter({ _id: programId, enrolledCount: { $gt: 0 } }),
+          { $inc: { enrolledCount: -1 } }
+        );
+      }
+      const freshDoc = await ProgramEnrollment.findOne(ngoFilter({ programId, studentId }))
+        .populate('studentId', 'registrationNumber firstName lastName email status userId');
+      return freshDoc;
+    }
+
+    return updatedEnrollment.populate('studentId', 'registrationNumber firstName lastName email status userId');
+  }
+
+  // CASE 3: Status transition between non-active states (e.g., 'withdrawn' -> 'completed')
+  const historyEntry = {
+    status,
+    changedAt: now,
+    reason: reason || `Status updated to ${status}`,
+    changedBy: userId
+  };
+
   const updateData = { status };
   if (status === 'withdrawn') {
-    updateData.withdrawnAt = new Date();
+    updateData.withdrawnAt = now;
     updateData.withdrawalReason = reason || '';
   } else if (status === 'completed') {
-    updateData.completedAt = new Date();
-  } else if (status === 'enrolled') {
-    updateData.withdrawnAt = null;
-    updateData.withdrawalReason = '';
+    updateData.completedAt = now;
   }
 
   const enrollment = await ProgramEnrollment.findOneAndUpdate(
     ngoFilter({ programId, studentId }),
-    { $set: updateData },
+    {
+      $set: updateData,
+      $push: { history: historyEntry }
+    },
     { returnDocument: 'after', runValidators: true }
   ).populate('studentId', 'registrationNumber firstName lastName email status userId');
-  if (!enrollment) throw httpError(404, 'Program enrollment not found.');
+
   return enrollment;
 };
 

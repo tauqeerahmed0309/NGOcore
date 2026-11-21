@@ -6,6 +6,7 @@ const ngoScope = (req, res, next) => {
   }
 
   const ngoId = req.user.ngoId;
+  req.ngoId = ngoId;
   req.ngoFilter = (conditions = {}) => ({ ...conditions, ngoId });
   return next();
 };
